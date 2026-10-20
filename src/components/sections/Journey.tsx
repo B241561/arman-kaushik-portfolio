@@ -37,7 +37,7 @@ export function Journey() {
           {journey.items.map((item, i) => {
             const Icon = icons[item.type]
             return (
-              <li key={`${item.title}-${i}`} className="relative">
+              <li key={item.id} className="relative">
                 <motion.span
                   aria-hidden
                   initial={{ scale: 0 }}

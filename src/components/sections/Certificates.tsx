@@ -34,6 +34,11 @@ export function Certificates() {
               <li key={certificate.id}>
                 <Reveal delay={index * 0.06}>
                   <GlassCard className="h-full">
+                    {certificate.type === 'image' && certificate.file && (
+                      <button type="button" onClick={() => setSelected(certificate)} aria-label={`Open ${certificate.title} certificate`} className="mb-5 block w-full overflow-hidden rounded-2xl border border-[var(--line)]">
+                        <SafeImage key={certificate.file} src={certificate.file} alt={`${certificate.title} certificate`} loading="lazy" fallbackLabel="Certificate image unavailable" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+                      </button>
+                    )}
                     <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-2xl border border-[var(--line)]">
                       <Icon className="text-accent size-5" />
                     </span>

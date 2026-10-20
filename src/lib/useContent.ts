@@ -43,15 +43,18 @@ function isRecord(value: unknown): value is RecordValue {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+// A saved array replaces the default array outright: its length, order and members come from the
+// saved document. Only an item whose id matches a default item borrows that item's missing fields;
+// there is no positional fallback, so new items never inherit fields from an unrelated default.
 function mergeValues(defaultValue: unknown, savedValue: unknown): unknown {
   if (Array.isArray(savedValue)) {
     const defaults = Array.isArray(defaultValue) ? defaultValue : []
-    return savedValue.map((item, index) => {
+    return savedValue.map((item) => {
       const itemId = isRecord(item) && typeof item.id === 'string' ? item.id : null
       const matchingDefault = itemId
         ? defaults.find((candidate) => isRecord(candidate) && candidate.id === itemId)
         : undefined
-      return mergeValues(matchingDefault ?? defaults[index] ?? {}, item)
+      return matchingDefault ? mergeValues(matchingDefault, item) : item
     })
   }
 
