@@ -1,19 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { getStore } from '@netlify/blobs'
 import { isAuthorized, jsonResponse } from './_admin-auth'
+import { MEDIA_STORE_NAME, MEDIA_TYPES, mediaStore, mediaUrl, sniffMediaType } from './_media'
 
 const MAX_SIZE = 4 * 1024 * 1024
-const supportedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf'])
-
-function matchesSignature(bytes: Uint8Array, type: string) {
-  if (type === 'image/jpeg') return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
-  if (type === 'image/png') return bytes.length >= 8 && bytes.slice(0, 8).join(',') === '137,80,78,71,13,10,26,10'
-  if (type === 'image/webp') return bytes.length >= 12 &&
-    String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' &&
-    String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP'
-  if (type === 'application/pdf') return String.fromCharCode(...bytes.slice(0, 5)) === '%PDF-'
-  return false
-}
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405, { Allow: 'POST' })
@@ -28,7 +17,7 @@ export default async function handler(request: Request): Promise<Response> {
       return jsonResponse({ error: 'Invalid file name encoding' }, 400)
     }
     const name = decodedName.replace(/[\\/\r\n]/g, '_').slice(0, 120)
-    if (!supportedTypes.has(type)) return jsonResponse({ error: 'Unsupported file type' }, 415)
+    if (!MEDIA_TYPES.has(type)) return jsonResponse({ error: 'Unsupported file type' }, 415)
 
     const contentLength = Number(request.headers.get('content-length'))
     if (Number.isFinite(contentLength) && contentLength > MAX_SIZE) {
@@ -55,12 +44,14 @@ export default async function handler(request: Request): Promise<Response> {
       bytes.set(chunk, offset)
       offset += chunk.length
     }
-    if (!matchesSignature(bytes, type)) return jsonResponse({ error: 'File contents do not match the selected type' }, 400)
+    if (sniffMediaType(bytes) !== type) return jsonResponse({ error: 'File contents do not match the selected type' }, 400)
 
-    const id = randomUUID()
-    await getStore('media').set(id, bytes, { metadata: { name, type, size: bytes.length } })
-    return jsonResponse({ id, url: `/media/${id}`, name, type, size: bytes.length })
-  } catch {
+    const id = randomUUID().toLowerCase()
+    await mediaStore().set(id, bytes, { metadata: { name, type, size: bytes.length } })
+    console.log(`[media-upload] stored store=${MEDIA_STORE_NAME} key=${id} size=${bytes.length} type=${type}`)
+    return jsonResponse({ id, url: mediaUrl(id), name, type, size: bytes.length })
+  } catch (error) {
+    console.error(`[media-upload] failed store=${MEDIA_STORE_NAME}`, error instanceof Error ? error.message : error)
     return jsonResponse({ error: 'Upload failed' }, 500)
   }
 }

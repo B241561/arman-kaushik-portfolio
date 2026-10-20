@@ -23,7 +23,7 @@
   from = "/media/*"
   to = "/.netlify/functions/media-get?id=:splat"
   status = 200
-  force = false
+  force = true
 
 [[redirects]]
   from = "/*"
