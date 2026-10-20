@@ -1,5 +1,5 @@
 import { AnimatePresence, MotionConfig } from 'framer-motion'
-import { useCallback, useState } from 'react'
+import { lazy, Suspense, useCallback, useState } from 'react'
 import { Cursor } from './components/layout/Cursor'
 import { Footer } from './components/layout/Footer'
 import { Intro } from './components/layout/Intro'
@@ -16,6 +16,7 @@ import { prefersReducedMotion } from './lib/hooks'
 import { useContent } from './lib/useContent'
 
 const INTRO_KEY = 'intro-seen'
+const AdminPage = lazy(() => import('./components/admin/AdminPage'))
 
 /** Intro plays once per session and never for reduced-motion users. */
 function shouldSkipIntro() {
@@ -28,6 +29,17 @@ function shouldSkipIntro() {
 }
 
 export default function App() {
+  if (window.location.pathname.replace(/\/+$/, '') === '/admin') {
+    return (
+      <Suspense fallback={<main className="bg-bg text-fg min-h-screen p-6">Loading editor…</main>}>
+        <AdminPage />
+      </Suspense>
+    )
+  }
+  return <PublicApp />
+}
+
+function PublicApp() {
   const [ready, setReady] = useState(shouldSkipIntro)
   const content = useContent()
 

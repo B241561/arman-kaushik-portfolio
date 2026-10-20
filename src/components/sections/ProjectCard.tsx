@@ -86,7 +86,7 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
           </div>
           <p className="text-muted text-[15px] leading-relaxed">{project.featured ? project.summary : project.tagline}</p>
           <ul className="mt-1 flex flex-wrap gap-1.5">
-            {project.stack.slice(0, project.featured ? 4 : 3).map((tag) => (
+            {project.tags.slice(0, project.featured ? 4 : 3).map((tag) => (
               <li key={tag} className="bg-fg/[0.05] text-fg/80 rounded-full border border-[var(--line)] px-3 py-1 text-xs font-medium">
                 {tag}
               </li>

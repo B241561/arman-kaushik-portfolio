@@ -46,6 +46,7 @@ const projects: Project[] = [
       { id: 'calibration', label: 'Calibration', description: 'Calibration — check whether predicted confidence matches what actually happens.' },
       { id: 'fairness', label: 'Fairness', description: 'Fairness — compare how outcomes differ across groups.' },
       { id: 'data-integrity', label: 'Data integrity', description: 'Data integrity — check the inputs for problems before blaming the model.' },
+      { id: 'platform', label: 'Platform', description: 'Brought together in one investigation platform built with Flask.' },
     ] as ProjectFlowStep[],
     featured: true,
     problem:

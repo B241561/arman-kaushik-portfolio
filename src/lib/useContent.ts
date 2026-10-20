@@ -82,10 +82,6 @@ function mapProject(project: EditableProject, index: number): Partial<Project> &
     mapped.demoVideoUrl = project.demoVideoUrl
   } else if (links !== undefined) {
     const savedDemo = links.find((link) => link.kind === 'demo')
-    const fallbackDemoUrl = defaultProject?.demoVideoUrl
-    if (!savedDemo && fallbackDemoUrl) {
-      links.push({ label: 'Demo video', href: fallbackDemoUrl, kind: 'demo' })
-    }
     if (savedDemo) mapped.demoVideoUrl = savedDemo.href
   }
   if (links !== undefined) mapped.links = links
@@ -144,17 +140,6 @@ function toContentPatch(saved: EditableContent): RecordValue {
   return patch
 }
 
-function readCachedContent(): EditableContent | null {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY)
-    if (raw === null) return null
-    const parsed: unknown = JSON.parse(raw)
-    return isEditableContent(parsed) ? parsed : null
-  } catch {
-    return null
-  }
-}
-
 function cacheContent(saved: EditableContent) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(saved))
@@ -165,17 +150,18 @@ function cacheContent(saved: EditableContent) {
 
 async function fetchContent(): Promise<SiteContent> {
   try {
-    const response = await fetch('/.netlify/functions/content-get')
+    const response = await fetch('/.netlify/functions/content-get', { cache: 'no-store' })
     if (!response.ok) return content
     const value: unknown = await response.json()
     if (!isEditableContent(value)) return content
 
-    const saved = Object.keys(value).length === 0 ? readCachedContent() : value
-    if (!saved) return content
-    if (saved !== value) return mergeValues(content, toContentPatch(saved)) as SiteContent
+    if (Object.keys(value).length === 0) {
+      try { localStorage.removeItem(CACHE_KEY) } catch { /* storage can be unavailable */ }
+      return content
+    }
 
-    cacheContent(saved)
-    return mergeValues(content, toContentPatch(saved)) as SiteContent
+    cacheContent(value)
+    return mergeValues(content, toContentPatch(value)) as SiteContent
   } catch {
     return content
   }

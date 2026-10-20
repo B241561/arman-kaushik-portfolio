@@ -112,7 +112,7 @@ function seo(): Plugin {
       this.emitFile({
         type: 'asset',
         fileName: 'robots.txt',
-        source: `User-agent: *\nAllow: /\n\nSitemap: ${url}/sitemap.xml\n`,
+        source: `User-agent: *\nDisallow: /admin\nAllow: /\n\nSitemap: ${url}/sitemap.xml\n`,
       })
       this.emitFile({
         type: 'asset',
