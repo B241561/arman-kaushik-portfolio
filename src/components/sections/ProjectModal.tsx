@@ -113,12 +113,12 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
               <ProjectArt project={project} large />
             </div>
 
-            {project.links.map((link) => {
+            {project.links.map((link, i) => {
               if (link.kind !== 'demo') return null
               const videoId = getYouTubeVideoId(link.href)
               return videoId ? (
                 <DemoVideo
-                  key={link.href}
+                  key={`${i}-${link.href}`}
                   project={project}
                   videoId={videoId}
                   href={link.href}
@@ -128,8 +128,8 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
               ) : null
             })}
 
-            {project.screenshots.slice(1).map((screenshot) => (
-              <div key={screenshot.src} className="px-6 pt-5 sm:px-12">
+            {project.screenshots.slice(1).map((screenshot, i) => (
+              <div key={`${i}-${screenshot.src}`} className="px-6 pt-5 sm:px-12">
                 <LazyImage
                   src={screenshot.src}
                   alt={screenshot.alt}
@@ -182,8 +182,8 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     {project.approach.length > 0 && <motion.section {...fadeUp(0.22)}>
                     <ModalLabel>{projects.sections.approach}</ModalLabel>
                     <ul className="mt-4 space-y-3">
-                      {project.approach.map((step) => (
-                        <li key={step} className="text-muted flex gap-3 text-[16px] leading-relaxed">
+                      {project.approach.map((step, i) => (
+                        <li key={`${i}-${step}`} className="text-muted flex gap-3 text-[16px] leading-relaxed">
                           <span className="bg-accent-gradient mt-2.5 size-1.5 shrink-0 rounded-full" />
                           {step}
                         </li>
@@ -196,8 +196,8 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                   {project.stack.length > 0 && <motion.section {...fadeUp(0.26)}>
                     <ModalLabel>{projects.sections.stack}</ModalLabel>
                     <ul className="mt-4 flex flex-wrap gap-2">
-                      {project.stack.map((tag) => (
-                        <li key={tag} className="glass rounded-full px-3.5 py-1.5 text-sm font-medium">
+                      {project.stack.map((tag, i) => (
+                        <li key={`${i}-${tag}`} className="glass rounded-full px-3.5 py-1.5 text-sm font-medium">
                           {tag}
                         </li>
                       ))}
@@ -206,7 +206,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                   {project.links.some((link) => link.kind !== 'demo') && <motion.section {...fadeUp(0.3)}>
                     <ModalLabel>{projects.sections.links}</ModalLabel>
                     <ul className="mt-4 space-y-2">
-                      {project.links.filter((link) => link.kind !== 'demo').map((link) => {
+                      {project.links.filter((link) => link.kind !== 'demo').map((link, i) => {
                         const Icon = link.kind === 'repo' ? Code : Globe
                         const missing = isPlaceholder(link.href)
                         const inner = (
@@ -224,7 +224,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                           </>
                         )
                         return (
-                          <li key={link.label}>
+                          <li key={`${i}-${link.label}`}>
                             {missing ? (
                               <span className="flex items-center gap-3 rounded-2xl border border-dashed border-[var(--line)] p-3 opacity-70">
                                 {inner}
