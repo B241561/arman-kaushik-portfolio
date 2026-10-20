@@ -39,6 +39,7 @@ function warnForMissingPublicAssets(): Plugin {
     name: 'warn-for-missing-public-assets',
     configureServer() {
       const assetUrls = [
+        '/favicon.svg',
         content.person.resumeUrl,
         content.person.photo.src,
         ...content.projects.items.map((project) => project.image),
