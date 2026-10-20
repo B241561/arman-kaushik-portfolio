@@ -3,6 +3,7 @@ export type EditableProjectLink = { label: string; href: string; kind?: 'repo' |
 
 export type ProjectScreenshot = { src: string; alt: string }
 export type ProjectFlowStep = { id: string; label: string; description: string }
+export type Certificate = { id: string; title: string; issuer: string; year: string | number; type: 'image' | 'pdf' | 'link'; file: string }
 export type JourneyItem = {
   id: string
   date?: string
@@ -37,6 +38,11 @@ export type EditablePerson = {
   tagline?: string
   photo?: { src?: string; alt?: string }
   resumeUrl?: string
+}
+
+export type EditableResume = {
+  currentUrl?: string
+  previous?: { id: string; url: string; uploadedAt: string }[]
 }
 
 export type EditableAbout = {
@@ -80,13 +86,14 @@ export type EditableCertificate = {
   id: string
   title: string
   issuer: string
-  year: string | number
-  type: string
-  file: string
+  year?: string | number
+  type: 'image' | 'pdf' | 'link'
+  file?: string
 }
 
 export type EditableContent = {
   person?: EditablePerson
+  resume?: EditableResume
   about?: EditableAbout
   skills?: { groups?: EditableSkillGroup[] }
   projects?: EditableProject[]
@@ -124,6 +131,8 @@ const hasOnlyKeys = (value: UnknownRecord, keys: readonly string[]) =>
 
 const isText = (value: unknown, maxLength: number) =>
   typeof value === 'string' && value.length <= maxLength
+const isNonEmptyText = (value: unknown, maxLength: number) =>
+  typeof value === 'string' && value.length <= maxLength && value.trim().length > 0
 
 const isOptionalText = (value: UnknownRecord, key: string, maxLength: number) =>
   !(key in value) || isText(value[key], maxLength)
@@ -143,8 +152,73 @@ export function isAllowedAssetUrl(value: unknown): value is string {
   }
 }
 
-function isOptionalUrl(value: UnknownRecord, key: string) {
-  return !(key in value) || isAllowedAssetUrl(value[key])
+function isMediaAssetUrl(value: unknown) {
+  if (typeof value !== 'string') return false
+  if (/^\/media\/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value)) return true
+  return value.startsWith('https://') && isAllowedAssetUrl(value)
+}
+
+export function migrateLegacyAssetUrls(value: unknown, siteUrl: string): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value
+  const migrated = JSON.parse(JSON.stringify(value)) as Record<string, unknown>
+  const makeAbsolute = (record: Record<string, unknown>, key: string) => {
+    const asset = record[key]
+    if (typeof asset === 'string' && asset.startsWith('/') && !asset.startsWith('//') &&
+      !asset.startsWith('/media/') && !asset.includes('\\') && !/\s/.test(asset)) {
+      record[key] = new URL(asset, siteUrl).href
+    }
+  }
+
+  if (typeof migrated.person === 'object' && migrated.person !== null && !Array.isArray(migrated.person)) {
+    const person = migrated.person as Record<string, unknown>
+    makeAbsolute(person, 'resumeUrl')
+    if (typeof person.photo === 'object' && person.photo !== null && !Array.isArray(person.photo)) {
+      makeAbsolute(person.photo as Record<string, unknown>, 'src')
+    }
+  }
+  if (typeof migrated.resume === 'object' && migrated.resume !== null && !Array.isArray(migrated.resume)) {
+    const resume = migrated.resume as Record<string, unknown>
+    makeAbsolute(resume, 'currentUrl')
+    if (Array.isArray(resume.previous)) {
+      for (const item of resume.previous) {
+        if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+          makeAbsolute(item as Record<string, unknown>, 'url')
+        }
+      }
+    }
+  }
+  if (Array.isArray(migrated.projects)) {
+    for (const project of migrated.projects) {
+      if (typeof project !== 'object' || project === null || Array.isArray(project)) continue
+      const screenshots = (project as Record<string, unknown>).screenshots
+      if (Array.isArray(screenshots)) {
+        for (const screenshot of screenshots) {
+          if (typeof screenshot === 'object' && screenshot !== null && !Array.isArray(screenshot)) {
+            makeAbsolute(screenshot as Record<string, unknown>, 'src')
+          }
+        }
+      }
+    }
+  }
+  if (Array.isArray(migrated.certificates)) {
+    for (const certificate of migrated.certificates) {
+      if (typeof certificate === 'object' && certificate !== null && !Array.isArray(certificate)) {
+        makeAbsolute(certificate as Record<string, unknown>, 'file')
+      }
+    }
+  }
+  return migrated
+}
+
+function isYouTubeUrl(value: unknown): value is string {
+  if (typeof value !== 'string') return false
+  try {
+    const parsed = new URL(value)
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, '')
+    return ['youtu.be', 'youtube.com'].includes(host) && getYouTubeVideoId(value) !== null
+  } catch {
+    return false
+  }
 }
 
 function hasRequiredText(value: UnknownRecord, key: string, maxLength: number) {
@@ -153,21 +227,23 @@ function hasRequiredText(value: UnknownRecord, key: string, maxLength: number) {
 
 function isScreenshot(value: unknown): value is { src: string; alt: string } {
   if (!isRecord(value) || !hasOnlyKeys(value, ['src', 'alt'])) return false
-  return isAllowedAssetUrl(value.src) && hasRequiredText(value, 'alt', 120)
+  return isMediaAssetUrl(value.src) && isNonEmptyText(value.alt, 120)
 }
 
 function isProjectLink(value: unknown): value is EditableProjectLink {
   if (!isRecord(value) || !hasOnlyKeys(value, ['label', 'href', 'kind'])) return false
-  if (!hasRequiredText(value, 'label', 120) || !isAllowedAssetUrl(value.href)) return false
-  return !('kind' in value) || value.kind === 'repo' || value.kind === 'live' || value.kind === 'demo'
+  if (!isNonEmptyText(value.label, 120) || typeof value.href !== 'string' || !value.href.startsWith('https://') || !isAllowedAssetUrl(value.href)) return false
+  if (!('kind' in value)) return true
+  if (value.kind === 'demo') return isYouTubeUrl(value.href)
+  return value.kind === 'repo' || value.kind === 'live'
 }
 
 function isFlowStep(value: unknown): value is ProjectFlowStep {
   if (!isRecord(value) || !hasOnlyKeys(value, ['id', 'label', 'description'])) return false
   return (
-    hasRequiredText(value, 'id', 80) &&
-    hasRequiredText(value, 'label', 120) &&
-    hasRequiredText(value, 'description', 1500)
+    isNonEmptyText(value.id, 80) &&
+    isNonEmptyText(value.label, 120) &&
+    isNonEmptyText(value.description, 1500)
   )
 }
 
@@ -185,9 +261,9 @@ function isProject(value: unknown): value is EditableProject {
   ])) return false
 
   return (
-    hasRequiredText(value, 'id', 80) &&
-    isOptionalText(value, 'name', 120) &&
-    isOptionalText(value, 'tagline', 120) &&
+    isNonEmptyText(value.id, 80) &&
+    (!('name' in value) || isNonEmptyText(value.name, 120)) &&
+    (!('tagline' in value) || isNonEmptyText(value.tagline, 120)) &&
     isOptionalText(value, 'description', 1500) &&
     isOptionalText(value, 'problem', 1500) &&
     (!('approach' in value) || isStringArray(value.approach, 1500, 30)) &&
@@ -195,7 +271,7 @@ function isProject(value: unknown): value is EditableProject {
     (!('tags' in value) || isStringArray(value.tags, 120, 40)) &&
     (!('screenshots' in value) ||
       (Array.isArray(value.screenshots) && value.screenshots.length <= 12 && value.screenshots.every(isScreenshot))) &&
-    isOptionalUrl(value, 'demoVideoUrl') &&
+    (!('demoVideoUrl' in value) || value.demoVideoUrl === '' || isYouTubeUrl(value.demoVideoUrl)) &&
     (!('links' in value) ||
       (Array.isArray(value.links) && value.links.length <= 20 && value.links.every(isProjectLink))) &&
     (!('flowSteps' in value) ||
@@ -211,13 +287,13 @@ function isPerson(value: unknown): value is EditablePerson {
   if (
     !isOptionalText(value, 'name', 120) ||
     !isOptionalText(value, 'tagline', 1500) ||
-    !isOptionalUrl(value, 'resumeUrl')
+    ('resumeUrl' in value && !isMediaAssetUrl(value.resumeUrl))
   ) return false
   if (!('photo' in value)) return true
   return (
     isRecord(value.photo) &&
     hasOnlyKeys(value.photo, ['src', 'alt']) &&
-    isOptionalUrl(value.photo, 'src') &&
+    (!('src' in value.photo) || value.photo.src === '' || isMediaAssetUrl(value.photo.src)) &&
     isOptionalText(value.photo, 'alt', 120)
   )
 }
@@ -259,7 +335,7 @@ function isSkills(value: unknown): value is { groups?: EditableSkillGroup[] } {
     value.groups.every((group) =>
       isRecord(group) &&
       hasOnlyKeys(group, ['title', 'icon', 'items']) &&
-      hasRequiredText(group, 'title', 120) &&
+      isNonEmptyText(group.title, 120) &&
       ['code', 'brain', 'chart', 'globe'].includes(String(group.icon)) &&
       isStringArray(group.items, 120, 40))
   )
@@ -268,40 +344,54 @@ function isSkills(value: unknown): value is { groups?: EditableSkillGroup[] } {
 function isTimelineItem(value: unknown): value is EditableTimelineItem {
   if (!isRecord(value) || !hasOnlyKeys(value, ['id', 'date', 'kicker', 'title', 'text'])) return false
   return (
-    hasRequiredText(value, 'id', 80) &&
+    isNonEmptyText(value.id, 80) &&
     isOptionalText(value, 'date', 120) &&
-    hasRequiredText(value, 'kicker', 120) &&
-    hasRequiredText(value, 'title', 120) &&
-    hasRequiredText(value, 'text', 1500)
+    isNonEmptyText(value.kicker, 120) &&
+    isNonEmptyText(value.title, 120) &&
+    isNonEmptyText(value.text, 1500)
   )
 }
 
 function isCertificate(value: unknown): value is EditableCertificate {
   if (!isRecord(value) || !hasOnlyKeys(value, ['id', 'title', 'issuer', 'year', 'type', 'file'])) return false
   return (
-    hasRequiredText(value, 'id', 80) &&
-    hasRequiredText(value, 'title', 120) &&
-    hasRequiredText(value, 'issuer', 120) &&
-    (hasRequiredText(value, 'year', 40) ||
+    isNonEmptyText(value.id, 80) &&
+    isNonEmptyText(value.title, 120) &&
+    isNonEmptyText(value.issuer, 120) &&
+    (!('year' in value) || hasRequiredText(value, 'year', 40) ||
       (typeof value.year === 'number' && Number.isFinite(value.year))) &&
-    hasRequiredText(value, 'type', 80) &&
-    'file' in value &&
-    isAllowedAssetUrl(value.file)
+    ['image', 'pdf', 'link'].includes(String(value.type)) &&
+    (!('file' in value) || value.file === '' || isMediaAssetUrl(value.file))
   )
 }
 
+function isResume(value: unknown): value is EditableResume {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['currentUrl', 'previous'])) return false
+  if ('currentUrl' in value && !isMediaAssetUrl(value.currentUrl)) return false
+  if (!('previous' in value)) return true
+  return Array.isArray(value.previous) && value.previous.length <= 3 &&
+    value.previous.every((item) =>
+      isRecord(item) &&
+      hasOnlyKeys(item, ['id', 'url', 'uploadedAt']) &&
+      hasRequiredText(item, 'id', 80) &&
+      isMediaAssetUrl(item.url) &&
+      hasRequiredText(item, 'uploadedAt', 80)) &&
+    hasUniqueIds(value.previous)
+}
+
 export function isEditableContent(value: unknown): value is EditableContent {
-  if (!isRecord(value) || !hasOnlyKeys(value, ['person', 'about', 'skills', 'projects', 'timeline', 'certificates'])) {
+  if (!isRecord(value) || !hasOnlyKeys(value, ['person', 'resume', 'about', 'skills', 'projects', 'timeline', 'certificates'])) {
     return false
   }
 
   if ('person' in value && !isPerson(value.person)) return false
+  if ('resume' in value && !isResume(value.resume)) return false
   if ('about' in value && !isAbout(value.about)) return false
   if ('skills' in value && !isSkills(value.skills)) return false
   if ('projects' in value) {
     if (
       !Array.isArray(value.projects) ||
-      value.projects.length > 20 ||
+      value.projects.length > 12 ||
       !value.projects.every(isProject) ||
       !hasUniqueIds(value.projects)
     ) return false

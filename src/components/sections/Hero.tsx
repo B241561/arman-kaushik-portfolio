@@ -1,6 +1,6 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Download } from 'lucide-react'
-import { Fragment, useRef, useState, type MouseEvent } from 'react'
+import { Fragment, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { cn } from '../../lib/cn'
 import { useScrollTo } from '../../lib/lenis'
 import { spring, springSoft } from '../../lib/motion'
@@ -17,6 +17,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const toast = useToast()
   const ref = useRef<HTMLElement>(null)
   const [photoFailed, setPhotoFailed] = useState(false)
+  useEffect(() => setPhotoFailed(false), [person.photo.src])
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 140])
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0])

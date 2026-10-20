@@ -20,6 +20,12 @@
   force = false
 
 [[redirects]]
+  from = "/media/*"
+  to = "/.netlify/functions/media-get?id=:splat"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

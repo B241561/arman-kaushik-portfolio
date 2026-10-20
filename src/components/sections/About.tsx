@@ -33,12 +33,15 @@ export function About() {
 
         <div className="mt-6 grid gap-16 md:grid-cols-[1.4fr_1fr]">
           <div>
-            <HighlightText
-              text={about.body}
-              highlightSet={highlightSet}
-              className="text-[clamp(1.6rem,4.6vw,3.25rem)] leading-[1.14] font-semibold tracking-[-0.035em]"
-            />
+            {about.body && (
+              <HighlightText
+                text={about.body}
+                highlightSet={highlightSet}
+                className="text-[clamp(1.6rem,4.6vw,3.25rem)] leading-[1.14] font-semibold tracking-[-0.035em]"
+              />
+            )}
 
+            {(about.stats.length > 0 || about.status.lines.length > 0) && (
             <div className="mt-16 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {about.stats.map((stat, i) => (
                 <Reveal key={stat.label} delay={i * 0.08}>
@@ -50,7 +53,7 @@ export function About() {
                   </GlassCard>
                 </Reveal>
               ))}
-              <Reveal delay={0.16}>
+              {about.status.lines.length > 0 && <Reveal delay={0.16}>
                 <GlassCard className="flex h-full flex-col gap-6">
                   <div className="flex items-center gap-4">
                     <div className="min-w-0">
@@ -67,8 +70,9 @@ export function About() {
                     ))}
                   </ul>
                 </GlassCard>
-              </Reveal>
+              </Reveal>}
             </div>
+            )}
           </div>
 
           <div className="relative">

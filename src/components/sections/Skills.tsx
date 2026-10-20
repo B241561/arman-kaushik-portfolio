@@ -12,6 +12,8 @@ export function Skills() {
   const { skills } = useContent()
   const allSkills = skills.groups.flatMap((group) => group.items)
 
+  if (skills.groups.length === 0) return null
+
   return (
     <section id="skills" className="relative py-28 sm:py-40">
       <div className="container-x">
@@ -19,10 +21,12 @@ export function Skills() {
       </div>
 
       {/* Hovering anywhere on the band pauses both rows */}
-      <Reveal className="group/marquee mt-14 flex flex-col gap-3">
-        <Marquee items={allSkills} />
-        <Marquee items={[...allSkills].reverse()} reverse />
-      </Reveal>
+      {allSkills.length > 0 && (
+        <Reveal className="group/marquee mt-14 flex flex-col gap-3">
+          <Marquee items={allSkills} />
+          <Marquee items={[...allSkills].reverse()} reverse />
+        </Reveal>
+      )}
 
       <div className="container-x mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {skills.groups.map((group, i) => {

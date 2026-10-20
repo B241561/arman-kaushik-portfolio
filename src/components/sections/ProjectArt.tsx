@@ -1,5 +1,6 @@
 import { Activity, FileText, Plane } from 'lucide-react'
 import type { Project } from '../../data/schema'
+import { useEffect, useState } from 'react'
 import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
 import { LazyImage } from '../primitives/LazyImage'
@@ -16,8 +17,10 @@ const tints: Record<Project['icon'], string> = {
 /** Cover visual: the project's image when provided, otherwise abstract artwork. */
 export function ProjectArt({ project, large = false }: { project: Project; large?: boolean }) {
   const Icon = icons[project.icon]
+  const [imageFailed, setImageFailed] = useState(false)
+  useEffect(() => setImageFailed(false), [project.image])
 
-  if (!isPlaceholder(project.image)) {
+  if (!isPlaceholder(project.image) && !imageFailed) {
     return (
       <div className="bg-surface absolute inset-0 overflow-hidden">
         <LazyImage
@@ -25,6 +28,7 @@ export function ProjectArt({ project, large = false }: { project: Project; large
           alt={project.imageAlt ?? project.title}
           width={large ? 1200 : 720}
           height={large ? 675 : 405}
+          onError={() => setImageFailed(true)}
           className="absolute inset-0 size-full object-cover object-top"
         />
       </div>

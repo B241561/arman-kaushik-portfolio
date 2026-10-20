@@ -18,6 +18,8 @@ export function Journey() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.75', 'end 0.6'] })
   const scaleY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 1]), { stiffness: 120, damping: 26, restDelta: 0.001 })
 
+  if (journey.items.length === 0) return null
+
   return (
     <section id="journey" className="relative py-28 sm:py-40">
       <div className="container-x">

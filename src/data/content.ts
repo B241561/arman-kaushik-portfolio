@@ -7,7 +7,7 @@
  * This file contains the default content; use useContent() for rendered content.
  */
 
-import type { JourneyItem, Project, ProjectFlowStep, ProjectLink } from './schema'
+import type { Certificate, JourneyItem, Project, ProjectFlowStep, ProjectLink } from './schema'
 
 export type { Project, ProjectLink } from './schema'
 
@@ -100,8 +100,8 @@ const projects: Project[] = [
     tagline: 'AI-powered travel planner',
     summary: 'A MERN-style travel planner that uses Groq AI to help put trips together.',
     icon: 'tripcraft',
-    image: '/img/tripcraft.png',
-    screenshots: [{ src: '/img/tripcraft.png', alt: 'TripCraft' }],
+    image: '/img/tripcraft.webp',
+    screenshots: [{ src: '/img/tripcraft.webp', alt: 'TripCraft' }],
     tags: ['MERN-style stack', 'React', 'Groq AI', 'JWT auth', 'Docker', 'CI/CD'],
     demoVideoUrl: 'https://youtu.be/5x4SO8GRVZE',
     flowSteps: [
@@ -152,7 +152,9 @@ export const content = {
     ogImage: '[OG_IMAGE_URL]',
   },
 
-  certificates: [] as { id: string; title: string; issuer: string; year: string | number; type: string; file: string }[],
+  certificates: [
+    { id: 'wonkru', title: 'Wonkru Certificate', issuer: 'Wonkru', year: '', type: 'image' as const, file: '' },
+  ] as Certificate[],
 
   person,
 
@@ -176,6 +178,7 @@ export const content = {
       { id: 'about', label: 'About' },
       { id: 'skills', label: 'Skills' },
       { id: 'projects', label: 'Projects' },
+      { id: 'certificates', label: 'Certificates' },
       { id: 'journey', label: 'Journey' },
       { id: 'contact', label: 'Contact' },
     ],

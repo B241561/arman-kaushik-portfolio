@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, Code, Globe, Play, X } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUpRight, Code, Globe, Play, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
 import { getYouTubeVideoId, type Project } from '../../data/schema'
 import { useMediaQuery } from '../../lib/hooks'
@@ -8,6 +8,7 @@ import { spring, springLayout } from '../../lib/motion'
 import { isPlaceholder } from '../../lib/placeholder'
 import { useContent } from '../../lib/useContent'
 import { ProjectArt } from './ProjectArt'
+import { LazyImage } from '../primitives/LazyImage'
 
 /** Fullscreen sheet that grows out of the tapped card (shared layoutId), iOS app-open style. */
 export function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
@@ -127,6 +128,18 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
               ) : null
             })}
 
+            {project.screenshots.slice(1).map((screenshot) => (
+              <div key={screenshot.src} className="px-6 pt-5 sm:px-12">
+                <LazyImage
+                  src={screenshot.src}
+                  alt={screenshot.alt}
+                  width={1200}
+                  height={675}
+                  className="aspect-video w-full rounded-[20px] object-cover object-top"
+                />
+              </div>
+            ))}
+
             <div className="px-6 pb-14 sm:px-12">
               <motion.div {...fadeUp(0.1)}>
                 <p className="text-subtle text-xs font-semibold tracking-[0.18em] tabular-nums">{project.index}</p>
@@ -141,11 +154,32 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
 
               <div className="mt-10 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-14">
                 <div className="space-y-10">
-                  <motion.section {...fadeUp(0.16)}>
+                  {project.flowSteps.length > 0 && (
+                    <section>
+                      <ModalLabel>Project flow</ModalLabel>
+                      <ol className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:items-stretch sm:gap-0">
+                        {project.flowSteps.map((step, index) => (
+                          <li key={step.id} className="flex min-w-0 flex-1 flex-col items-center gap-2 sm:flex-row">
+                            <div className="glass w-full rounded-2xl p-3 sm:h-full">
+                              <p className="font-semibold">{step.label}</p>
+                              <p className="text-muted mt-1 text-sm leading-relaxed">{step.description}</p>
+                            </div>
+                            {index < project.flowSteps.length - 1 && (
+                              <>
+                                <ArrowDown aria-hidden className="text-accent size-4 shrink-0 sm:hidden" />
+                                <ArrowRight aria-hidden className="text-accent hidden size-4 shrink-0 sm:block" />
+                              </>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    </section>
+                  )}
+                    {project.problem && <motion.section {...fadeUp(0.16)}>
                     <ModalLabel>{projects.sections.problem}</ModalLabel>
                     <p className="text-fg/90 mt-3 text-lg leading-relaxed text-pretty">{project.problem}</p>
-                  </motion.section>
-                  <motion.section {...fadeUp(0.22)}>
+                    </motion.section>}
+                    {project.approach.length > 0 && <motion.section {...fadeUp(0.22)}>
                     <ModalLabel>{projects.sections.approach}</ModalLabel>
                     <ul className="mt-4 space-y-3">
                       {project.approach.map((step) => (
@@ -155,11 +189,11 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                         </li>
                       ))}
                     </ul>
-                  </motion.section>
+                  </motion.section>}
                 </div>
 
                 <div className="space-y-10">
-                  <motion.section {...fadeUp(0.26)}>
+                  {project.stack.length > 0 && <motion.section {...fadeUp(0.26)}>
                     <ModalLabel>{projects.sections.stack}</ModalLabel>
                     <ul className="mt-4 flex flex-wrap gap-2">
                       {project.stack.map((tag) => (
@@ -168,8 +202,8 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                         </li>
                       ))}
                     </ul>
-                  </motion.section>
-                  <motion.section {...fadeUp(0.3)}>
+                  </motion.section>}
+                  {project.links.some((link) => link.kind !== 'demo') && <motion.section {...fadeUp(0.3)}>
                     <ModalLabel>{projects.sections.links}</ModalLabel>
                     <ul className="mt-4 space-y-2">
                       {project.links.filter((link) => link.kind !== 'demo').map((link) => {
@@ -209,7 +243,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                         )
                       })}
                     </ul>
-                  </motion.section>
+                  </motion.section>}
                 </div>
               </div>
             </div>

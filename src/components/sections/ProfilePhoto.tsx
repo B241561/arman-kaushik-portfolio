@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
-import { useRef, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
 import { useContent } from '../../lib/useContent'
@@ -18,6 +18,8 @@ export function ProfilePhoto() {
   const fine = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
   const reduce = useReducedMotion()
   const ref = useRef<HTMLDivElement>(null)
+  const [photoFailed, setPhotoFailed] = useState(false)
+  useEffect(() => setPhotoFailed(false), [person.photo.src])
 
   const rotateX = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 })
   const rotateY = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 })
@@ -38,7 +40,7 @@ export function ProfilePhoto() {
     rotateY.set(0)
   }
 
-  const hasPhoto = !isPlaceholder(person.photo.src)
+  const hasPhoto = !isPlaceholder(person.photo.src) && !photoFailed
 
   return (
     <Reveal delay={0.2}>
@@ -63,6 +65,7 @@ export function ProfilePhoto() {
               width={640}
               height={800}
               className="absolute inset-0 size-full object-cover object-top"
+              onError={() => setPhotoFailed(true)}
             />
           ) : (
             <div className="absolute inset-0 overflow-hidden">

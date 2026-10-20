@@ -12,6 +12,8 @@ export function Projects() {
   const open = projects.items.find((p) => p.id === openId) ?? null
   const close = useCallback(() => setOpenId(null), [])
 
+  if (projects.items.length === 0) return null
+
   return (
     <section id="projects" className="relative py-28 sm:py-40">
       <div className="container-x">

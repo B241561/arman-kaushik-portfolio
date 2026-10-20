@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { content } from '../data/content'
 import {
   isEditableContent,
+  migrateLegacyAssetUrls,
   type EditableContent,
   type EditableProject,
+  type EditableCertificate,
   type EditableTimelineItem,
   type JourneyItem,
   type Project,
@@ -16,6 +18,26 @@ type SiteContent = typeof content
 type RecordValue = Record<string, unknown>
 
 let contentRequest: Promise<SiteContent> | undefined
+const defaultAssetPaths = new Set([
+  '/img/profile.jpg',
+  '/img/feynml.png',
+  '/img/resume-analyzer.png',
+  '/img/tripcraft.png',
+  '/img/tripcraft.webp',
+  '/Arman_kaushik_resume.pdf',
+])
+
+function restoreDefaultAssetPath(value: string): string {
+  try {
+    const parsed = new URL(value)
+    const defaultOrigin = new URL(content.site.url).origin
+    return parsed.origin === defaultOrigin && defaultAssetPaths.has(parsed.pathname)
+      ? parsed.pathname
+      : value
+  } catch {
+    return value
+  }
+}
 
 function isRecord(value: unknown): value is RecordValue {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -61,29 +83,35 @@ function mapProject(project: EditableProject, index: number): Partial<Project> &
   if (project.tags !== undefined) mapped.tags = project.tags
   if (project.flowSteps !== undefined) {
     mapped.flowSteps = project.flowSteps
-    mapped.approach = project.flowSteps.map((step) => step.description)
-  } else if (project.approach !== undefined) {
-    mapped.approach = project.approach
   }
+  if (project.approach !== undefined) mapped.approach = project.approach
   if (project.screenshots !== undefined) {
-    mapped.screenshots = project.screenshots
-    mapped.image = project.screenshots[0]?.src ?? ''
-    mapped.imageAlt = project.screenshots[0]?.alt
+    mapped.screenshots = project.screenshots.filter((screenshot) => screenshot.src !== '').map((screenshot) => ({
+      ...screenshot,
+      src: restoreDefaultAssetPath(screenshot.src),
+    }))
+    mapped.image = mapped.screenshots[0]?.src ?? ''
+    mapped.imageAlt = mapped.screenshots[0]?.alt
   }
 
   let links: ProjectLink[] | undefined
   if (project.links !== undefined) {
     links = project.links.map((link) => ({ ...link, kind: link.kind ?? 'live' }))
   }
-  if (project.demoVideoUrl !== undefined) {
+  if (project.demoVideoUrl) {
     links ??= defaultProject?.links ?? []
     links = links.filter((link) => link.kind !== 'demo')
     links.push({ label: 'Demo video', href: project.demoVideoUrl, kind: 'demo' })
     mapped.demoVideoUrl = project.demoVideoUrl
   } else if (links !== undefined) {
     const savedDemo = links.find((link) => link.kind === 'demo')
-    if (savedDemo) mapped.demoVideoUrl = savedDemo.href
+    links = links.filter((link) => link.kind !== 'demo')
+    if (project.demoVideoUrl === undefined && savedDemo) {
+      mapped.demoVideoUrl = savedDemo.href
+      links.push(savedDemo)
+    }
   }
+  if (project.demoVideoUrl === '') mapped.demoVideoUrl = ''
   if (links !== undefined) mapped.links = links
 
   if (!defaultProject) {
@@ -120,6 +148,10 @@ function toContentPatch(saved: EditableContent): RecordValue {
 
   if (saved.person) {
     const person: RecordValue = { ...saved.person }
+    if (typeof person.resumeUrl === 'string') person.resumeUrl = restoreDefaultAssetPath(person.resumeUrl)
+    if (isRecord(person.photo) && typeof person.photo.src === 'string') {
+      person.photo = { ...person.photo, src: restoreDefaultAssetPath(person.photo.src) }
+    }
     if (saved.person.name !== undefined) {
       person.firstName = saved.person.name.trim().split(/\s+/)[0] ?? ''
       person.initials = saved.person.name
@@ -131,11 +163,21 @@ function toContentPatch(saved: EditableContent): RecordValue {
     }
     patch.person = person
   }
+  if (saved.resume?.currentUrl) {
+    patch.person = {
+      ...(isRecord(patch.person) ? patch.person : {}),
+      resumeUrl: restoreDefaultAssetPath(saved.resume.currentUrl),
+    }
+  }
   if (saved.about) patch.about = saved.about
   if (saved.skills) patch.skills = saved.skills
   if (saved.projects) patch.projects = saved.projects.map(mapProject)
   if (saved.timeline) patch.journey = { items: saved.timeline.map(mapTimelineItem) }
-  if (saved.certificates) patch.certificates = saved.certificates
+  if (saved.certificates) patch.certificates = saved.certificates.map((certificate): EditableCertificate => ({
+    ...certificate,
+    year: certificate.year ?? '',
+    file: certificate.file ? restoreDefaultAssetPath(certificate.file) : '',
+  }))
 
   return patch
 }
@@ -152,7 +194,7 @@ async function fetchContent(): Promise<SiteContent> {
   try {
     const response = await fetch('/.netlify/functions/content-get', { cache: 'no-store' })
     if (!response.ok) return content
-    const value: unknown = await response.json()
+    const value: unknown = migrateLegacyAssetUrls(await response.json(), content.site.url)
     if (!isEditableContent(value)) return content
 
     if (Object.keys(value).length === 0) {

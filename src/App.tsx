@@ -7,6 +7,7 @@ import { Navbar } from './components/layout/Navbar'
 import { ScrollProgress } from './components/layout/ScrollProgress'
 import { About } from './components/sections/About'
 import { Contact } from './components/sections/Contact'
+import { Certificates } from './components/sections/Certificates'
 import { GitHubStrip } from './components/sections/GitHubStrip'
 import { Hero } from './components/sections/Hero'
 import { Journey } from './components/sections/Journey'
@@ -72,6 +73,7 @@ function PublicApp() {
         <About />
         <Skills />
         <Projects />
+        <Certificates />
         <Journey />
         <GitHubStrip />
         <Contact />
