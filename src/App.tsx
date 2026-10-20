@@ -1,6 +1,7 @@
 import { AnimatePresence, MotionConfig } from 'framer-motion'
 import { lazy, Suspense, useCallback, useState } from 'react'
 import { Cursor } from './components/layout/Cursor'
+import { ErrorBoundary } from './components/primitives/ErrorBoundary'
 import { Footer } from './components/layout/Footer'
 import { Intro } from './components/layout/Intro'
 import { Navbar } from './components/layout/Navbar'
@@ -33,7 +34,9 @@ export default function App() {
   if (window.location.pathname.replace(/\/+$/, '') === '/admin') {
     return (
       <Suspense fallback={<main className="bg-bg text-fg min-h-screen p-6">Loading editor…</main>}>
-        <AdminPage />
+        <ErrorBoundary name="admin editor" fallback={<main role="alert" className="bg-bg text-fg min-h-screen p-6">The editor hit an error. Reload the page to continue.</main>}>
+          <AdminPage />
+        </ErrorBoundary>
       </Suspense>
     )
   }
@@ -69,16 +72,16 @@ function PublicApp() {
       <Navbar ready={ready} />
 
       <main id="main">
-        <Hero ready={ready} />
-        <About />
-        <Skills />
-        <Projects />
-        <Certificates />
-        <Journey />
-        <GitHubStrip />
-        <Contact />
+        <ErrorBoundary name="home"><Hero ready={ready} /></ErrorBoundary>
+        <ErrorBoundary name="about"><About /></ErrorBoundary>
+        <ErrorBoundary name="skills"><Skills /></ErrorBoundary>
+        <ErrorBoundary name="projects"><Projects /></ErrorBoundary>
+        <ErrorBoundary name="certificates"><Certificates /></ErrorBoundary>
+        <ErrorBoundary name="journey"><Journey /></ErrorBoundary>
+        <ErrorBoundary name="GitHub"><GitHubStrip /></ErrorBoundary>
+        <ErrorBoundary name="contact"><Contact /></ErrorBoundary>
       </main>
-      <Footer />
+      <ErrorBoundary name="footer"><Footer /></ErrorBoundary>
     </MotionConfig>
   )
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowUpRight, FileText, Image as ImageIcon, X } from 'lucide-react'
 import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
+import { SafeImage } from '../primitives/SafeImage'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 
@@ -69,7 +70,7 @@ export function Certificates() {
               <X aria-hidden className="size-5" />
             </button>
             {selected.type === 'image' ? (
-              <img src={selected.file} alt={`${selected.title} certificate`} className="mx-auto max-h-[75vh] w-full rounded-2xl object-contain" />
+              <SafeImage key={selected.file} src={selected.file} alt={`${selected.title} certificate`} fallbackLabel="Certificate image unavailable" className="mx-auto max-h-[75vh] w-full rounded-2xl object-contain" />
             ) : (
               <iframe title={`${selected.title} certificate PDF`} src={selected.file} className="h-[70vh] w-full rounded-2xl border border-[var(--line)]" />
             )}

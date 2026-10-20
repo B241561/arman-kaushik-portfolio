@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { isEditableContent, migrateLegacyAssetUrls, type EditableContent } from '../../data/schema'
 import { content } from '../../data/content'
+import { ErrorBoundary } from '../primitives/ErrorBoundary'
+import { SafeImage } from '../primitives/SafeImage'
 
 type Tab = 'person' | 'about' | 'skills' | 'projects' | 'timeline' | 'certificates' | 'resume' | 'media' | 'history'
 type PathPart = string | number
@@ -17,6 +19,9 @@ type FieldProps = {
   onSelectAsset: (path: PathPart[], url: string) => void
   onRemove?: () => void
 }
+
+/** Media id from a /media/<id> URL, lowercased so field values and library entries compare reliably. */
+const mediaIdOf = (url: string) => /^\/media\/([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})$/i.exec(url.trim())?.[1].toLowerCase() ?? null
 
 const persistedAssetUrl = (url: string) => url.startsWith('/') ? new URL(url, content.site.url).href : url
 
@@ -261,7 +266,10 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
   }
 
   const assetField = ['src', 'resumeUrl', 'currentUrl', 'file', 'url'].includes(key)
-  const selectedMedia = mediaFiles.find((file) => file.url === stringValue)
+  const fieldMediaId = mediaIdOf(stringValue)
+  const selectedMedia = fieldMediaId ? mediaFiles.find((file) => file.id.toLowerCase() === fieldMediaId) : undefined
+  // Preview always follows the field value, never the dropdown's matched item.
+  const previewHref = fieldMediaId ? `/media/${fieldMediaId}` : stringValue
   const isImageAsset = key === 'src' || selectedMedia?.type.startsWith('image/') === true
   return (
     <>
@@ -303,7 +311,7 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
           <select
             aria-label={`Choose existing ${label.toLowerCase()}`}
             className={`${inputClass} max-w-full sm:max-w-sm`}
-            value={stringValue.startsWith('/media/') ? stringValue : ''}
+            value={selectedMedia?.url ?? ''}
             onChange={(event) => event.target.value ? onSelectAsset(path, event.target.value) : clearAsset()}
           >
             <option value="">Choose existing media…</option>
@@ -315,7 +323,7 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
           </select>
           {typeof value === 'string' && value.length > 0 && (
             <>
-              <a href={value} target="_blank" rel="noreferrer" className="text-sm underline">Preview</a>
+              <a href={previewHref} target="_blank" rel="noreferrer" className="text-sm underline">Preview</a>
               {selectedMedia && (
                 <button type="button" className={buttonClass} onClick={clearAsset}>Remove file</button>
               )}
@@ -323,7 +331,7 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
           )}
         </div>
         {typeof value === 'string' && value.length > 0 && isImageAsset && (
-          <img src={value} alt="" className="max-h-40 w-fit rounded-xl border border-[var(--line)] object-contain" />
+          <SafeImage key={previewHref} src={previewHref} alt="" fallbackLabel="Preview unavailable" className="max-h-40 w-fit rounded-xl border border-[var(--line)] object-contain" />
         )}
         {typeof value === 'string' && (selectedMedia?.size ?? 0) > 500 * 1024 && (
           <p className="text-xs text-amber-300">This image is over 500 KB. Consider converting it to WebP.</p>
@@ -546,6 +554,8 @@ export default function AdminPage() {
       if (!response.ok || typeof result !== 'object' || result === null || !('url' in result) || typeof result.url !== 'string') {
         throw new Error(typeof result === 'object' && result !== null && 'error' in result ? String(result.error) : `Upload failed (${response.status})`)
       }
+      const uploadedUrl = result.url
+      if (!mediaIdOf(uploadedUrl)) throw new Error('Upload response did not include a valid media URL.')
       if (path && assetField === 'currentUrl') {
         setDraft((current: unknown) => {
           if (!isRecordValue(current)) return current
@@ -554,10 +564,10 @@ export default function AdminPage() {
           const history = typeof resume.currentUrl === 'string' && resume.currentUrl
             ? [{ id: `resume-${crypto.randomUUID()}`, url: resume.currentUrl, uploadedAt: new Date().toISOString() }, ...previous].slice(0, 3)
             : previous
-          return { ...current, resume: { ...resume, currentUrl: result.url, previous: history } }
+          return { ...current, resume: { ...resume, currentUrl: uploadedUrl, previous: history } }
         })
       } else if (path) {
-        update(path, result.url)
+        update(path, uploadedUrl)
       }
       try {
         await loadMedia()
@@ -781,6 +791,7 @@ export default function AdminPage() {
 
         <section className="mt-5 rounded-3xl border border-[var(--line)] bg-elevated p-4 sm:p-6" role="tabpanel">
           <h2 className="mb-5 text-xl font-semibold">{labels[tab]}</h2>
+          <ErrorBoundary key={tab} name="editor" fallback={<p role="alert" className="text-sm text-red-400">This editor tab couldn't be displayed. Your draft is kept; switch tabs or reload the page.</p>}>
           {mediaTab ? (
             <div className="grid gap-4">
               <label className={buttonClass}>
@@ -804,7 +815,7 @@ export default function AdminPage() {
                   {mediaFiles.map((file) => (
                     <li key={file.id} className="glass min-w-0 rounded-2xl p-3">
                       {file.type.startsWith('image/') ? (
-                        <img src={file.url} alt="" className="mb-3 h-36 w-full rounded-xl object-cover" />
+                        <SafeImage src={file.url} alt="" fallbackLabel="Preview unavailable" className="mb-3 h-36 w-full rounded-xl object-cover" />
                       ) : (
                         <div className="mb-3 grid h-36 place-items-center rounded-xl border border-[var(--line)] text-sm">PDF</div>
                       )}
@@ -872,6 +883,7 @@ export default function AdminPage() {
               <SchemaFields value={activeValue} path={[tab]} update={update} mediaFiles={mediaFiles} onUpload={uploadAsset} onDeleteMedia={deleteMedia} onSelectAsset={selectAsset} />
             </fieldset>
           )}
+          </ErrorBoundary>
         </section>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
