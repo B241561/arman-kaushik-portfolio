@@ -9,6 +9,8 @@ export type ContentVersion = {
 
 const HISTORY_KEY = 'content-history'
 const HISTORY_LIMIT = 10
+// Strong consistency so a read right after a save sees the new document.
+const siteStore = () => getStore({ name: 'site', consistency: 'strong' })
 
 function isVersion(value: unknown): value is ContentVersion {
   return (
@@ -23,24 +25,24 @@ function isVersion(value: unknown): value is ContentVersion {
 }
 
 export async function readVersions(): Promise<ContentVersion[]> {
-  const stored = await getStore('site').get(HISTORY_KEY, { type: 'json' })
+  const stored = await siteStore().get(HISTORY_KEY, { type: 'json' })
   return Array.isArray(stored) ? stored.filter(isVersion) : []
 }
 
 export async function saveVersion(data: unknown) {
   const versions = await readVersions()
   versions.push({ id: randomUUID(), createdAt: new Date().toISOString(), data })
-  await getStore('site').set(HISTORY_KEY, JSON.stringify(versions.slice(-HISTORY_LIMIT)))
+  await siteStore().set(HISTORY_KEY, JSON.stringify(versions.slice(-HISTORY_LIMIT)))
 }
 
 export async function readCurrentContent(): Promise<unknown | null> {
-  return getStore('site').get('content', { type: 'json' })
+  return siteStore().get('content', { type: 'json' })
 }
 
 export async function writeCurrentContent(value: unknown) {
-  await getStore('site').set('content', JSON.stringify(value))
+  await siteStore().set('content', JSON.stringify(value))
 }
 
 export async function deleteCurrentContent() {
-  await getStore('site').delete('content')
+  await siteStore().delete('content')
 }

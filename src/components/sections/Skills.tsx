@@ -32,16 +32,16 @@ export function Skills() {
         {skills.groups.map((group, i) => {
           const Icon = icons[group.icon]
           return (
-            <Reveal key={group.title} delay={i * 0.06}>
+            <Reveal key={`${group.title}-${i}`} delay={i * 0.06}>
               <GlassCard className="h-full">
                 <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-2xl border border-[var(--line)]">
                   <Icon className="text-accent size-5" />
                 </span>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{group.title}</h3>
                 <ul className="mt-4 flex flex-wrap gap-2">
-                  {group.items.map((item) => (
+                  {group.items.map((item, j) => (
                     <li
-                      key={item}
+                      key={`${item}-${j}`}
                       className="bg-fg/[0.05] text-fg/90 rounded-full border border-[var(--line)] px-3.5 py-1.5 text-sm font-medium"
                     >
                       {item}
@@ -72,8 +72,8 @@ function Marquee({ items, reverse = false }: { items: string[]; reverse?: boolea
   if (reduce) {
     return (
       <ul className="container-x flex flex-wrap justify-center gap-3">
-        {items.map((item) => (
-          <li key={item}>
+        {items.map((item, j) => (
+          <li key={`${item}-${j}`}>
             <Chip label={item} />
           </li>
         ))}

@@ -1,7 +1,8 @@
 import { getStore } from '@netlify/blobs'
 
 const headers = {
-  'Cache-Control': 'public, max-age=60',
+  // Never cache: the CDN would otherwise serve the pre-save document to the site and the admin.
+  'Cache-Control': 'no-store',
   'Content-Type': 'application/json; charset=utf-8',
 }
 
@@ -13,7 +14,7 @@ export default async function handler(request: Request): Promise<Response> {
     })
   }
 
-  const content = await getStore('site').get('content', { type: 'json' })
+  const content = await getStore({ name: 'site', consistency: 'strong' }).get('content', { type: 'json' })
   return new Response(request.method === 'HEAD' ? null : JSON.stringify(content ?? {}), {
     status: 200,
     headers,

@@ -44,7 +44,7 @@ export function About() {
             {(about.stats.length > 0 || about.status.lines.length > 0) && (
             <div className="mt-16 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {about.stats.map((stat, i) => (
-                <Reveal key={stat.label} delay={i * 0.08}>
+                <Reveal key={`${stat.label}-${i}`} delay={i * 0.08}>
                   <GlassCard className="flex h-full flex-col justify-between gap-10">
                     <span className="text-gradient text-6xl font-semibold tracking-[-0.05em] tabular-nums sm:text-7xl">
                       <Counter value={stat.value} />
@@ -62,8 +62,8 @@ export function About() {
                     </div>
                   </div>
                   <ul className="text-muted space-y-2 text-[15px]">
-                    {about.status.lines.map((line) => (
-                      <li key={line} className="flex gap-2.5">
+                    {about.status.lines.map((line, j) => (
+                      <li key={`${line}-${j}`} className="flex gap-2.5">
                         <span className="bg-accent mt-2 size-1.5 shrink-0 rounded-full" />
                         {line}
                       </li>
