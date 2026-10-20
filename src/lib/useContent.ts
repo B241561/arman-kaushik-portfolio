@@ -323,12 +323,21 @@ async function fetchContent(): Promise<SiteContent> {
   }
 }
 
+let loadedContent: SiteContent | undefined
+
+/** Resolves once the saved content has been fetched (or the defaults, if that fails). */
+export function loadContent(): Promise<SiteContent> {
+  contentRequest ??= fetchContent().then((value) => (loadedContent = value))
+  return contentRequest
+}
+
+export const isContentLoaded = () => loadedContent !== undefined
+
 export function useContent(): SiteContent {
-  const [currentContent, setCurrentContent] = useState<SiteContent>(content)
+  const [currentContent, setCurrentContent] = useState<SiteContent>(loadedContent ?? content)
 
   useEffect(() => {
-    contentRequest ??= fetchContent()
-    void contentRequest.then(setCurrentContent)
+    void loadContent().then(setCurrentContent)
   }, [])
 
   return currentContent

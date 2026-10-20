@@ -5,10 +5,24 @@ import { cn } from '../../lib/cn'
 import { useScrollTo } from '../../lib/lenis'
 import { spring, springSoft } from '../../lib/motion'
 import { isPlaceholder } from '../../lib/placeholder'
-import { useContent } from '../../lib/useContent'
+import { isContentLoaded, loadContent, useContent } from '../../lib/useContent'
 import { Magnetic } from '../primitives/Magnetic'
 import { useToast } from '../primitives/Toast'
 import { Aurora } from './Aurora'
+
+const RESUME_FILENAME = 'Arman-Kaushik-Resume.pdf'
+
+// Uploaded resumes live at /media/<id>; ?download=1 makes media-get send them as an attachment.
+const resumeDownloadUrl = (url: string) => (url.startsWith('/media/') ? `${url}?download=1` : url)
+
+function startDownload(url: string) {
+  const link = document.createElement('a')
+  link.href = url
+  link.download = RESUME_FILENAME
+  document.body.append(link)
+  link.click()
+  link.remove()
+}
 
 export function Hero({ ready }: { ready: boolean }) {
   const { hero, person, ui } = useContent()
@@ -37,9 +51,17 @@ export function Hero({ ready }: { ready: boolean }) {
   }
 
   const onResume = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (!resumeMissing) return
+    if (!resumeMissing && isContentLoaded()) return
     e.preventDefault()
-    toast(ui.resumeMissing)
+    if (resumeMissing && isContentLoaded()) {
+      toast(ui.resumeMissing)
+      return
+    }
+    // Saved content is still loading: wait for it so the uploaded resume wins over the bundled one.
+    void loadContent().then((loaded) => {
+      if (isPlaceholder(loaded.person.resumeUrl)) toast(ui.resumeMissing)
+      else startDownload(resumeDownloadUrl(loaded.person.resumeUrl))
+    })
   }
 
   return (
@@ -139,8 +161,8 @@ export function Hero({ ready }: { ready: boolean }) {
           </Magnetic>
           <Magnetic>
             <a
-              href={resumeMissing ? '#' : person.resumeUrl}
-              download={resumeMissing ? undefined : 'Arman-Kaushik-Resume.pdf'}
+              href={resumeMissing ? '#' : resumeDownloadUrl(person.resumeUrl)}
+              download={resumeMissing ? undefined : RESUME_FILENAME}
               onClick={onResume}
               aria-disabled={resumeMissing || undefined}
               className="group glass inline-flex h-13 items-center gap-2 rounded-full px-7 text-[15px] font-medium transition-transform duration-300 active:scale-[0.97]"

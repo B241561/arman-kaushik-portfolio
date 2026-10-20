@@ -19,6 +19,14 @@
   status = 200
   force = false
 
+# Listed first so /media/<id>?download=1 reaches media-get with its download flag.
+[[redirects]]
+  from = "/media/*"
+  to = "/.netlify/functions/media-get?id=:splat&download=:download"
+  query = {download = ":download"}
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/media/*"
   to = "/.netlify/functions/media-get?id=:splat"
