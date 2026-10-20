@@ -7,6 +7,9 @@ const assetHeaders = {
 }
 // Misses and errors must never be cached, otherwise a just-uploaded file can stay "missing".
 const uncachedHeaders = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }
+// ?download=1 forces a PDF to save instead of opening inline, which mobile browsers need because
+// they ignore the <a download> attribute.
+const DOWNLOAD_FILENAME = 'Arman-Kaushik-Resume.pdf'
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
@@ -45,6 +48,7 @@ export default async function handler(request: Request): Promise<Response> {
       return new Response('Not found', { status: 404, headers: uncachedHeaders })
     }
 
+    const download = url.searchParams.get('download') === '1'
     const bytes = new Uint8Array(stored.data)
     const metaType = typeof stored.metadata.type === 'string' ? stored.metadata.type.toLowerCase() : ''
     const type = MEDIA_TYPES.has(metaType) ? metaType : sniffMediaType(bytes) ?? 'application/octet-stream'
@@ -55,7 +59,9 @@ export default async function handler(request: Request): Promise<Response> {
         ...assetHeaders,
         'Content-Type': type,
         'Content-Length': String(bytes.length),
-        'Content-Disposition': type === 'application/octet-stream' ? 'attachment' : 'inline',
+        'Content-Disposition': type === 'application/pdf' && download
+          ? `attachment; filename="${DOWNLOAD_FILENAME}"`
+          : type === 'application/octet-stream' ? 'attachment' : 'inline',
       },
     })
   } catch (error) {
