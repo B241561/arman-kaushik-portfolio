@@ -31,7 +31,7 @@ export function Journey() {
           <motion.span
             aria-hidden
             style={{ scaleY: reduce ? 1 : scaleY }}
-            className="from-accent to-accent-2 absolute top-2 bottom-2 left-[15px] w-px origin-top bg-linear-to-b shadow-[0_0_12px_var(--accent)] sm:left-[23px]"
+            className="from-accent to-accent-2 absolute top-2 bottom-2 left-[15px] w-px origin-top bg-linear-to-b sm:left-[23px]"
           />
 
           {journey.items.map((item, i) => {
@@ -52,7 +52,7 @@ export function Journey() {
                   <Icon className="size-3.5 sm:size-5" />
                 </motion.span>
                 <Reveal delay={0.05}>
-                  <GlassCard className="!p-5 sm:!p-7">
+                  <GlassCard hoverable className="!p-5 sm:!p-7">
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                       {item.date && !isPlaceholder(item.date) && (
                         <>

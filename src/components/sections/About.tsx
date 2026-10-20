@@ -42,11 +42,11 @@ export function About() {
             )}
 
             {(about.stats.length > 0 || about.status.lines.length > 0) && (
-            <div className="mt-16 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <div className="mt-16 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {about.stats.map((stat, i) => (
                 <Reveal key={`${stat.label}-${i}`} delay={i * 0.08}>
-                  <GlassCard className="flex h-full flex-col justify-between gap-10">
-                    <span className="text-gradient text-6xl font-semibold tracking-[-0.05em] tabular-nums sm:text-7xl">
+                  <GlassCard hoverable className="flex h-full flex-col justify-between gap-10">
+                    <span className="text-gradient text-5xl font-semibold tracking-[-0.05em] tabular-nums sm:text-6xl">
                       <Counter value={stat.value} />
                     </span>
                     <p className="text-muted text-base">{stat.label}</p>
@@ -54,7 +54,7 @@ export function About() {
                 </Reveal>
               ))}
               {about.status.lines.length > 0 && <Reveal delay={0.16}>
-                <GlassCard className="flex h-full flex-col gap-6">
+                <GlassCard hoverable className="flex h-full flex-col gap-6">
                   <div className="flex items-center gap-4">
                     <div className="min-w-0">
                       <p className="text-subtle text-xs font-semibold tracking-[0.18em] uppercase">{about.status.title}</p>

@@ -30,7 +30,7 @@ export function Intro({ onFinish }: { onFinish: () => void }) {
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={springSnappy}
-          className="bg-accent-gradient grid size-16 place-items-center rounded-[22px] text-xl font-semibold tracking-tight text-white shadow-[0_20px_60px_-15px_var(--accent-2)]"
+          className="bg-accent-gradient grid size-16 place-items-center rounded-[22px] text-xl font-semibold tracking-tight text-white elevation-2"
         >
           {content.person.initials}
         </motion.div>

@@ -49,7 +49,7 @@ export function ProjectArt({ project, large = false }: { project: Project; large
         ))}
         <span
           className={cn(
-            'glass-strong relative grid place-items-center rounded-[22px]',
+            'glass-solid rounded-tile relative grid place-items-center',
             large ? 'size-20' : 'size-16',
           )}
         >
