@@ -1,14 +1,13 @@
 import { AnimatePresence, LayoutGroup } from 'framer-motion'
 import { useCallback, useState } from 'react'
-import { content } from '../../data/content'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
+import { useContent } from '../../lib/useContent'
 import { ProjectCard } from './ProjectCard'
 import { ProjectModal } from './ProjectModal'
 
-const { projects } = content
-
 export function Projects() {
+  const { projects } = useContent()
   const [openId, setOpenId] = useState<string | null>(null)
   const open = projects.items.find((p) => p.id === openId) ?? null
   const close = useCallback(() => setOpenId(null), [])

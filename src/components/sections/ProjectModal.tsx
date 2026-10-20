@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Code, Globe, Play, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
-import { content, getYouTubeVideoId, type Project } from '../../data/content'
+import { getYouTubeVideoId, type Project } from '../../data/schema'
 import { useMediaQuery } from '../../lib/hooks'
 import { useScrollLock } from '../../lib/lenis'
 import { spring, springLayout } from '../../lib/motion'
 import { isPlaceholder } from '../../lib/placeholder'
+import { useContent } from '../../lib/useContent'
 import { ProjectArt } from './ProjectArt'
-
-const { sections } = content.projects
 
 /** Fullscreen sheet that grows out of the tapped card (shared layoutId), iOS app-open style. */
 export function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+  const { projects, ui } = useContent()
   const closeRef = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null)
@@ -142,11 +142,11 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
               <div className="mt-10 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-14">
                 <div className="space-y-10">
                   <motion.section {...fadeUp(0.16)}>
-                    <ModalLabel>{sections.problem}</ModalLabel>
+                    <ModalLabel>{projects.sections.problem}</ModalLabel>
                     <p className="text-fg/90 mt-3 text-lg leading-relaxed text-pretty">{project.problem}</p>
                   </motion.section>
                   <motion.section {...fadeUp(0.22)}>
-                    <ModalLabel>{sections.approach}</ModalLabel>
+                    <ModalLabel>{projects.sections.approach}</ModalLabel>
                     <ul className="mt-4 space-y-3">
                       {project.approach.map((step) => (
                         <li key={step} className="text-muted flex gap-3 text-[16px] leading-relaxed">
@@ -160,7 +160,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
 
                 <div className="space-y-10">
                   <motion.section {...fadeUp(0.26)}>
-                    <ModalLabel>{sections.stack}</ModalLabel>
+                    <ModalLabel>{projects.sections.stack}</ModalLabel>
                     <ul className="mt-4 flex flex-wrap gap-2">
                       {project.stack.map((tag) => (
                         <li key={tag} className="glass rounded-full px-3.5 py-1.5 text-sm font-medium">
@@ -170,7 +170,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     </ul>
                   </motion.section>
                   <motion.section {...fadeUp(0.3)}>
-                    <ModalLabel>{sections.links}</ModalLabel>
+                    <ModalLabel>{projects.sections.links}</ModalLabel>
                     <ul className="mt-4 space-y-2">
                       {project.links.filter((link) => link.kind !== 'demo').map((link) => {
                         const Icon = link.kind === 'repo' ? Code : Globe
@@ -183,7 +183,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                             <span className="min-w-0 flex-1">
                               <span className="block font-medium">{link.label}</span>
                               <span className="text-subtle block truncate text-xs">
-                                {missing ? `${content.ui.notSetYet} · ${link.href}` : link.href.replace(/^https?:\/\//, '')}
+                                {missing ? `${ui.notSetYet} · ${link.href}` : link.href.replace(/^https?:\/\//, '')}
                               </span>
                             </span>
                             {!missing && <ArrowUpRight className="size-4 shrink-0" />}
@@ -219,7 +219,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
             ref={closeRef}
             type="button"
             onClick={handleClose}
-            aria-label={content.ui.close}
+            aria-label={ui.close}
             className="glass-strong absolute top-4 right-4 z-10 grid size-10 place-items-center rounded-full transition-transform active:scale-90"
           >
             <X className="size-[18px]" />

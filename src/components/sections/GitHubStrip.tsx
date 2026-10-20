@@ -1,12 +1,11 @@
 import { ArrowUpRight, BookMarked, Github } from 'lucide-react'
-import { content } from '../../data/content'
 import { isPlaceholder } from '../../lib/placeholder'
+import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 
-const { github, person } = content
-
 export function GitHubStrip() {
+  const { github, person, ui } = useContent()
   const profile = person.socials.github
   const hasProfile = !isPlaceholder(profile)
 
@@ -41,7 +40,7 @@ export function GitHubStrip() {
                 </a>
               ) : (
                 <span className="text-subtle inline-flex h-11 items-center self-start rounded-full border border-dashed border-[var(--line)] px-5 text-sm sm:self-auto">
-                  {content.ui.notSetYet}
+                  {ui.notSetYet}
                 </span>
               )}
             </div>

@@ -1,18 +1,17 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight, Download } from 'lucide-react'
 import { Fragment, useRef, useState, type MouseEvent } from 'react'
-import { content } from '../../data/content'
 import { cn } from '../../lib/cn'
 import { useScrollTo } from '../../lib/lenis'
 import { spring, springSoft } from '../../lib/motion'
 import { isPlaceholder } from '../../lib/placeholder'
+import { useContent } from '../../lib/useContent'
 import { Magnetic } from '../primitives/Magnetic'
 import { useToast } from '../primitives/Toast'
 import { Aurora } from './Aurora'
 
-const { hero, person, ui } = content
-
 export function Hero({ ready }: { ready: boolean }) {
+  const { hero, person, ui } = useContent()
   const reduce = useReducedMotion()
   const scrollTo = useScrollTo()
   const toast = useToast()
@@ -23,7 +22,7 @@ export function Hero({ ready }: { ready: boolean }) {
   const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0])
 
   const nameWords = person.name.split(' ')
-  const valueWords = hero.valueProp.split(' ')
+  const valueWords = person.tagline.split(' ')
   const resumeMissing = isPlaceholder(person.resumeUrl)
   const photoProps = {
     src: person.photo.src,

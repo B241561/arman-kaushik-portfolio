@@ -1,16 +1,18 @@
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { ArrowUpRight, Play } from 'lucide-react'
 import { useRef, type PointerEvent } from 'react'
-import { content, getYouTubeVideoId, type Project } from '../../data/content'
+import { getYouTubeVideoId, type Project } from '../../data/schema'
 import { cn } from '../../lib/cn'
 import { useFinePointer } from '../../lib/hooks'
 import { springLayout } from '../../lib/motion'
+import { useContent } from '../../lib/useContent'
 import { ProjectArt } from './ProjectArt'
 
 const MAX_TILT = 8
 
 /** Bento tile: 3D tilt toward the cursor + spotlight. Shares a layoutId with the modal. */
 export function ProjectCard({ project, onOpen, className }: { project: Project; onOpen: () => void; className?: string }) {
+  const { ui } = useContent()
   const hasDemoVideo = project.links.some(
     (link) => link.kind === 'demo' && getYouTubeVideoId(link.href) !== null,
   )
@@ -53,7 +55,7 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
         whileTap={{ scale: 0.98 }}
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
-        aria-label={`${content.ui.openProject}: ${project.title}`}
+        aria-label={`${ui.openProject}: ${project.title}`}
         className="glass spotlight group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
       >
         <div className="relative aspect-video w-full shrink-0 overflow-hidden">

@@ -12,8 +12,8 @@ import { Hero } from './components/sections/Hero'
 import { Journey } from './components/sections/Journey'
 import { Projects } from './components/sections/Projects'
 import { Skills } from './components/sections/Skills'
-import { content } from './data/content'
 import { prefersReducedMotion } from './lib/hooks'
+import { useContent } from './lib/useContent'
 
 const INTRO_KEY = 'intro-seen'
 
@@ -29,6 +29,7 @@ function shouldSkipIntro() {
 
 export default function App() {
   const [ready, setReady] = useState(shouldSkipIntro)
+  const content = useContent()
 
   const finishIntro = useCallback(() => {
     setReady(true)

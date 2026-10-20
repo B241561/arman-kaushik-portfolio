@@ -1,22 +1,22 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight, Check, Copy, Github, Linkedin, Mail, Send } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { content } from '../../data/content'
 import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
+import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
 import { Magnetic } from '../primitives/Magnetic'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 import { useToast } from '../primitives/Toast'
 
-const { contact, person, ui } = content
 const socialIcons = { github: Github, linkedin: Linkedin }
 
 const field =
   'w-full rounded-2xl border border-[var(--line)] bg-fg/[0.04] px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent focus:ring-4 focus:ring-accent/20'
 
 export function Contact() {
+  const { contact, person, ui } = useContent()
   const toast = useToast()
   const [copied, setCopied] = useState(false)
   const emailMissing = isPlaceholder(person.email)

@@ -1,11 +1,10 @@
 import { ArrowUp } from 'lucide-react'
-import { content } from '../../data/content'
 import { useScrollTo } from '../../lib/lenis'
+import { useContent } from '../../lib/useContent'
 import { Magnetic } from '../primitives/Magnetic'
 
-const { footer, person, nav } = content
-
 export function Footer() {
+  const { footer, person, nav } = useContent()
   const scrollTo = useScrollTo()
   return (
     <footer className="relative overflow-hidden border-t border-[var(--line)] pt-20 pb-10">

@@ -1,18 +1,18 @@
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { Code, GraduationCap, Rocket } from 'lucide-react'
 import { useRef } from 'react'
-import { content } from '../../data/content'
 import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
+import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 
-const { journey } = content
 const icons = { education: GraduationCap, project: Code, next: Rocket }
 
 export function Journey() {
+  const { journey } = useContent()
   const ref = useRef<HTMLOListElement>(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.75', 'end 0.6'] })
@@ -52,19 +52,16 @@ export function Journey() {
                 <Reveal delay={0.05}>
                   <GlassCard className="!p-5 sm:!p-7">
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span
-                        className={cn(
-                          'text-sm font-semibold tabular-nums',
-                          isPlaceholder(item.period) ? 'text-subtle' : 'text-gradient',
-                        )}
-                      >
-                        {item.period}
-                      </span>
-                      <span className="text-subtle text-xs">·</span>
-                      <span className="text-subtle text-sm">{item.org}</span>
+                      {item.date && !isPlaceholder(item.date) && (
+                        <>
+                          <span className="text-gradient text-sm font-semibold tabular-nums">{item.date}</span>
+                          <span className="text-subtle text-xs">·</span>
+                        </>
+                      )}
+                      <span className="text-subtle text-sm">{item.kicker}</span>
                     </div>
                     <h3 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{item.title}</h3>
-                    <p className="text-muted mt-2 leading-relaxed">{item.description}</p>
+                    <p className="text-muted mt-2 leading-relaxed">{item.text}</p>
                   </GlassCard>
                 </Reveal>
               </li>

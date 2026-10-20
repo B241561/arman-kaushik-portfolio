@@ -1,17 +1,16 @@
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { content } from '../../data/content'
 import { cn } from '../../lib/cn'
 import { useActiveSection } from '../../lib/hooks'
 import { useScrollLock, useScrollTo } from '../../lib/lenis'
 import { spring, springSnappy } from '../../lib/motion'
+import { useContent } from '../../lib/useContent'
 import { ThemeToggle } from './ThemeToggle'
 
-const { nav, person } = content
-const sectionIds = ['home', ...nav.items.map((i) => i.id)]
-
 export function Navbar({ ready }: { ready: boolean }) {
+  const { nav, person } = useContent()
+  const sectionIds = ['home', ...nav.items.map((i) => i.id)]
   const active = useActiveSection(sectionIds)
   const scrollTo = useScrollTo()
   const { scrollY } = useScroll()

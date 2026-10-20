@@ -9,20 +9,21 @@ import {
   type MotionValue,
 } from 'framer-motion'
 import { useEffect, useRef } from 'react'
-import { content } from '../../data/content'
 import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
+import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
 import { LazyImage } from '../primitives/LazyImage'
 import { Reveal } from '../primitives/Reveal'
 import { Eyebrow } from '../primitives/SectionHeading'
 import { ProfilePhoto } from './ProfilePhoto'
 
-const { about, person } = content
-const highlightSet = new Set(about.highlights.map((w) => w.toLowerCase()))
 const normalise = (w: string) => w.toLowerCase().replace(/[.,;:!?—’']+$/g, '')
 
 export function About() {
+  const { about, person } = useContent()
+  const highlightSet = new Set(about.highlights.map((word) => word.toLowerCase()))
+
   return (
     <section id="about" className="relative py-28 sm:py-40">
       <div className="container-x">
@@ -34,6 +35,7 @@ export function About() {
           <div>
             <HighlightText
               text={about.body}
+              highlightSet={highlightSet}
               className="text-[clamp(1.6rem,4.6vw,3.25rem)] leading-[1.14] font-semibold tracking-[-0.035em]"
             />
 
@@ -79,7 +81,7 @@ export function About() {
 }
 
 /** Words light up one by one as the paragraph scrolls through the viewport. */
-function HighlightText({ text, className }: { text: string; className?: string }) {
+function HighlightText({ text, highlightSet, className }: { text: string; highlightSet: Set<string>; className?: string }) {
   const ref = useRef<HTMLParagraphElement>(null)
   const reduce = !!useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.45'] })

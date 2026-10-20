@@ -4,52 +4,18 @@
  * details. Components detect placeholders and render them as inert, so nothing
  * links to a broken URL before it is filled in.
  *
- * Keep this file free of imports: vite.config.ts reads it at build time for SEO.
+ * This file contains the default content; use useContent() for rendered content.
  */
 
-export type ProjectLink = { label: string; href: string; kind: 'repo' | 'live' | 'demo' }
+import type { JourneyItem, Project, ProjectFlowStep, ProjectLink } from './schema'
 
-export type Project = {
-  id: string
-  index: string
-  title: string
-  tagline: string
-  summary: string
-  icon: 'feynml' | 'resume' | 'tripcraft'
-  /** Optional screenshot path relative to /public/img. */
-  image: string
-  imageAlt?: string
-  problem: string
-  approach: string[]
-  stack: string[]
-  links: ProjectLink[]
-  featured?: boolean
-}
-
-export function getYouTubeVideoId(url: string): string | null {
-  try {
-    const parsed = new URL(url)
-    const host = parsed.hostname.replace(/^www\./, '').toLowerCase()
-    let id: string | null = null
-
-    if (host === 'youtu.be') {
-      id = parsed.pathname.split('/').filter(Boolean)[0] ?? null
-    } else if (host === 'youtube.com') {
-      id = parsed.pathname === '/watch'
-        ? parsed.searchParams.get('v')
-        : parsed.pathname.match(/^\/embed\/([^/]+)/)?.[1] ?? null
-    }
-
-    return id && /^[\w-]{11}$/.test(id) ? id : null
-  } catch {
-    return null
-  }
-}
+export type { Project, ProjectLink } from './schema'
 
 const person = {
   name: 'Arman Kaushik',
   firstName: 'Arman',
   initials: 'AK',
+  tagline: 'Third-year CSE student at SKIT Jaipur, building machine learning and data tools.',
   college: 'SKIT Jaipur',
   degree: 'B.Tech, Computer Science & Engineering',
   email: 'b241706@skit.ac.in',
@@ -72,6 +38,15 @@ const projects: Project[] = [
     icon: 'feynml',
     image: '/img/feynml.png',
     imageAlt: 'FeynML dashboard showing drift, calibration and fairness metrics',
+    screenshots: [{ src: '/img/feynml.png', alt: 'FeynML dashboard showing drift, calibration and fairness metrics' }],
+    tags: ['Python', 'Flask', 'Machine Learning', 'Data Science'],
+    demoVideoUrl: 'https://youtu.be/0jthubG-RxY',
+    flowSteps: [
+      { id: 'drift', label: 'Drift', description: 'Drift — check whether the data a model sees has shifted.' },
+      { id: 'calibration', label: 'Calibration', description: 'Calibration — check whether predicted confidence matches what actually happens.' },
+      { id: 'fairness', label: 'Fairness', description: 'Fairness — compare how outcomes differ across groups.' },
+      { id: 'data-integrity', label: 'Data integrity', description: 'Data integrity — check the inputs for problems before blaming the model.' },
+    ] as ProjectFlowStep[],
     featured: true,
     problem:
       'When a model misbehaves, the cause can hide in several places: the data may have drifted, its confidence may be miscalibrated, its outcomes may be unfair across groups, or the input data itself may be broken.',
@@ -95,6 +70,14 @@ const projects: Project[] = [
     summary: 'Scores resumes for ATS compatibility and matches them against job descriptions.',
     icon: 'resume',
     image: '/img/resume-analyzer.png',
+    screenshots: [{ src: '/img/resume-analyzer.png', alt: 'AI Resume Analyzer' }],
+    tags: ['Desktop app', 'ATS scoring', 'OCR', 'Gemini (optional)'],
+    demoVideoUrl: 'https://youtu.be/mbyUxWVvyhA',
+    flowSteps: [
+      { id: 'ats-scoring', label: 'ATS scoring', description: 'ATS scoring to rate how a resume is likely to fare with applicant tracking systems.' },
+      { id: 'job-matching', label: 'Job matching', description: 'Job matching to compare a resume against a role.' },
+      { id: 'ocr', label: 'OCR', description: 'OCR so scanned and image-based resumes can be read too.' },
+    ] as ProjectFlowStep[],
     problem:
       'Applicants often can’t tell how an applicant tracking system will read their resume, or how closely it matches a specific role.',
     approach: [
@@ -117,6 +100,14 @@ const projects: Project[] = [
     summary: 'A MERN-style travel planner that uses Groq AI to help put trips together.',
     icon: 'tripcraft',
     image: '/img/tripcraft.png',
+    screenshots: [{ src: '/img/tripcraft.png', alt: 'TripCraft' }],
+    tags: ['MERN-style stack', 'React', 'Groq AI', 'JWT auth', 'Docker', 'CI/CD'],
+    demoVideoUrl: 'https://youtu.be/5x4SO8GRVZE',
+    flowSteps: [
+      { id: 'full-stack', label: 'Full-stack', description: 'MERN-style full-stack architecture.' },
+      { id: 'groq-ai', label: 'Groq AI', description: 'Groq AI for AI-assisted trip planning.' },
+      { id: 'jwt-auth', label: 'JWT auth', description: 'JWT-based authentication for user accounts.' },
+    ] as ProjectFlowStep[],
     problem: 'Planning a trip means juggling destinations, days and ideas in many different places.',
     approach: [
       'MERN-style full-stack architecture.',
@@ -159,6 +150,8 @@ export const content = {
     /** 1200×630 PNG/JPG for link previews, e.g. "/og-image.png" in /public. */
     ogImage: '[OG_IMAGE_URL]',
   },
+
+  certificates: [] as { id: string; title: string; issuer: string; year: string | number; type: string; file: string }[],
 
   person,
 
@@ -235,41 +228,43 @@ export const content = {
     title: 'So far.',
     items: [
       {
-        period: '2024 – 2028',
+        id: 'education',
+        date: '2024 – 2028',
         title: person.degree,
-        org: person.college,
-        description: 'Currently in my third year.',
+        kicker: person.college,
+        text: 'Currently in my third year.',
         type: 'education' as const,
       },
       {
-        period: '[FEYNML_DATE]',
+        id: 'feynml',
         title: 'Built FeynML',
-        org: 'Project',
-        description: 'An ML failure investigation platform covering drift, calibration, fairness and data integrity.',
+        kicker: 'Project',
+        text: 'An ML failure investigation platform covering drift, calibration, fairness and data integrity.',
         type: 'project' as const,
       },
       {
-        period: '[RESUME_ANALYZER_DATE]',
+        id: 'resume-analyzer',
         title: 'Built AI Resume Analyzer',
-        org: 'Project',
-        description: 'A desktop app for ATS scoring and job matching, with OCR and optional Gemini support.',
+        kicker: 'Project',
+        text: 'A desktop app for ATS scoring and job matching, with OCR and optional Gemini support.',
         type: 'project' as const,
       },
       {
-        period: '[TRIPCRAFT_DATE]',
+        id: 'tripcraft',
         title: 'Built TripCraft',
-        org: 'Project',
-        description: 'A MERN-style travel planner with Groq AI, JWT auth, Docker and CI/CD.',
+        kicker: 'Project',
+        text: 'A MERN-style travel planner with Groq AI, JWT auth, Docker and CI/CD.',
         type: 'project' as const,
       },
       {
-        period: 'Now',
+        id: 'internship',
+        date: 'Now',
         title: 'Looking for an internship',
-        org: 'AI/ML · Data Science',
-        description: 'Seeking AI/ML and data science internship opportunities.',
+        kicker: 'AI/ML · Data Science',
+        text: 'Seeking AI/ML and data science internship opportunities.',
         type: 'next' as const,
       },
-    ],
+    ] satisfies JourneyItem[],
   },
 
   github: {

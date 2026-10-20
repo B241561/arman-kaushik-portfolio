@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { content } from '../../data/content'
 import { spring, springSnappy } from '../../lib/motion'
+import { useContent } from '../../lib/useContent'
 
 /** ~0.85s hold + 0.3s fade = under 1.2s. Click, any key, or "Skip" ends it early. */
 export function Intro({ onFinish }: { onFinish: () => void }) {
+  const content = useContent()
+
   useEffect(() => {
     const timer = window.setTimeout(onFinish, 850)
     window.addEventListener('keydown', onFinish)

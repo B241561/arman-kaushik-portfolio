@@ -1,5 +1,5 @@
 import { Activity, FileText, Plane } from 'lucide-react'
-import type { Project } from '../../data/content'
+import type { Project } from '../../data/schema'
 import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
 import { LazyImage } from '../primitives/LazyImage'

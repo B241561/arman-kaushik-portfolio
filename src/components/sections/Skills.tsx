@@ -1,16 +1,17 @@
 import { useReducedMotion } from 'framer-motion'
 import { Brain, ChartColumn, Code, Globe } from 'lucide-react'
-import { content } from '../../data/content'
 import { cn } from '../../lib/cn'
+import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 
-const { skills } = content
 const icons = { code: Code, brain: Brain, chart: ChartColumn, globe: Globe }
-const allSkills = skills.groups.flatMap((g) => g.items)
 
 export function Skills() {
+  const { skills } = useContent()
+  const allSkills = skills.groups.flatMap((group) => group.items)
+
   return (
     <section id="skills" className="relative py-28 sm:py-40">
       <div className="container-x">

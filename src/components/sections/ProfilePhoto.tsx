@@ -1,8 +1,8 @@
 import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import { useRef, type PointerEvent } from 'react'
-import { content } from '../../data/content'
 import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
+import { useContent } from '../../lib/useContent'
 import { LazyImage } from '../primitives/LazyImage'
 import { Reveal } from '../primitives/Reveal'
 
@@ -13,6 +13,7 @@ const MAX_TILT = 6
  * and a status badge. Falls back to abstract artwork if no photo is set.
  */
 export function ProfilePhoto() {
+  const content = useContent()
   const { person, about } = content
   const fine = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
   const reduce = useReducedMotion()
