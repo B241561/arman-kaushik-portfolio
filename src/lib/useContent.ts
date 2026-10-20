@@ -117,20 +117,7 @@ function mapProject(project: EditableProject, index: number): Partial<Project> &
   if (project.demoVideoUrl === '') mapped.demoVideoUrl = ''
   if (links !== undefined) mapped.links = links
 
-  if (!defaultProject) {
-    mapped.title ??= project.name ?? ''
-    mapped.tagline ??= project.tagline ?? ''
-    mapped.summary ??= project.description ?? ''
-    mapped.problem ??= project.problem ?? ''
-    mapped.approach ??= []
-    mapped.stack ??= []
-    mapped.tags ??= []
-    mapped.screenshots ??= []
-    mapped.links ??= []
-    mapped.image ??= ''
-    mapped.flowSteps ??= []
-  }
-
+  // Fields still missing on a new project are filled in by normalizeProject after the merge.
   return mapped
 }
 
@@ -174,7 +161,9 @@ function toContentPatch(saved: EditableContent): RecordValue {
   }
   if (saved.about) patch.about = saved.about
   if (saved.skills) patch.skills = saved.skills
-  if (saved.projects) patch.projects = saved.projects.map(mapProject)
+  // The saved document stores projects as a bare array, but the site content keeps them under
+  // projects.items next to the section's label/title/subtitle.
+  if (saved.projects) patch.projects = { items: saved.projects.map(mapProject) }
   if (saved.timeline) patch.journey = { items: saved.timeline.map(mapTimelineItem) }
   if (saved.certificates) patch.certificates = saved.certificates.map((certificate): EditableCertificate => ({
     ...certificate,
@@ -183,6 +172,128 @@ function toContentPatch(saved: EditableContent): RecordValue {
   }))
 
   return patch
+}
+
+const text = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value : fallback)
+const textList = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+const records = (value: unknown): RecordValue[] => (Array.isArray(value) ? value.filter(isRecord) : [])
+const oneOf = <T extends string>(value: unknown, options: readonly T[], fallback: T): T =>
+  options.includes(value as T) ? (value as T) : fallback
+
+const projectIcons = ['feynml', 'resume', 'tripcraft'] as const
+const linkKinds = ['repo', 'live', 'demo'] as const
+const skillIcons = ['code', 'brain', 'chart', 'globe'] as const
+const journeyTypes = ['education', 'project', 'next'] as const
+const certificateTypes = ['image', 'pdf', 'link'] as const
+
+// Gives every project field a safe value (arrays [], strings ''), whatever the saved item contained.
+function normalizeProject(value: RecordValue, index: number): Project {
+  const screenshots = records(value.screenshots)
+    .filter((screenshot) => typeof screenshot.src === 'string' && screenshot.src !== '')
+    .map((screenshot) => ({ src: text(screenshot.src), alt: text(screenshot.alt) }))
+  const project: Project = {
+    id: text(value.id) || `project-${index + 1}`,
+    index: text(value.index) || String(index + 1).padStart(2, '0'),
+    title: text(value.title),
+    tagline: text(value.tagline),
+    summary: text(value.summary),
+    icon: oneOf(value.icon, projectIcons, 'feynml'),
+    image: text(value.image),
+    screenshots,
+    tags: textList(value.tags),
+    flowSteps: records(value.flowSteps).map((step, stepIndex) => ({
+      id: text(step.id) || `step-${stepIndex + 1}`,
+      label: text(step.label),
+      description: text(step.description),
+    })),
+    problem: text(value.problem),
+    approach: textList(value.approach),
+    stack: textList(value.stack),
+    links: records(value.links)
+      .filter((link) => typeof link.href === 'string' && link.href !== '')
+      .map((link) => ({ label: text(link.label), href: text(link.href), kind: oneOf(link.kind, linkKinds, 'live') })),
+    featured: value.featured === true,
+  }
+  if (typeof value.imageAlt === 'string') project.imageAlt = value.imageAlt
+  if (typeof value.demoVideoUrl === 'string') project.demoVideoUrl = value.demoVideoUrl
+  return project
+}
+
+// Runs on every read so sections never dereference a missing field, whichever section was saved.
+function normalizeContent(value: SiteContent): SiteContent {
+  const site = value as unknown as RecordValue
+  const section = (key: string): RecordValue => (isRecord(site[key]) ? site[key] : {})
+  const person = section('person')
+  const photo = isRecord(person.photo) ? person.photo : {}
+  const about = section('about')
+  const status = isRecord(about.status) ? about.status : {}
+  const skills = section('skills')
+  const projects = section('projects')
+  const journey = section('journey')
+
+  return {
+    ...value,
+    person: {
+      ...value.person,
+      name: text(person.name),
+      firstName: text(person.firstName),
+      initials: text(person.initials),
+      tagline: text(person.tagline),
+      resumeUrl: text(person.resumeUrl),
+      photo: { src: text(photo.src), alt: text(photo.alt) },
+    },
+    about: {
+      ...value.about,
+      label: text(about.label, content.about.label),
+      body: text(about.body),
+      highlights: textList(about.highlights),
+      stats: records(about.stats)
+        .filter((stat) => typeof stat.value === 'number' && Number.isFinite(stat.value))
+        .map((stat) => ({ value: stat.value as number, label: text(stat.label) })),
+      status: { title: text(status.title, content.about.status.title), lines: textList(status.lines) },
+    },
+    skills: {
+      ...value.skills,
+      label: text(skills.label, content.skills.label),
+      title: text(skills.title, content.skills.title),
+      subtitle: text(skills.subtitle, content.skills.subtitle),
+      groups: records(skills.groups).map((group) => ({
+        title: text(group.title),
+        icon: oneOf(group.icon, skillIcons, 'code'),
+        items: textList(group.items),
+      })),
+    },
+    projects: {
+      ...value.projects,
+      label: text(projects.label, content.projects.label),
+      title: text(projects.title, content.projects.title),
+      subtitle: text(projects.subtitle, content.projects.subtitle),
+      sections: { ...content.projects.sections, ...(isRecord(projects.sections) ? projects.sections : {}) },
+      items: records(projects.items).map(normalizeProject),
+    },
+    journey: {
+      ...value.journey,
+      label: text(journey.label, content.journey.label),
+      title: text(journey.title, content.journey.title),
+      items: records(journey.items).map((item, index): JourneyItem => ({
+        id: text(item.id) || `journey-${index + 1}`,
+        ...(typeof item.date === 'string' ? { date: item.date } : {}),
+        title: text(item.title),
+        kicker: text(item.kicker),
+        text: text(item.text),
+        type: oneOf(item.type, journeyTypes, 'project'),
+      })) as SiteContent['journey']['items'],
+    },
+    certificates: records(site.certificates).map((certificate, index) => ({
+      id: text(certificate.id) || `certificate-${index + 1}`,
+      title: text(certificate.title),
+      issuer: text(certificate.issuer),
+      year: typeof certificate.year === 'number' ? certificate.year : text(certificate.year),
+      type: oneOf(certificate.type, certificateTypes, 'link'),
+      file: text(certificate.file),
+    })),
+  }
 }
 
 function cacheContent(saved: EditableContent) {
@@ -206,7 +317,7 @@ async function fetchContent(): Promise<SiteContent> {
     }
 
     cacheContent(value)
-    return mergeValues(content, toContentPatch(value)) as SiteContent
+    return normalizeContent(mergeValues(content, toContentPatch(value)) as SiteContent)
   } catch {
     return content
   }
