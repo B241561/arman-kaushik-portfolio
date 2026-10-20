@@ -56,7 +56,7 @@ export function ProfilePhoto() {
           onPointerMove={onMove}
           onPointerLeave={onLeave}
           style={{ rotateX, rotateY, transformStyle: 'preserve-3d', borderRadius: 28 }}
-          className="bg-elevated border-line relative z-10 aspect-[4/5] w-full overflow-hidden border shadow-2xl"
+          className="bg-elevated border-line elevation-3 relative z-10 aspect-[4/5] w-full overflow-hidden border"
         >
           {hasPhoto ? (
             <LazyImage
@@ -82,7 +82,7 @@ export function ProfilePhoto() {
                     style={{ width: 160 + ring * 80, height: 160 + ring * 80 }}
                   />
                 ))}
-                <span className="bg-accent-gradient relative grid size-32 place-items-center rounded-3xl text-4xl font-bold text-white shadow-2xl">
+                <span className="bg-accent-gradient relative grid size-32 place-items-center rounded-3xl text-4xl font-bold text-white elevation-2">
                   {person.initials}
                 </span>
               </div>
@@ -91,9 +91,9 @@ export function ProfilePhoto() {
 
           {/* Status Badge */}
           <div className="absolute inset-x-4 bottom-4 z-20">
-            <div className="glass-strong flex items-center gap-3 rounded-2xl p-3 shadow-lg">
+            <div className="glass-solid rounded-control flex items-center gap-3 p-3">
               <span className="relative flex size-2.5 shrink-0">
-                <span className="bg-accent absolute inline-flex size-full animate-ping rounded-full opacity-75" />
+                <span className="bg-accent animate-halo absolute inline-flex size-full rounded-full" />
                 <span className="bg-accent relative inline-flex size-2.5 rounded-full" />
               </span>
               <div className="min-w-0">

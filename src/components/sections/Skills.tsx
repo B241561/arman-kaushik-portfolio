@@ -33,8 +33,8 @@ export function Skills() {
           const Icon = icons[group.icon]
           return (
             <Reveal key={`${group.title}-${i}`} delay={i * 0.06}>
-              <GlassCard className="h-full">
-                <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-2xl border border-[var(--line)]">
+              <GlassCard hoverable className="h-full">
+                <span className="bg-fg/[0.06] rounded-control grid size-11 place-items-center border border-[var(--line)]">
                   <Icon className="text-accent size-5" />
                 </span>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{group.title}</h3>
@@ -57,9 +57,10 @@ export function Skills() {
   )
 }
 
+/** Flat translucent pill — no backdrop-filter or shadow, since ~30 of these move continuously. */
 function Chip({ label }: { label: string }) {
   return (
-    <span className="glass flex items-center gap-2.5 rounded-full px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
+    <span className="bg-glass flex items-center gap-2.5 rounded-full border border-[var(--line)] px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
       <span className="bg-accent-gradient size-1.5 rounded-full" />
       {label}
     </span>
@@ -83,10 +84,10 @@ function Marquee({ items, reverse = false }: { items: string[]; reverse?: boolea
 
   // Two copies + per-item right padding make translateX(-50%) loop seamlessly.
   return (
-    <div className="relative overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+    <div className="relative overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] sm:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
       <div
         className={cn(
-          'animate-marquee flex w-max group-hover/marquee:[animation-play-state:paused]',
+          'animate-marquee flex w-max will-change-transform group-hover/marquee:[animation-play-state:paused]',
           reverse && '[animation-direction:reverse]',
         )}
       >

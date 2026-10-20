@@ -88,7 +88,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
         exit={{ opacity: 0 }}
         transition={{ duration: 0.35 }}
         onClick={handleClose}
-        className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-md"
+        className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm sm:backdrop-blur-md"
       />
       <div className="pointer-events-none fixed inset-0 z-[81] flex justify-center sm:p-6 md:p-10">
         <motion.div
@@ -100,7 +100,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
           onKeyDown={onDialogKeyDown}
           aria-modal="true"
           aria-labelledby={`project-title-${project.id}`}
-          className="bg-elevated pointer-events-auto relative max-h-full w-full max-w-5xl overflow-hidden border border-[var(--line)] shadow-[0_40px_120px_-30px_rgb(0_0_0/0.7)]"
+          className="bg-elevated pointer-events-auto relative max-h-full w-full max-w-5xl overflow-hidden elevation-3 border border-[var(--line)]"
         >
           <span
             data-focus-sentinel="start"
@@ -135,7 +135,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                   alt={screenshot.alt}
                   width={1200}
                   height={675}
-                  className="aspect-video w-full rounded-[20px] object-cover object-top"
+                  className="rounded-tile aspect-video w-full object-cover object-top"
                 />
               </div>
             ))}
@@ -160,7 +160,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                       <ol className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:items-stretch sm:gap-0">
                         {project.flowSteps.map((step, index) => (
                           <li key={step.id} className="flex min-w-0 flex-1 flex-col items-center gap-2 sm:flex-row">
-                            <div className="glass w-full rounded-2xl p-3 sm:h-full">
+                            <div className="glass rounded-tile w-full p-3 sm:h-full">
                               <p className="font-semibold">{step.label}</p>
                               <p className="text-muted mt-1 text-sm leading-relaxed">{step.description}</p>
                             </div>
@@ -211,7 +211,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                         const missing = isPlaceholder(link.href)
                         const inner = (
                           <>
-                            <span className="bg-fg/[0.06] grid size-9 shrink-0 place-items-center rounded-xl">
+                            <span className="bg-fg/[0.06] rounded-control grid size-9 shrink-0 place-items-center">
                               <Icon className="size-4" />
                             </span>
                             <span className="min-w-0 flex-1">
@@ -226,7 +226,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                         return (
                           <li key={`${i}-${link.label}`}>
                             {missing ? (
-                              <span className="flex items-center gap-3 rounded-2xl border border-dashed border-[var(--line)] p-3 opacity-70">
+                              <span className="rounded-tile flex items-center gap-3 border border-dashed border-[var(--line)] p-3 opacity-70">
                                 {inner}
                               </span>
                             ) : (
@@ -234,7 +234,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                                 href={link.href}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="glass hover:bg-fg/[0.06] flex items-center gap-3 rounded-2xl p-3 transition-colors"
+                                className="glass hover:bg-fg/[0.06] rounded-tile flex items-center gap-3 p-3 transition-colors"
                               >
                                 {inner}
                               </a>
@@ -254,7 +254,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
             type="button"
             onClick={handleClose}
             aria-label={ui.close}
-            className="glass-strong absolute top-4 right-4 z-10 grid size-10 place-items-center rounded-full transition-transform active:scale-90"
+            className="glass-solid absolute top-[max(1rem,env(safe-area-inset-top))] right-4 z-10 grid size-11 place-items-center rounded-full transition-transform active:scale-90 sm:size-10"
           >
             <X className="size-[18px]" />
           </button>
@@ -287,7 +287,7 @@ function DemoVideo({
 
   return (
     <div className="px-6 pt-5 sm:px-12">
-      <div className="relative aspect-video overflow-hidden rounded-[20px] bg-linear-to-br from-slate-950 via-slate-900 to-indigo-950">
+      <div className="rounded-tile relative aspect-video overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-indigo-950">
         {playing ? (
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
@@ -311,7 +311,7 @@ function DemoVideo({
                 className="absolute inset-0 size-full object-cover"
               />
             )}
-            <span className="glass-strong relative grid size-16 place-items-center rounded-full shadow-xl">
+            <span className="glass-solid relative grid size-16 place-items-center rounded-full">
               <Play aria-hidden className="size-7 fill-current" />
             </span>
           </button>

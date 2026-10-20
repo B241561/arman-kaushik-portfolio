@@ -25,8 +25,8 @@ export function LazyImage({ src, alt, width, height, className, onError }: LazyI
       onLoad={() => setLoaded(true)}
       onError={onError}
       className={cn(
-        'transition-[opacity,filter] duration-700 ease-[var(--ease-apple)]',
-        loaded ? 'opacity-100 blur-none' : 'opacity-0 blur-md',
+        'transition-opacity duration-500 ease-[var(--ease-apple)]',
+        loaded ? 'opacity-100' : 'opacity-0',
         className,
       )}
     />

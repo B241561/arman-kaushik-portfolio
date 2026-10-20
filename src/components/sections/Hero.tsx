@@ -69,13 +69,13 @@ export function Hero({ ready }: { ready: boolean }) {
       <Aurora />
       <motion.div style={{ y, opacity }} className="container-x relative text-center">
         <motion.div
-          initial={reduce ? false : { opacity: 0, y: 16, filter: 'blur(8px)' }}
-          animate={reduce ? undefined : ready ? { opacity: 1, y: 0, filter: 'blur(0px)' } : undefined}
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          animate={reduce ? undefined : ready ? { opacity: 1, y: 0 } : undefined}
           transition={{ ...spring, delay: 0 }}
           className="mx-auto mb-6 flex justify-center sm:mb-8 [@media(max-height:700px)]:mb-3"
         >
-          <div className="bg-accent-gradient rounded-full p-[2px] opacity-25 shadow-[var(--shadow-card)]">
-            <div className="bg-glass rounded-full p-[2px] backdrop-blur-sm">
+          <div className="bg-accent-gradient elevation-1 rounded-full p-[2px] opacity-25">
+            <div className="bg-glass rounded-full p-[2px]">
               <div className="relative size-[120px] overflow-hidden rounded-full min-[768px]:size-[152px] [@media(max-height:700px)]:!size-[96px]">
                 {isPlaceholder(person.photo.src) || photoFailed ? (
                   <div
@@ -100,18 +100,18 @@ export function Hero({ ready }: { ready: boolean }) {
           className="glass text-muted mx-auto inline-flex max-w-full items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium sm:text-sm"
         >
           <span className="relative flex size-2 shrink-0">
-            <span className="bg-accent absolute inline-flex size-full animate-ping rounded-full opacity-60" />
+            <span className="bg-accent animate-halo absolute inline-flex size-full rounded-full" />
             <span className="bg-accent relative inline-flex size-2 rounded-full" />
           </span>
           <span className="truncate">{hero.eyebrow}</span>
         </motion.p>
 
-        <h1 className="mt-5 text-[clamp(3.1rem,14.5vw,10.5rem)] leading-[0.9] font-semibold tracking-[-0.055em] [@media(max-height:700px)]:mt-4">
+        <h1 className="mt-5 text-[clamp(2.75rem,13.5vw,10.5rem)] leading-[0.9] font-semibold tracking-[-0.055em] [@media(max-height:700px)]:mt-4">
           <span className="sr-only">{person.name}</span>
           <span aria-hidden>
             {nameWords.map((word, i) => (
               <Fragment key={word}>
-                <span className="inline-block overflow-hidden pb-[0.1em]">
+                <span className="inline-block max-w-full overflow-hidden pb-[0.1em] break-words">
                   <motion.span
                     className={cn('inline-block', i === nameWords.length - 1 && 'text-gradient')}
                     initial={reduce ? { opacity: 0 } : { y: '108%' }}
@@ -132,8 +132,8 @@ export function Hero({ ready }: { ready: boolean }) {
             <Fragment key={i}>
               <motion.span
                 className="inline-block"
-                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10, filter: 'blur(8px)' }}
-                animate={ready ? { opacity: 1, y: 0, filter: 'blur(0px)' } : undefined}
+                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                animate={ready ? { opacity: 1, y: 0 } : undefined}
                 transition={{ ...spring, delay: 0.45 + i * 0.035 }}
               >
                 {word}

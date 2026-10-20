@@ -56,12 +56,12 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
         aria-label={`${ui.openProject}: ${project.title}`}
-        className="glass spotlight group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
+        className="glass spotlight group rounded-card flex h-full w-full flex-col overflow-hidden text-left"
       >
         <div className="relative aspect-video w-full shrink-0 overflow-hidden">
           <ProjectArt project={project} large={project.featured} />
           {hasDemoVideo && (
-            <span className="glass-strong absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
+            <span className="glass-solid absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
               <Play aria-hidden className="size-3 fill-current" />
               Demo
             </span>
