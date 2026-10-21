@@ -3,41 +3,30 @@
 @custom-variant light (&:where([data-theme='light'], [data-theme='light'] *));
 
 /* ---------- Design tokens ---------- */
+/* Flat editorial palette: white, gray, charcoal, black. No gradients, blur or shadows. */
 
-:root {
-  color-scheme: dark;
-  --bg: #050507;
-  --surface: #0b0b0f;
-  --elevated: #111116;
-  --fg: #f5f5f7;
-  --muted: rgb(245 245 247 / 0.64);
-  --subtle: rgb(245 245 247 / 0.42);
-  --line: rgb(255 255 255 / 0.1);
-  --glass: rgb(255 255 255 / 0.045);
-  --glass-strong: rgb(20 20 26 / 0.62);
-  --accent: #3b82f6;
-  --accent-2: #8b5cf6;
-  --spot: rgb(255 255 255 / 0.09);
-  --aurora-opacity: 0.55;
-  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.06) inset, 0 30px 80px -40px rgb(0 0 0 / 0.8);
-}
-
+:root,
 [data-theme='light'] {
   color-scheme: light;
-  --bg: #fbfbfd;
-  --surface: #f2f2f6;
-  --elevated: #ffffff;
-  --fg: #1d1d1f;
-  --muted: rgb(29 29 31 / 0.66);
-  --subtle: rgb(29 29 31 / 0.44);
-  --line: rgb(0 0 0 / 0.08);
-  --glass: rgb(255 255 255 / 0.6);
-  --glass-strong: rgb(255 255 255 / 0.74);
-  --accent: #2563eb;
-  --accent-2: #7c3aed;
-  --spot: rgb(37 99 235 / 0.08);
-  --aurora-opacity: 0.32;
-  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.8) inset, 0 30px 60px -40px rgb(15 23 42 / 0.25);
+  --white: #ffffff;
+  --gray: #a8a8a8;
+  --charcoal: #2b2b2b;
+  --charcoal-hover: #444444;
+  --black: #000000;
+
+  --bg: var(--white);
+  --surface: var(--white);
+  --elevated: var(--white);
+  --fg: var(--charcoal);
+  --muted: rgb(43 43 43 / 0.78);
+  --subtle: rgb(43 43 43 / 0.6);
+  --line: rgb(43 43 43 / 0.16);
+  --glass: var(--white);
+  --glass-strong: var(--white);
+  --accent: var(--charcoal);
+  --accent-2: var(--charcoal);
+  --spot: transparent;
+  --shadow-card: none;
 }
 
 @theme inline {
@@ -51,35 +40,23 @@
   --color-glass: var(--glass);
   --color-accent: var(--accent);
   --color-accent-2: var(--accent-2);
+  --color-gray: var(--gray);
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-hover: var(--charcoal-hover);
 }
 
 @theme {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
   --radius-card: 1.75rem;
   --radius-sheet: 2rem;
   --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
 
   --animate-marquee: marquee 40s linear infinite;
-  --animate-aurora-a: aurora-a 18s ease-in-out infinite;
-  --animate-aurora-b: aurora-b 22s ease-in-out infinite;
-  --animate-aurora-c: aurora-c 26s ease-in-out infinite;
 
   @keyframes marquee {
     to {
       transform: translate3d(-50%, 0, 0);
     }
-  }
-  @keyframes aurora-a {
-    0%, 100% { transform: translate3d(-12%, -6%, 0) scale(1); }
-    50% { transform: translate3d(10%, 8%, 0) scale(1.18); }
-  }
-  @keyframes aurora-b {
-    0%, 100% { transform: translate3d(14%, 4%, 0) scale(1.1); }
-    50% { transform: translate3d(-10%, -10%, 0) scale(0.92); }
-  }
-  @keyframes aurora-c {
-    0%, 100% { transform: translate3d(0, 10%, 0) scale(0.95); }
-    50% { transform: translate3d(-6%, -4%, 0) scale(1.2); }
   }
 }
 
@@ -96,13 +73,13 @@
   }
   body {
     font-family: var(--font-sans);
-    font-feature-settings: 'ss01', 'cv11';
     background: var(--bg);
     overflow-x: clip;
     min-width: 320px;
   }
   ::selection {
-    background: color-mix(in oklab, var(--accent) 45%, transparent);
+    background: var(--gray);
+    color: var(--black);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
@@ -112,7 +89,7 @@
     cursor: pointer;
   }
   section[id] {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: 0;
   }
 }
 
@@ -138,15 +115,6 @@ html.theming * {
     border-color 0.45s var(--ease-apple) !important;
 }
 
-/* Custom cursor (desktop only — class added by <Cursor />) */
-html.has-cursor,
-html.has-cursor * {
-  cursor: none !important;
-}
-html.has-cursor :is(input, textarea, select) {
-  cursor: text !important;
-}
-
 /* ---------- Utilities ---------- */
 
 @utility container-x {
@@ -160,48 +128,56 @@ html.has-cursor :is(input, textarea, select) {
 }
 
 @utility glass {
-  background: var(--glass);
+  background: var(--white);
   border: 1px solid var(--line);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  box-shadow: var(--shadow-card);
 }
 
 @utility glass-strong {
-  background: var(--glass-strong);
+  background: var(--white);
   border: 1px solid var(--line);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: var(--shadow-card);
 }
 
+/* Kept as names so existing markup still works; both render as flat charcoal. */
 @utility text-gradient {
-  background-image: linear-gradient(115deg, var(--accent) 0%, var(--accent-2) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--charcoal);
 }
 
 @utility bg-accent-gradient {
-  background-image: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+  background-color: var(--charcoal);
 }
 
-/* Cursor-following spotlight — position set via --mx / --my */
-@utility spotlight {
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), var(--spot), transparent 42%);
-    opacity: 0;
-    transition: opacity 0.4s var(--ease-apple);
+/* Solid rectangular button: charcoal fill, small bold white text. */
+@utility btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  padding-inline: 1.25rem;
+  border-radius: 2px;
+  background: var(--charcoal);
+  color: var(--white);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: background-color 0.15s ease;
+  &:hover {
+    background: var(--charcoal-hover);
   }
-  &:hover::before {
-    opacity: 1;
-  }
+}
+
+/* ---------- Flat theme overrides ----------
+   Sharp corners, no shadows and no blur anywhere, regardless of component classes. */
+*,
+::before,
+::after {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[class*='rounded'] {
+  border-radius: 2px !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

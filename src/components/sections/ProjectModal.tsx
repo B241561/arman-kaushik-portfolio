@@ -287,7 +287,7 @@ function DemoVideo({
 
   return (
     <div className="px-6 pt-5 sm:px-12">
-      <div className="relative aspect-video overflow-hidden rounded-[20px] bg-linear-to-br from-slate-950 via-slate-900 to-indigo-950">
+      <div className="relative aspect-video overflow-hidden rounded-[20px] bg-black">
         {playing ? (
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}

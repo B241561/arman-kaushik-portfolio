@@ -4,7 +4,7 @@ import { Reveal } from './Reveal'
 
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <p className={cn('text-gradient text-sm font-semibold tracking-[0.18em] uppercase', className)}>{children}</p>
+    <p className={cn('text-fg text-sm font-bold tracking-[0.12em] uppercase', className)}>{children}</p>
   )
 }
 
@@ -12,7 +12,7 @@ export function SectionHeading({ label, title, subtitle }: { label: string; titl
   return (
     <Reveal className="max-w-3xl">
       <Eyebrow>{label}</Eyebrow>
-      <h2 className="mt-4 text-[clamp(2.4rem,7vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.045em]">{title}</h2>
+      <h2 className="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] leading-tight font-bold tracking-[-0.01em]">{title}</h2>
       {subtitle && <p className="text-muted mt-5 max-w-xl text-lg leading-relaxed text-pretty">{subtitle}</p>}
     </Reveal>
   )

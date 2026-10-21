@@ -1,11 +1,9 @@
 import { AnimatePresence, MotionConfig } from 'framer-motion'
 import { lazy, Suspense, useCallback, useState } from 'react'
 import { ErrorBoundary } from './components/primitives/ErrorBoundary'
-import { Cursor } from './components/layout/Cursor'
 import { Footer } from './components/layout/Footer'
 import { Intro } from './components/layout/Intro'
 import { Navbar } from './components/layout/Navbar'
-import { ScrollProgress } from './components/layout/ScrollProgress'
 import { About } from './components/sections/About'
 import { Contact } from './components/sections/Contact'
 import { Certificates } from './components/sections/Certificates'
@@ -60,15 +58,13 @@ function PublicApp() {
     <MotionConfig reducedMotion="user">
       <a
         href="#main"
-        className="bg-fg text-bg sr-only z-[400] rounded-full px-4 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
+        className="bg-fg text-bg sr-only z-[400] px-4 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
       >
         {content.ui.skipToContent}
       </a>
 
       <AnimatePresence>{!ready && <Intro key="intro" onFinish={finishIntro} />}</AnimatePresence>
 
-      <ScrollProgress />
-      <Cursor />
       <Navbar ready={ready} />
 
       <main id="main">

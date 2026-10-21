@@ -31,7 +31,7 @@ export function Journey() {
           <motion.span
             aria-hidden
             style={{ scaleY: reduce ? 1 : scaleY }}
-            className="from-accent to-accent-2 absolute top-2 bottom-2 left-[15px] w-px origin-top bg-linear-to-b shadow-[0_0_12px_var(--accent)] sm:left-[23px]"
+            className="bg-charcoal absolute top-2 bottom-2 left-[15px] w-px origin-top sm:left-[23px]"
           />
 
           {journey.items.map((item, i) => {

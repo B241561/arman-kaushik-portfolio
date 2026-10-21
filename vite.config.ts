@@ -81,7 +81,7 @@ function seo(): Plugin {
     `<meta name="keywords" content="${esc(site.keywords.join(', '))}" />`,
     `<meta name="author" content="${esc(person.name)}" />`,
     `<meta name="robots" content="index, follow" />`,
-    `<meta name="theme-color" content="#121110" />`,
+    `<meta name="theme-color" content="#ffffff" />`,
     `<link rel="canonical" href="${esc(url)}/" />`,
     `<meta property="og:type" content="profile" />`,
     `<meta property="og:site_name" content="${esc(person.name)}" />`,
