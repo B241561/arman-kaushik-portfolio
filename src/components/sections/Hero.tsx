@@ -99,7 +99,7 @@ export function Hero({ ready }: { ready: boolean }) {
           <span className="relative flex size-2 shrink-0">
             <span className="bg-accent relative inline-flex size-2 rounded-full" />
           </span>
-          <span className="truncate">{hero.eyebrow}</span>
+          <span className="min-w-0 whitespace-normal">{hero.eyebrow}</span>
         </motion.p>
 
         <h1 className="mt-5 text-[clamp(2.75rem,13.5vw,10.5rem)] leading-[0.9] font-semibold tracking-[-0.055em] [@media(max-height:700px)]:mt-4">
