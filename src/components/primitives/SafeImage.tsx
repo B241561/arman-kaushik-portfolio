@@ -14,7 +14,7 @@ export function SafeImage({ src, className, fallbackLabel = 'Image unavailable',
 
   if (!src || failed) {
     return (
-      <div role="img" aria-label={rest.alt || fallbackLabel} className={cn('text-subtle grid min-h-24 place-items-center gap-1 border border-[var(--line)] p-4 text-center text-xs', className)}>
+      <div role="img" aria-label={rest.alt || fallbackLabel} className={cn('bg-surface text-subtle grid min-h-24 place-items-center gap-1 border border-line p-4 text-center text-xs', className)}>
         <ImageIcon aria-hidden className="size-5" />
         <span>{fallbackLabel}</span>
       </div>

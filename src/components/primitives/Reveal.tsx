@@ -1,26 +1,21 @@
 import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
-import { easeApple, spring } from '../../lib/motion'
+import { easeOut } from '../../lib/motion'
 
 type RevealProps = HTMLMotionProps<'div'> & {
   delay?: number
   /** Distance in px the element rises from. */
   y?: number
-  once?: boolean
 }
 
-/** Fades and springs content up when it scrolls into view (transform + opacity only). */
-export function Reveal({ delay = 0, y = 28, once = true, children, ...rest }: RevealProps) {
+/** A one-time fade and short rise when content first scrolls into view. */
+export function Reveal({ delay = 0, y = 12, children, ...rest }: RevealProps) {
   const reduce = useReducedMotion()
   return (
     <motion.div
       initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
       whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once, margin: '0px 0px -10% 0px' }}
-      transition={{
-        ...spring,
-        delay,
-        opacity: { duration: 0.5, delay, ease: easeApple },
-      }}
+      viewport={{ once: true, margin: '0px 0px -8% 0px' }}
+      transition={{ duration: 0.6, delay, ease: easeOut }}
       {...rest}
     >
       {children}
