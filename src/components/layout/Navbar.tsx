@@ -51,13 +51,13 @@ export function Navbar({ ready }: { ready: boolean }) {
             paddingRight: scrolled ? 5 : 7,
           }}
           transition={spring}
-          className="glass-strong pointer-events-auto flex w-full max-w-max items-center gap-1 rounded-full"
+          className="pointer-events-auto flex w-full max-w-max items-center gap-1 rounded-full border border-line bg-bg shadow-soft"
         >
           <button
             type="button"
             onClick={() => go('home')}
             aria-label={nav.homeLabel}
-            className="bg-accent-gradient grid size-9 shrink-0 place-items-center rounded-full text-[13px] font-semibold tracking-tight text-white"
+            className="bg-fg text-bg grid size-9 shrink-0 place-items-center rounded-full text-[13px] font-semibold tracking-tight"
           >
             {person.initials}
           </button>
@@ -126,7 +126,7 @@ export function Navbar({ ready }: { ready: boolean }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.97 }}
               transition={spring}
-              className="glass-strong rounded-card fixed inset-x-3 top-3 z-[61] origin-top p-5 md:hidden"
+              className="rounded-card fixed inset-x-3 top-3 z-[61] origin-top border border-line bg-bg p-5 shadow-soft md:hidden"
             >
               <div className="flex items-center justify-between">
                 <span className="text-muted text-sm font-medium">{nav.menuTitle}</span>
@@ -157,7 +157,7 @@ export function Navbar({ ready }: { ready: boolean }) {
                       )}
                     >
                       {item.label}
-                      {active === item.id && <span className="bg-accent-gradient size-2 rounded-full" />}
+                      {active === item.id && <span className="bg-accent size-2 rounded-full" />}
                     </button>
                   </motion.li>
                 ))}

@@ -2,7 +2,6 @@ import { useReducedMotion } from 'framer-motion'
 import { Brain, ChartColumn, Code, Globe } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import { useContent } from '../../lib/useContent'
-import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 
@@ -33,7 +32,7 @@ export function Skills() {
           const Icon = icons[group.icon]
           return (
             <Reveal key={`${group.title}-${i}`} delay={i * 0.06}>
-              <GlassCard hoverable className="h-full">
+              <div className="surface rounded-card h-full p-6 sm:p-8">
                 <span className="bg-fg/[0.06] rounded-control grid size-11 place-items-center border border-[var(--line)]">
                   <Icon className="text-accent size-5" />
                 </span>
@@ -48,7 +47,7 @@ export function Skills() {
                     </li>
                   ))}
                 </ul>
-              </GlassCard>
+              </div>
             </Reveal>
           )
         })}
@@ -60,8 +59,8 @@ export function Skills() {
 /** Flat translucent pill — no backdrop-filter or shadow, since ~30 of these move continuously. */
 function Chip({ label }: { label: string }) {
   return (
-    <span className="bg-glass flex items-center gap-2.5 rounded-full border border-[var(--line)] px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
-      <span className="bg-accent-gradient size-1.5 rounded-full" />
+    <span className="bg-elevated flex items-center gap-2.5 rounded-full border border-[var(--line)] px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
+      <span className="bg-accent size-1.5 rounded-full" />
       {label}
     </span>
   )

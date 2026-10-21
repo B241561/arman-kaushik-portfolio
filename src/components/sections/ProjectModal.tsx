@@ -149,7 +149,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                 >
                   {project.title}
                 </h2>
-                <p className="text-gradient mt-3 text-lg font-medium sm:text-xl">{project.tagline}</p>
+                <p className="text-accent mt-3 text-lg font-medium sm:text-xl">{project.tagline}</p>
               </motion.div>
 
               <div className="mt-10 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-14">
@@ -160,7 +160,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                       <ol className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:items-stretch sm:gap-0">
                         {project.flowSteps.map((step, index) => (
                           <li key={step.id} className="flex min-w-0 flex-1 flex-col items-center gap-2 sm:flex-row">
-                            <div className="glass rounded-tile w-full p-3 sm:h-full">
+                            <div className="surface rounded-tile w-full p-3 sm:h-full">
                               <p className="font-semibold">{step.label}</p>
                               <p className="text-muted mt-1 text-sm leading-relaxed">{step.description}</p>
                             </div>
@@ -184,7 +184,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     <ul className="mt-4 space-y-3">
                       {project.approach.map((step, i) => (
                         <li key={`${i}-${step}`} className="text-muted flex gap-3 text-[16px] leading-relaxed">
-                          <span className="bg-accent-gradient mt-2.5 size-1.5 shrink-0 rounded-full" />
+                          <span className="bg-accent mt-2.5 size-1.5 shrink-0 rounded-full" />
                           {step}
                         </li>
                       ))}
@@ -197,7 +197,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     <ModalLabel>{projects.sections.stack}</ModalLabel>
                     <ul className="mt-4 flex flex-wrap gap-2">
                       {project.stack.map((tag, i) => (
-                        <li key={`${i}-${tag}`} className="glass rounded-full px-3.5 py-1.5 text-sm font-medium">
+                        <li key={`${i}-${tag}`} className="surface rounded-full px-3.5 py-1.5 text-sm font-medium">
                           {tag}
                         </li>
                       ))}
@@ -234,7 +234,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                                 href={link.href}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="glass hover:bg-fg/[0.06] rounded-tile flex items-center gap-3 p-3 transition-colors"
+                                className="surface hover:bg-fg/[0.06] rounded-tile flex items-center gap-3 p-3 transition-colors"
                               >
                                 {inner}
                               </a>
@@ -254,7 +254,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
             type="button"
             onClick={handleClose}
             aria-label={ui.close}
-            className="glass-solid absolute top-[max(1rem,env(safe-area-inset-top))] right-4 z-10 grid size-11 place-items-center rounded-full transition-transform active:scale-90 sm:size-10"
+            className="bg-elevated border-line absolute top-[max(1rem,env(safe-area-inset-top))] right-4 z-10 grid size-11 place-items-center rounded-full border transition-transform active:scale-90 sm:size-10"
           >
             <X className="size-[18px]" />
           </button>
@@ -287,7 +287,7 @@ function DemoVideo({
 
   return (
     <div className="px-6 pt-5 sm:px-12">
-      <div className="rounded-tile relative aspect-video overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-indigo-950">
+      <div className="rounded-tile bg-surface border-line relative aspect-video overflow-hidden border">
         {playing ? (
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
@@ -311,7 +311,7 @@ function DemoVideo({
                 className="absolute inset-0 size-full object-cover"
               />
             )}
-            <span className="glass-solid relative grid size-16 place-items-center rounded-full">
+            <span className="bg-elevated border-line relative grid size-16 place-items-center rounded-full border">
               <Play aria-hidden className="size-7 fill-current" />
             </span>
           </button>

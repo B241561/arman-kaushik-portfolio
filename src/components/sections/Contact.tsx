@@ -4,8 +4,6 @@ import { useState, type FormEvent } from 'react'
 import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
 import { useContent } from '../../lib/useContent'
-import { GlassCard } from '../primitives/GlassCard'
-import { Magnetic } from '../primitives/Magnetic'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 import { useToast } from '../primitives/Toast'
@@ -53,7 +51,7 @@ export function Contact() {
         <div className="mt-14 grid gap-4 lg:grid-cols-5">
           <div className="flex flex-col gap-4 lg:col-span-2">
             <Reveal>
-              <GlassCard>
+              <div className="surface rounded-card p-6 sm:p-8">
                 <p className="text-subtle text-xs font-semibold tracking-[0.18em] uppercase">{contact.emailLabel}</p>
                 <p className="mt-3 text-xl font-semibold tracking-tight break-all sm:text-2xl">{person.email}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
@@ -78,18 +76,18 @@ export function Contact() {
                   {!emailMissing && (
                     <a
                       href={`mailto:${person.email}`}
-                      className="glass inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium"
+                      className="surface inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium"
                     >
                       <Mail className="size-4" />
                       {contact.emailLabel}
                     </a>
                   )}
                 </div>
-              </GlassCard>
+              </div>
             </Reveal>
 
             <Reveal delay={0.06}>
-              <GlassCard className="!p-3">
+              <div className="surface rounded-card !p-3">
                 <p className="text-subtle px-3 pt-3 pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
                   {contact.elsewhere}
                 </p>
@@ -129,12 +127,12 @@ export function Contact() {
                     )
                   })}
                 </ul>
-              </GlassCard>
+              </div>
             </Reveal>
           </div>
 
           <Reveal delay={0.1} className="lg:col-span-3">
-            <GlassCard className="h-full">
+            <div className="surface rounded-card h-full p-6 sm:p-8">
               <h3 className="text-2xl font-semibold tracking-tight">{contact.form.title}</h3>
               <form onSubmit={onSubmit} className="mt-6 grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -159,18 +157,16 @@ export function Contact() {
                 </label>
                 <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-subtle text-sm">{contact.form.note}</p>
-                  <Magnetic className="self-start sm:self-auto">
-                    <button
-                      type="submit"
-                      className="bg-accent-gradient group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium text-white elevation-2 transition-transform active:scale-[0.97]"
-                    >
-                      {contact.form.submit}
-                      <Send className="size-4 transition-transform duration-500 ease-[var(--ease-apple)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </button>
-                  </Magnetic>
+                  <button
+                    type="submit"
+                    className="bg-fg text-bg group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium transition-transform active:scale-[0.97]"
+                  >
+                    {contact.form.submit}
+                    <Send className="size-4 transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </button>
                 </div>
               </form>
-            </GlassCard>
+            </div>
           </Reveal>
         </div>
       </div>

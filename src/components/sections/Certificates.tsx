@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ArrowUpRight, FileText, Image as ImageIcon, X } from 'lucide-react'
 import { useContent } from '../../lib/useContent'
-import { GlassCard } from '../primitives/GlassCard'
 import { SafeImage } from '../primitives/SafeImage'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
@@ -33,7 +32,7 @@ export function Certificates() {
             return (
               <li key={certificate.id}>
                 <Reveal delay={index * 0.06}>
-                  <GlassCard hoverable className="h-full">
+                  <div className="surface rounded-card h-full p-6 sm:p-8">
                     {certificate.type === 'image' && certificate.file && (
                       <button type="button" onClick={() => setSelected(certificate)} aria-label={`Open ${certificate.title} certificate`} className="rounded-tile mb-5 block w-full overflow-hidden border border-[var(--line)]">
                         <SafeImage key={certificate.file} src={certificate.file} alt={`${certificate.title} certificate`} loading="lazy" fallbackLabel="Certificate image unavailable" className="rounded-tile aspect-[4/3] w-full object-cover" />
@@ -58,7 +57,7 @@ export function Certificates() {
                     ) : (
                       <p className="text-subtle mt-5 text-sm">Certificate file not uploaded yet.</p>
                     )}
-                  </GlassCard>
+                  </div>
                 </Reveal>
               </li>
             )
@@ -71,7 +70,7 @@ export function Certificates() {
           if (event.target === event.currentTarget) setSelected(null)
         }}>
           <section role="dialog" aria-modal="true" aria-label={`${selected.title} certificate`} className="bg-elevated rounded-sheet elevation-3 relative max-h-full w-full max-w-5xl overflow-auto border border-[var(--line)] p-4 sm:p-6">
-            <button type="button" aria-label="Close certificate" onClick={() => setSelected(null)} className="glass-solid absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full sm:size-10">
+            <button type="button" aria-label="Close certificate" onClick={() => setSelected(null)} className="surface absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full sm:size-10">
               <X aria-hidden className="size-5" />
             </button>
             {selected.type === 'image' ? (
@@ -81,8 +80,8 @@ export function Certificates() {
             )}
             {selected.type === 'pdf' && (
               <div className="mt-4 flex flex-wrap justify-center gap-3">
-                <a href={selected.file} target="_blank" rel="noreferrer" className="glass rounded-full px-4 py-2 text-sm font-medium">Open PDF</a>
-                <a href={selected.file} download className="glass rounded-full px-4 py-2 text-sm font-medium">Download PDF</a>
+                <a href={selected.file} target="_blank" rel="noreferrer" className="surface rounded-full px-4 py-2 text-sm font-medium">Open PDF</a>
+                <a href={selected.file} download className="surface rounded-full px-4 py-2 text-sm font-medium">Download PDF</a>
               </div>
             )}
           </section>

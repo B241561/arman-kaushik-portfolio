@@ -1,4 +1,4 @@
-# Arman Kaushik Portfolio
+# Armaan Kaushik Portfolio
 
 ## Requirements
 - Node.js 22 or newer

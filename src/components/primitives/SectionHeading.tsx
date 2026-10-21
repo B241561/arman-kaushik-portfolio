@@ -52,7 +52,7 @@ export function SectionHeading({
       <SectionLabel id={id} label={label} className="md:col-span-3 md:pt-2" />
       {(title || subtitle) && (
         <div className="md:col-span-9">
-          {title && <h2 className={cn('font-serif font-normal', sizes[size])}>{title}</h2>}
+          {title && <h2 className={cn('font-sans font-medium tracking-[-0.02em]', sizes[size])}>{title}</h2>}
           {subtitle && <p className="text-muted mt-4 max-w-[52ch] text-lg leading-relaxed text-pretty">{subtitle}</p>}
           {aside}
         </div>

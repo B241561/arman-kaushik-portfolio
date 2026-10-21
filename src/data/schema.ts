@@ -47,6 +47,10 @@ export type EditableResume = {
 
 export type EditableAbout = {
   label?: string
+  copyVersion?: number
+  heading?: string
+  paragraph?: string
+  internshipStatus?: string
   body?: string
   highlights?: string[]
   stats?: { value: number; label: string }[]
@@ -299,9 +303,13 @@ function isPerson(value: unknown): value is EditablePerson {
 }
 
 function isAbout(value: unknown): value is EditableAbout {
-  if (!isRecord(value) || !hasOnlyKeys(value, ['label', 'body', 'highlights', 'stats', 'status'])) return false
+  if (!isRecord(value) || !hasOnlyKeys(value, ['label', 'copyVersion', 'heading', 'paragraph', 'internshipStatus', 'body', 'highlights', 'stats', 'status'])) return false
   if (
     !isOptionalText(value, 'label', 120) ||
+    ('copyVersion' in value && value.copyVersion !== 2) ||
+    !isOptionalText(value, 'heading', 240) ||
+    !isOptionalText(value, 'paragraph', 1500) ||
+    !isOptionalText(value, 'internshipStatus', 120) ||
     !isOptionalText(value, 'body', 1500) ||
     ('highlights' in value && !isStringArray(value.highlights, 120, 40))
   ) return false

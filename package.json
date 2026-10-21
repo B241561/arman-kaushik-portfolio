@@ -1,5 +1,5 @@
 {
-  "name": "arman-kaushik-portfolio",
+  "name": "armaan-kaushik-portfolio",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fontsource/inter": "^5.3.0",
-    "@fontsource/newsreader": "^5.3.0",
     "@netlify/blobs": "^11.1.4",
     "framer-motion": "^11.18.2",
     "lenis": "^1.1.20",

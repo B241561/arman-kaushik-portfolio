@@ -1,7 +1,6 @@
 import { ArrowUp } from 'lucide-react'
 import { useScrollTo } from '../../lib/lenis'
 import { useContent } from '../../lib/useContent'
-import { Magnetic } from '../primitives/Magnetic'
 
 export function Footer() {
   const { footer, person, nav } = useContent()
@@ -22,18 +21,16 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          <Magnetic>
-            <button
-              type="button"
-              onClick={() => scrollTo(0)}
-              className="glass group flex items-center gap-3 rounded-full py-2 pr-5 pl-2 text-sm font-medium"
-            >
+          <button
+            type="button"
+            onClick={() => scrollTo(0)}
+            className="group inline-flex items-center gap-3 rounded-full border border-line py-2 pr-5 pl-2 text-sm font-medium"
+          >
               <span className="bg-fg text-bg grid size-9 place-items-center rounded-full transition-transform duration-500 ease-[var(--ease-apple)] group-hover:-translate-y-0.5">
                 <ArrowUp className="size-4" />
               </span>
               {footer.backToTop}
-            </button>
-          </Magnetic>
+          </button>
         </div>
 
         <p

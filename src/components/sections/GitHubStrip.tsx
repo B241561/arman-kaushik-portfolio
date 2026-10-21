@@ -1,7 +1,6 @@
 import { ArrowUpRight, BookMarked, Github } from 'lucide-react'
 import { isPlaceholder } from '../../lib/placeholder'
 import { useContent } from '../../lib/useContent'
-import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 
 export function GitHubStrip() {
@@ -13,7 +12,7 @@ export function GitHubStrip() {
     <section aria-labelledby="github-title" className="relative py-12 sm:py-20">
       <div className="container-x">
         <Reveal>
-          <GlassCard className="overflow-hidden">
+          <div className="surface rounded-card overflow-hidden p-6 sm:p-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
                 <span className="bg-fg text-bg rounded-control grid size-12 shrink-0 place-items-center">
@@ -66,7 +65,7 @@ export function GitHubStrip() {
                     <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
                       {repo.tags.map((tag) => (
                         <li key={tag} className="text-subtle flex items-center gap-1.5 text-xs">
-                          <span className="bg-accent-gradient size-2 rounded-full" />
+                          <span className="bg-accent size-2 rounded-full" />
                           {tag}
                         </li>
                       ))}
@@ -88,7 +87,7 @@ export function GitHubStrip() {
                 )
               })}
             </ul>
-          </GlassCard>
+          </div>
         </Reveal>
       </div>
     </section>

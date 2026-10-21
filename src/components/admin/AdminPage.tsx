@@ -56,6 +56,10 @@ const labels: Record<string, string> = {
   resumeUrl: 'Resume URL',
   label: 'Label',
   body: 'About text',
+  heading: 'About heading',
+  paragraph: 'About paragraph',
+  internshipStatus: 'Internship status line',
+  copyVersion: 'About copy version',
   highlights: 'Highlighted words',
   stats: 'Statistics',
   value: 'Value',
@@ -91,7 +95,7 @@ const inputClass =
 const buttonClass =
   'rounded-full border border-[var(--line)] px-4 py-2 text-sm font-medium transition-colors hover:bg-fg/[0.08] disabled:cursor-not-allowed disabled:opacity-50'
 const primaryButtonClass =
-  'rounded-full bg-accent-gradient px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-full bg-fg px-5 py-2.5 text-sm font-semibold text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
 
 function createDefaultDocument(): EditableContent {
   return {
@@ -103,6 +107,10 @@ function createDefaultDocument(): EditableContent {
     resume: { currentUrl: persistedAssetUrl(content.person.resumeUrl), previous: [] },
     about: {
       label: content.about.label,
+      copyVersion: content.about.copyVersion,
+      heading: content.about.heading,
+      paragraph: content.about.paragraph,
+      internshipStatus: content.about.internshipStatus,
       body: content.about.body,
       highlights: [...content.about.highlights],
       stats: content.about.stats.map((stat) => ({ ...stat })),
@@ -235,8 +243,10 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
     }
     update(path, path[0] === 'person' && key === 'src' ? '' : undefined)
   }
-  const isLongText = ['body', 'description', 'problem', 'text'].includes(key)
-  const maxLength = ['title', 'name', 'label'].includes(key) ? 120 : isLongText ? 1500 : undefined
+  const isLongText = ['body', 'description', 'paragraph', 'problem', 'text'].includes(key)
+  const maxLength = ['title', 'name', 'label', 'internshipStatus'].includes(key)
+    ? 120
+    : key === 'heading' ? 240 : isLongText ? 1500 : undefined
   const stringValue = typeof value === 'string' || typeof value === 'number' ? String(value) : ''
 
   if (key === 'icon' || key === 'kind' || key === 'type') {
@@ -409,7 +419,9 @@ function SchemaFields({
   if (typeof value === 'object' && value !== null) {
     return (
       <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
-        {Object.entries(value).map(([key, child]) => (
+        {Object.entries(value)
+          .filter(([key]) => !(path[0] === 'about' && ['body', 'status', 'copyVersion'].includes(key)))
+          .map(([key, child]) => (
           <div key={key} className={`min-w-0 ${['body', 'description', 'problem', 'text', 'approach', 'lines', 'items', 'stack', 'tags', 'highlights'].includes(key) ? 'sm:col-span-2' : ''}`}>
             <SchemaFields value={child} path={[...path, key]} update={update} mediaFiles={mediaFiles} onUpload={onUpload} onDeleteMedia={onDeleteMedia} onSelectAsset={onSelectAsset} onRemove={onRemove} />
           </div>
@@ -813,7 +825,7 @@ export default function AdminPage() {
               ) : (
                 <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {mediaFiles.map((file) => (
-                    <li key={file.id} className="glass min-w-0 rounded-2xl p-3">
+                    <li key={file.id} className="surface min-w-0 rounded-2xl p-3">
                       {file.type.startsWith('image/') ? (
                         <SafeImage src={file.url} alt="" fallbackLabel="Preview unavailable" className="mb-3 h-36 w-full rounded-xl object-cover" />
                       ) : (
