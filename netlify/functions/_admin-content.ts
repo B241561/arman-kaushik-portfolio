@@ -1,16 +1,9 @@
 import { randomUUID } from 'node:crypto'
-import { getStore } from '@netlify/blobs'
+import type { StorageAdapter } from '../../server/storage'
+import { netlifyStorage } from './_storage'
 
-export type ContentVersion = {
-  id: string
-  createdAt: string
-  data: unknown
-}
-
-const HISTORY_KEY = 'content-history'
 const HISTORY_LIMIT = 10
-// Strong consistency so a read right after a save sees the new document.
-const siteStore = () => getStore({ name: 'site', consistency: 'strong' })
+export type ContentVersion = import('../../server/storage').HistoryVersion
 
 function isVersion(value: unknown): value is ContentVersion {
   return (
@@ -24,25 +17,24 @@ function isVersion(value: unknown): value is ContentVersion {
   )
 }
 
-export async function readVersions(): Promise<ContentVersion[]> {
-  const stored = await siteStore().get(HISTORY_KEY, { type: 'json' })
-  return Array.isArray(stored) ? stored.filter(isVersion) : []
+export async function readVersions(storage: StorageAdapter = netlifyStorage): Promise<ContentVersion[]> {
+  return (await storage.getHistory()).filter(isVersion)
 }
 
-export async function saveVersion(data: unknown) {
-  const versions = await readVersions()
+export async function saveVersion(data: unknown, storage: StorageAdapter = netlifyStorage) {
+  const versions = await readVersions(storage)
   versions.push({ id: randomUUID(), createdAt: new Date().toISOString(), data })
-  await siteStore().set(HISTORY_KEY, JSON.stringify(versions.slice(-HISTORY_LIMIT)))
+  await storage.setHistory(versions.slice(-HISTORY_LIMIT))
 }
 
-export async function readCurrentContent(): Promise<unknown | null> {
-  return siteStore().get('content', { type: 'json' })
+export async function readCurrentContent(storage: StorageAdapter = netlifyStorage): Promise<unknown | null> {
+  return storage.getContent()
 }
 
-export async function writeCurrentContent(value: unknown) {
-  await siteStore().set('content', JSON.stringify(value))
+export async function writeCurrentContent(value: unknown, storage: StorageAdapter = netlifyStorage) {
+  await storage.setContent(value)
 }
 
-export async function deleteCurrentContent() {
-  await siteStore().delete('content')
+export async function deleteCurrentContent(storage: StorageAdapter = netlifyStorage) {
+  await storage.deleteContent()
 }
