@@ -1,6 +1,8 @@
 import { ArrowUpRight } from 'lucide-react'
+import { content as defaultContent } from '../../data/content'
 import { useContent } from '../../lib/useContent'
 import { Reveal } from '../primitives/Reveal'
+import { ProfilePhoto } from './ProfilePhoto'
 
 const projectCopy: Record<string, { title: string; result: string; href?: string; linkLabel: string }> = {
   feynml: {
@@ -23,12 +25,14 @@ const projectCopy: Record<string, { title: string; result: string; href?: string
 
 export function About() {
   const { about, projects } = useContent()
-  const cards = projects.items.flatMap((project) => {
-    const copy = projectCopy[project.id]
-    if (!copy) return []
-    const href = copy.href ?? project.links.find((link) => link.kind === 'demo')?.href
-    if (!href) return []
-    return [{ ...copy, tags: project.tags, href }]
+  const cards = Object.entries(projectCopy).map(([id, copy]) => {
+    const defaultProject = defaultContent.projects.items.find((project) => project.id === id)
+    const project = projects.items.find((item) => item.id === id) ?? defaultProject
+    const href = copy.href
+      ?? project?.links.find((link) => link.kind === 'demo')?.href
+      ?? defaultProject?.links.find((link) => link.kind === 'demo')?.href
+      ?? ''
+    return { ...copy, tags: project?.tags ?? defaultProject?.tags ?? [], href }
   })
 
   return (
@@ -54,13 +58,7 @@ export function About() {
             </Reveal>
 
             <Reveal delay={0.08} className="mt-8">
-              <div
-                role="img"
-                aria-label="Placeholder for a photo or FeynML screenshot"
-                className="grid aspect-[16/9] place-items-center border border-dashed border-white/25 bg-[#121212] px-4 text-center font-mono text-[13px] leading-[1.7] text-[#8F8F8F]"
-              >
-                Photo or FeynML screenshot
-              </div>
+              <ProfilePhoto />
             </Reveal>
           </div>
 

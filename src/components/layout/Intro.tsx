@@ -30,7 +30,7 @@ export function Intro({ onFinish }: { onFinish: () => void }) {
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={springSnappy}
-          className="grid size-16 place-items-center border border-line text-xl font-semibold tracking-tight text-fg"
+          className="bg-fg text-bg grid size-16 place-items-center rounded-[22px] text-xl font-semibold tracking-tight"
         >
           {content.person.initials}
         </motion.div>
@@ -49,7 +49,7 @@ export function Intro({ onFinish }: { onFinish: () => void }) {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
-            className="h-full origin-left bg-accent"
+            className="bg-accent h-full origin-left"
           />
         </div>
       </div>

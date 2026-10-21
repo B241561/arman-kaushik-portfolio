@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowUpRight, Check, Copy, Send } from 'lucide-react'
+import { ArrowUpRight, Check, Copy, Github, Linkedin, Mail, Send } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
@@ -8,8 +8,10 @@ import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 import { useToast } from '../primitives/Toast'
 
+const socialIcons = { github: Github, linkedin: Linkedin }
+
 const field =
-  'w-full border border-[var(--line)] bg-surface px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-hidden focus:border-accent focus:ring-[3px] focus:ring-accent/25'
+  'rounded-control w-full border border-[var(--line)] bg-fg/[0.04] px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-hidden focus:border-accent focus:ring-[3px] focus:ring-accent/35'
 
 export function Contact() {
   const { contact, person, ui } = useContent()
@@ -42,97 +44,131 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="py-24 sm:py-32">
+    <section id="contact" className="relative py-28 sm:py-40">
       <div className="container-x">
         <SectionHeading label={contact.label} title={contact.title} subtitle={contact.subtitle} />
 
-        <Reveal className="mt-12">
-          <ul className="grid border-y border-line sm:grid-cols-3">
-            <li className="flex min-w-0 items-start justify-between gap-3 border-b border-line py-5 sm:border-r sm:border-b-0 sm:pr-5">
-              <div className="min-w-0">
-                <p className="label-mono">{contact.emailLabel}</p>
-                {emailMissing ? (
-                  <p className="mt-2 break-all font-sans text-xl text-subtle">{person.email}</p>
-                ) : (
-                  <a href={`mailto:${person.email}`} className="link-underline mt-2 block break-all font-sans text-xl text-fg">
-                    {person.email}
-                  </a>
-                )}
-              </div>
-              <button type="button" onClick={copyEmail} aria-label={copied ? contact.copied : contact.copy} className="mt-5 shrink-0 text-muted hover:text-accent">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span
-                    key={copied ? 'check' : 'copy'}
-                    initial={{ scale: 0.7, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.7, opacity: 0 }}
-                    transition={springSnappy}
-                    className="block"
+        <div className="mt-14 grid gap-4 lg:grid-cols-5">
+          <div className="flex flex-col gap-4 lg:col-span-2">
+            <Reveal>
+              <div className="surface rounded-card p-6 sm:p-8">
+                <p className="text-subtle text-xs font-semibold tracking-[0.18em] uppercase">{contact.emailLabel}</p>
+                <p className="mt-3 text-xl font-semibold tracking-tight break-all sm:text-2xl">{person.email}</p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={copyEmail}
+                    className="bg-fg text-bg inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium transition-transform active:scale-[0.97]"
                   >
-                    {copied ? <Check aria-hidden className="size-5" /> : <Copy aria-hidden className="size-5" />}
-                  </motion.span>
-                </AnimatePresence>
-              </button>
-            </li>
-
-            {contact.socials.map((social) => {
-              const missing = isPlaceholder(social.href)
-              return (
-                <li key={social.label} className="flex min-w-0 items-center justify-between gap-3 border-b border-line py-5 last:border-b-0 sm:border-r sm:border-b-0 sm:px-5 sm:last:border-r-0">
-                  <div className="min-w-0">
-                    <p className="label-mono">{social.label}</p>
-                    {missing ? (
-                      <p className="text-subtle mt-2 truncate font-sans text-xl">{social.href}</p>
-                    ) : (
-                      <a href={social.href} target="_blank" rel="noreferrer" className="link-underline mt-2 block truncate font-sans text-2xl text-fg">
-                        {social.handle}
-                      </a>
-                    )}
-                  </div>
-                  {!missing && <ArrowUpRight aria-hidden className="size-5 shrink-0 text-accent" />}
-                </li>
-              )
-            })}
-          </ul>
-        </Reveal>
-
-        <Reveal delay={0.08} className="mt-12">
-          <div className="border-b border-line pb-8">
-            <h3 className="font-sans text-2xl font-normal">{contact.form.title}</h3>
-            <form onSubmit={onSubmit} className="mt-6 grid gap-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="grid gap-2">
-                  <span className="text-muted text-sm font-medium">{contact.form.name}</span>
-                  <input name="name" autoComplete="name" placeholder={contact.form.namePlaceholder} className={field} />
-                </label>
-                <label className="grid gap-2">
-                  <span className="text-muted text-sm font-medium">{contact.form.subject}</span>
-                  <input name="subject" placeholder={contact.form.subjectPlaceholder} className={field} />
-                </label>
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      <motion.span
+                        key={copied ? 'check' : 'copy'}
+                        initial={{ scale: 0.4, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.4, opacity: 0 }}
+                        transition={springSnappy}
+                      >
+                        {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+                      </motion.span>
+                    </AnimatePresence>
+                    {copied ? contact.copied : contact.copy}
+                  </button>
+                  {!emailMissing && (
+                    <a
+                      href={`mailto:${person.email}`}
+                      className="surface inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium"
+                    >
+                      <Mail className="size-4" />
+                      {contact.emailLabel}
+                    </a>
+                  )}
+                </div>
               </div>
-              <label className="grid gap-2">
-                <span className="text-muted text-sm font-medium">{contact.form.message}</span>
-                <textarea
-                  name="message"
-                  required
-                  rows={6}
-                  placeholder={contact.form.messagePlaceholder}
-                  className={`${field} resize-none`}
-                />
-              </label>
-              <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-subtle text-sm">{contact.form.note}</p>
-                <button
-                  type="submit"
-                  className="inline-flex min-h-11 items-center gap-2 self-start bg-fg px-5 py-2.5 text-sm font-medium text-bg transition-colors hover:bg-accent"
-                >
-                  {contact.form.submit}
-                  <Send aria-hidden className="size-4" />
-                </button>
+            </Reveal>
+
+            <Reveal delay={0.06}>
+              <div className="surface rounded-card !p-3">
+                <p className="text-subtle px-3 pt-3 pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
+                  {contact.elsewhere}
+                </p>
+                <ul>
+                  {contact.socials.map((s) => {
+                    const Icon = socialIcons[s.icon]
+                    const missing = isPlaceholder(s.href)
+                    const row = (
+                      <>
+                        <span className="bg-fg/[0.06] rounded-control grid size-10 shrink-0 place-items-center">
+                          <Icon className="size-[18px]" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-medium">{s.label}</span>
+                          <span className="text-subtle block truncate text-sm">{missing ? s.href : s.handle}</span>
+                        </span>
+                        {!missing && (
+                          <ArrowUpRight className="text-subtle group-hover:text-fg size-4 shrink-0 transition-all duration-500 ease-[var(--ease-apple)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        )}
+                      </>
+                    )
+                    return (
+                      <li key={s.label}>
+                        {missing ? (
+                          <span className="rounded-tile flex items-center gap-3 p-3 opacity-70">{row}</span>
+                        ) : (
+                          <a
+                            href={s.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="group hover:bg-fg/[0.05] rounded-tile flex items-center gap-3 p-3 transition-colors"
+                          >
+                            {row}
+                          </a>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
-            </form>
+            </Reveal>
           </div>
-        </Reveal>
+
+          <Reveal delay={0.1} className="lg:col-span-3">
+            <div className="surface rounded-card h-full p-6 sm:p-8">
+              <h3 className="text-2xl font-semibold tracking-tight">{contact.form.title}</h3>
+              <form onSubmit={onSubmit} className="mt-6 grid gap-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-2">
+                    <span className="text-muted text-sm font-medium">{contact.form.name}</span>
+                    <input name="name" autoComplete="name" placeholder={contact.form.namePlaceholder} className={field} />
+                  </label>
+                  <label className="grid gap-2">
+                    <span className="text-muted text-sm font-medium">{contact.form.subject}</span>
+                    <input name="subject" placeholder={contact.form.subjectPlaceholder} className={field} />
+                  </label>
+                </div>
+                <label className="grid gap-2">
+                  <span className="text-muted text-sm font-medium">{contact.form.message}</span>
+                  <textarea
+                    name="message"
+                    required
+                    rows={6}
+                    placeholder={contact.form.messagePlaceholder}
+                    className={`${field} resize-none`}
+                  />
+                </label>
+                <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-subtle text-sm">{contact.form.note}</p>
+                  <button
+                    type="submit"
+                    className="bg-fg text-bg group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium transition-transform active:scale-[0.97]"
+                  >
+                    {contact.form.submit}
+                    <Send className="size-4 transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Reveal>
+        </div>
       </div>
     </section>
   )

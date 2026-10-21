@@ -334,7 +334,7 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
           <SafeImage key={previewHref} src={previewHref} alt="" fallbackLabel="Preview unavailable" className="max-h-40 w-fit rounded-xl border border-[var(--line)] object-contain" />
         )}
         {typeof value === 'string' && (selectedMedia?.size ?? 0) > 500 * 1024 && (
-          <p className="text-warn text-xs">This image is over 500 KB. Consider converting it to WebP.</p>
+          <p className="text-xs text-amber-300">This image is over 500 KB. Consider converting it to WebP.</p>
         )}
         {typeof value === 'string' && value.length > 0 && !value.startsWith('/media/') && (
           <button type="button" className={`${buttonClass} justify-self-start`} onClick={clearAsset}>Clear asset</button>
@@ -791,7 +791,7 @@ export default function AdminPage() {
 
         <section className="mt-5 rounded-3xl border border-[var(--line)] bg-elevated p-4 sm:p-6" role="tabpanel">
           <h2 className="mb-5 text-xl font-semibold">{labels[tab]}</h2>
-          <ErrorBoundary key={tab} name="editor" fallback={<p role="alert" className="text-danger text-sm">This editor tab couldn't be displayed. Your draft is kept; switch tabs or reload the page.</p>}>
+          <ErrorBoundary key={tab} name="editor" fallback={<p role="alert" className="text-sm text-red-400">This editor tab couldn't be displayed. Your draft is kept; switch tabs or reload the page.</p>}>
           {mediaTab ? (
             <div className="grid gap-4">
               <label className={buttonClass}>
@@ -813,7 +813,7 @@ export default function AdminPage() {
               ) : (
                 <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {mediaFiles.map((file) => (
-                    <li key={file.id} className="min-w-0 rounded-2xl border border-line bg-surface p-3">
+                    <li key={file.id} className="surface min-w-0 rounded-2xl p-3">
                       {file.type.startsWith('image/') ? (
                         <SafeImage src={file.url} alt="" fallbackLabel="Preview unavailable" className="mb-3 h-36 w-full rounded-xl object-cover" />
                       ) : (
@@ -822,7 +822,7 @@ export default function AdminPage() {
                       <p className="truncate text-sm font-medium">{file.name}</p>
                       <p className="text-subtle mt-1 text-xs">{Math.ceil(file.size / 1024)} KB · {file.type}</p>
                       {file.type.startsWith('image/') && file.size > 500 * 1024 && (
-                        <p className="text-warn mt-2 text-xs">Over 500 KB; consider WebP.</p>
+                        <p className="mt-2 text-xs text-amber-300">Over 500 KB; consider WebP.</p>
                       )}
                       <div className="mt-3 flex flex-wrap gap-2">
                         <a href={file.url} target="_blank" rel="noreferrer" className={buttonClass}>Open</a>
@@ -893,7 +893,7 @@ export default function AdminPage() {
           <button type="button" className={buttonClass} disabled={busy || loading} onClick={reset}>Reset to defaults</button>
           <button type="button" className={primaryButtonClass} disabled={busy || loading || !dirty || !valid} onClick={save}>{busy ? 'Saving…' : 'Save'}</button>
         </div>
-        {!valid && <p className="text-danger mt-3 text-sm">Some fields are invalid. Check required fields, URLs, text lengths, and duplicate IDs.</p>}
+        {!valid && <p className="mt-3 text-sm text-red-400">Some fields are invalid. Check required fields, URLs, text lengths, and duplicate IDs.</p>}
         {message && <p role="status" className="mt-3 text-sm">{message}</p>}
 
       </div>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowDown, ArrowRight, ArrowUpRight, Play, X } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUpRight, Code, Globe, Play, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react'
 import { getYouTubeVideoId, type Project } from '../../data/schema'
 import { useMediaQuery } from '../../lib/hooks'
@@ -88,7 +88,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
         exit={{ opacity: 0 }}
         transition={{ duration: 0.35 }}
         onClick={handleClose}
-        className="fixed inset-0 z-[80] bg-[var(--scrim)]"
+        className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm sm:backdrop-blur-md"
       />
       <div className="pointer-events-none fixed inset-0 z-[81] flex justify-center sm:p-6 md:p-10">
         <motion.div
@@ -149,7 +149,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                 >
                   {project.title}
                 </h2>
-                <p className="text-muted mt-3 text-lg sm:text-xl">{project.tagline}</p>
+                <p className="text-accent mt-3 text-lg font-medium sm:text-xl">{project.tagline}</p>
               </motion.div>
 
               <div className="mt-10 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-14">
@@ -160,7 +160,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                       <ol className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:items-stretch sm:gap-0">
                         {project.flowSteps.map((step, index) => (
                           <li key={step.id} className="flex min-w-0 flex-1 flex-col items-center gap-2 sm:flex-row">
-                            <div className="h-full w-full border border-line bg-surface p-3">
+                            <div className="surface rounded-tile w-full p-3 sm:h-full">
                               <p className="font-semibold">{step.label}</p>
                               <p className="text-muted mt-1 text-sm leading-relaxed">{step.description}</p>
                             </div>
@@ -184,7 +184,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     <ul className="mt-4 space-y-3">
                       {project.approach.map((step, i) => (
                         <li key={`${i}-${step}`} className="text-muted flex gap-3 text-[16px] leading-relaxed">
-                          <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" />
+                          <span className="bg-accent mt-2.5 size-1.5 shrink-0 rounded-full" />
                           {step}
                         </li>
                       ))}
@@ -195,9 +195,11 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                 <div className="space-y-10">
                   {project.stack.length > 0 && <motion.section {...fadeUp(0.26)}>
                     <ModalLabel>{projects.sections.stack}</ModalLabel>
-                    <ul className="text-muted mt-4 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                    <ul className="mt-4 flex flex-wrap gap-2">
                       {project.stack.map((tag, i) => (
-                        <li key={`${i}-${tag}`}>{tag}{i < project.stack.length - 1 ? ' ·' : ''}</li>
+                        <li key={`${i}-${tag}`} className="surface rounded-full px-3.5 py-1.5 text-sm font-medium">
+                          {tag}
+                        </li>
                       ))}
                     </ul>
                   </motion.section>}
@@ -205,22 +207,26 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     <ModalLabel>{projects.sections.links}</ModalLabel>
                     <ul className="mt-4 space-y-2">
                       {project.links.filter((link) => link.kind !== 'demo').map((link, i) => {
+                        const Icon = link.kind === 'repo' ? Code : Globe
                         const missing = isPlaceholder(link.href)
                         const inner = (
                           <>
+                            <span className="bg-fg/[0.06] rounded-control grid size-9 shrink-0 place-items-center">
+                              <Icon className="size-4" />
+                            </span>
                             <span className="min-w-0 flex-1">
                               <span className="block font-medium">{link.label}</span>
                               <span className="text-subtle block truncate text-xs">
                                 {missing ? `${ui.notSetYet} · ${link.href}` : link.href.replace(/^https?:\/\//, '')}
                               </span>
                             </span>
-                            {!missing && <ArrowUpRight className="size-4 shrink-0 text-accent" />}
+                            {!missing && <ArrowUpRight className="size-4 shrink-0" />}
                           </>
                         )
                         return (
                           <li key={`${i}-${link.label}`}>
                             {missing ? (
-                              <span className="flex items-center gap-3 border-b border-line py-3 opacity-70">
+                              <span className="rounded-tile flex items-center gap-3 border border-dashed border-[var(--line)] p-3 opacity-70">
                                 {inner}
                               </span>
                             ) : (
@@ -228,7 +234,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                                 href={link.href}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex items-center gap-3 border-b border-line py-3 transition-colors hover:text-accent"
+                                className="surface hover:bg-fg/[0.06] rounded-tile flex items-center gap-3 p-3 transition-colors"
                               >
                                 {inner}
                               </a>
@@ -248,7 +254,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
             type="button"
             onClick={handleClose}
             aria-label={ui.close}
-            className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4 z-10 grid size-11 place-items-center border border-line bg-elevated sm:size-10"
+            className="bg-elevated border-line absolute top-[max(1rem,env(safe-area-inset-top))] right-4 z-10 grid size-11 place-items-center rounded-full border transition-transform active:scale-90 sm:size-10"
           >
             <X className="size-[18px]" />
           </button>
@@ -281,7 +287,7 @@ function DemoVideo({
 
   return (
     <div className="px-6 pt-5 sm:px-12">
-      <div className="relative aspect-video overflow-hidden border border-line bg-surface">
+      <div className="rounded-tile bg-surface border-line relative aspect-video overflow-hidden border">
         {playing ? (
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
@@ -305,7 +311,7 @@ function DemoVideo({
                 className="absolute inset-0 size-full object-cover"
               />
             )}
-            <span className="relative grid size-16 place-items-center border border-line bg-elevated text-accent">
+            <span className="bg-elevated border-line relative grid size-16 place-items-center rounded-full border">
               <Play aria-hidden className="size-7 fill-current" />
             </span>
           </button>

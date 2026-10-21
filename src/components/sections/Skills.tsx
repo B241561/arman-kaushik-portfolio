@@ -1,28 +1,101 @@
+import { useReducedMotion } from 'framer-motion'
+import { Brain, ChartColumn, Code, Globe } from 'lucide-react'
+import { cn } from '../../lib/cn'
+import { useContent } from '../../lib/useContent'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
-import { useContent } from '../../lib/useContent'
+
+const icons = { code: Code, brain: Brain, chart: ChartColumn, globe: Globe }
 
 export function Skills() {
   const { skills } = useContent()
+  const allSkills = skills.groups.flatMap((group) => group.items)
 
   if (skills.groups.length === 0) return null
 
   return (
-    <section id="skills" className="py-24 sm:py-32">
+    <section id="skills" className="relative py-28 sm:py-40">
       <div className="container-x">
         <SectionHeading label={skills.label} title={skills.title} subtitle={skills.subtitle} />
+      </div>
 
-        <ul className="mt-12 grid gap-x-10 md:grid-cols-2">
-          {skills.groups.map((group, index) => (
-            <li key={`${group.title}-${index}`} className="border-t border-line py-5">
-              <Reveal delay={index * 0.05}>
-                <h3 className="font-sans text-xl font-medium text-fg">{group.title}</h3>
-                <p className="text-muted mt-2 leading-relaxed">{group.items.join(' · ')}</p>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+      {/* Hovering anywhere on the band pauses both rows */}
+      {allSkills.length > 0 && (
+        <Reveal className="group/marquee mt-14 flex flex-col gap-3">
+          <Marquee items={allSkills} />
+          <Marquee items={[...allSkills].reverse()} reverse />
+        </Reveal>
+      )}
+
+      <div className="container-x mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {skills.groups.map((group, i) => {
+          const Icon = icons[group.icon]
+          return (
+            <Reveal key={`${group.title}-${i}`} delay={i * 0.06}>
+              <div className="surface rounded-card h-full p-6 sm:p-8">
+                <span className="bg-fg/[0.06] rounded-control grid size-11 place-items-center border border-[var(--line)]">
+                  <Icon className="text-accent size-5" />
+                </span>
+                <h3 className="mt-6 text-xl font-semibold tracking-tight">{group.title}</h3>
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {group.items.map((item, j) => (
+                    <li
+                      key={`${item}-${j}`}
+                      className="bg-fg/[0.05] text-fg/90 rounded-full border border-[var(--line)] px-3.5 py-1.5 text-sm font-medium"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+          )
+        })}
       </div>
     </section>
+  )
+}
+
+/** Flat translucent pill — no backdrop-filter or shadow, since ~30 of these move continuously. */
+function Chip({ label }: { label: string }) {
+  return (
+    <span className="bg-elevated flex items-center gap-2.5 rounded-full border border-[var(--line)] px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
+      <span className="bg-accent size-1.5 rounded-full" />
+      {label}
+    </span>
+  )
+}
+
+function Marquee({ items, reverse = false }: { items: string[]; reverse?: boolean }) {
+  const reduce = useReducedMotion()
+
+  if (reduce) {
+    return (
+      <ul className="container-x flex flex-wrap justify-center gap-3">
+        {items.map((item, j) => (
+          <li key={`${item}-${j}`}>
+            <Chip label={item} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  // Two copies + per-item right padding make translateX(-50%) loop seamlessly.
+  return (
+    <div className="relative overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] sm:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+      <div
+        className={cn(
+          'animate-marquee flex w-max will-change-transform group-hover/marquee:[animation-play-state:paused]',
+          reverse && '[animation-direction:reverse]',
+        )}
+      >
+        {[...items, ...items].map((item, i) => (
+          <div key={i} className="pr-3" aria-hidden={i >= items.length || undefined}>
+            <Chip label={item} />
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

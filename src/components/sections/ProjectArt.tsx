@@ -1,34 +1,53 @@
-import { useEffect, useState } from 'react'
+import { Activity, FileText, Plane } from 'lucide-react'
 import type { Project } from '../../data/schema'
+import { useEffect, useState } from 'react'
+import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
 import { LazyImage } from '../primitives/LazyImage'
 
-/** Uses the supplied project screenshot, with a quiet paper-and-ink fallback. */
+const icons = { feynml: Activity, resume: FileText, tripcraft: Plane }
+
+/** Cover visual: the project's image when provided, otherwise abstract artwork. */
 export function ProjectArt({ project, large = false }: { project: Project; large?: boolean }) {
+  const Icon = icons[project.icon]
   const [imageFailed, setImageFailed] = useState(false)
   useEffect(() => setImageFailed(false), [project.image])
 
   if (!isPlaceholder(project.image) && !imageFailed) {
     return (
-      <div className="absolute inset-0 overflow-hidden bg-surface">
+      <div className="bg-surface absolute inset-0 overflow-hidden">
         <LazyImage
           src={project.image}
           alt={project.imageAlt ?? project.title}
           width={large ? 1200 : 720}
           height={large ? 675 : 405}
           onError={() => setImageFailed(true)}
-          className="size-full object-cover object-top"
+          className="absolute inset-0 size-full object-cover object-top"
         />
       </div>
     )
   }
 
   return (
-    <div aria-hidden className="absolute inset-0 grid place-items-center overflow-hidden bg-surface">
-      <span className="absolute inset-x-0 top-0 h-px bg-accent" />
-      <div className="text-center">
-        <p className="label-mono text-accent">{project.index}</p>
-        <p className="mt-2 font-sans text-5xl tracking-tight text-fg sm:text-7xl">{project.title}</p>
+    <div aria-hidden className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-surface" />
+      <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)] bg-[linear-gradient(to_right,var(--line)_1px,transparent_1px),linear-gradient(to_bottom,var(--line)_1px,transparent_1px)] bg-[size:32px_32px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        {[0, 1, 2].map((ring) => (
+          <span
+            key={ring}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--line)]"
+            style={{ width: (large ? 180 : 130) + ring * (large ? 90 : 64), height: (large ? 180 : 130) + ring * (large ? 90 : 64) }}
+          />
+        ))}
+        <span
+          className={cn(
+            'relative grid place-items-center rounded-tile border border-line bg-elevated',
+            large ? 'size-20' : 'size-16',
+          )}
+        >
+          <Icon className={cn('text-fg', large ? 'size-9' : 'size-7')} strokeWidth={1.6} />
+        </span>
       </div>
     </div>
   )
