@@ -12,15 +12,15 @@ import type { Certificate, JourneyItem, Project, ProjectFlowStep, ProjectLink } 
 export type { Project, ProjectLink } from './schema'
 
 const person = {
-  name: 'Arman Kaushik',
-  firstName: 'Arman',
+  name: 'Armaan Kaushik',
+  firstName: 'Armaan',
   initials: 'AK',
   tagline: 'Third-year CSE student at SKIT Jaipur, building machine learning and data tools.',
   college: 'SKIT Jaipur',
   degree: 'B.Tech, Computer Science & Engineering',
   email: 'b241706@skit.ac.in',
   resumeUrl: '/Arman_kaushik_resume.pdf',
-  photo: { src: '/img/profile.jpg', alt: 'Portrait of Arman Kaushik' },
+  photo: { src: '/img/profile.jpg', alt: 'Portrait of Armaan Kaushik' },
   githubUsername: 'B241561',
   socials: {
     github: 'https://github.com/B241561',
@@ -134,12 +134,12 @@ const skillGroups = [
 export const content = {
   site: {
     url: 'https://arman-kaushik-portfolio-e4b637.netlify.app',
-    title: 'Arman Kaushik — AI/ML & Data Science Portfolio',
+    title: 'Armaan Kaushik — AI/ML & Data Science Portfolio',
     description:
-      'Portfolio of Arman Kaushik, a third-year B.Tech CSE student at SKIT Jaipur building machine learning and data projects. Open to AI/ML and data science internships.',
+      'Portfolio of Armaan Kaushik, a third-year B.Tech CSE student at SKIT Jaipur building machine learning and data projects. Open to AI/ML and data science internships.',
     jobTitle: 'B.Tech Computer Science & Engineering student',
     keywords: [
-      'Arman Kaushik',
+      'Armaan Kaushik',
       'SKIT Jaipur',
       'AI/ML internship',
       'data science internship',
@@ -173,7 +173,7 @@ export const content = {
   },
 
   nav: {
-    homeLabel: 'Arman Kaushik — home',
+    homeLabel: 'Armaan Kaushik — home',
     items: [
       { id: 'about', label: 'About' },
       { id: 'skills', label: 'Skills' },
@@ -200,15 +200,14 @@ export const content = {
 
   about: {
     label: 'About',
-    body: 'I’m Arman, a third-year B.Tech Computer Science student at SKIT Jaipur. I build with machine learning and data — from a platform that investigates why models fail, to an AI resume analyzer and an AI travel planner. Now I’m looking for AI/ML and data science internships.',
-    highlights: ['machine', 'learning', 'data', 'AI/ML', 'science', 'internships'],
+    body: "I'm a third-year CSE student at SKIT Jaipur. I'm building FeynML solo, a platform that investigates why ML models fail. I've also built an AI Resume Analyzer and an AI travel planner. I'm looking for AI/ML and data science internships.",
+    highlights: ['ML models fail'],
     stats: [
-      { value: 3, label: 'Portfolio projects' },
       { value: 224, label: 'GitHub contributions in the last year' },
     ],
     status: {
-      title: 'Currently',
-      lines: ['3rd year · B.Tech CSE', 'SKIT Jaipur · 2024 – 2028', 'Open to AI/ML & data science internships'],
+      title: '',
+      lines: ['Open to AI/ML & data science internships'],
     },
   },
 
@@ -314,7 +313,7 @@ export const content = {
   },
 
   footer: {
-    tagline: 'Designed and built by Arman Kaushik.',
+    tagline: 'Designed and built by Armaan Kaushik.',
     backToTop: 'Back to top',
   },
 }

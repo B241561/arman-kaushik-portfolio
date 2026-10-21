@@ -1,99 +1,77 @@
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
-import { ArrowUpRight, Play } from 'lucide-react'
-import { useRef, type PointerEvent } from 'react'
-import { getYouTubeVideoId, type Project } from '../../data/schema'
+import { motion } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
+import type { Project } from '../../data/schema'
 import { cn } from '../../lib/cn'
-import { useFinePointer } from '../../lib/hooks'
+import { isPlaceholder } from '../../lib/placeholder'
 import { springLayout } from '../../lib/motion'
 import { useContent } from '../../lib/useContent'
 import { ProjectArt } from './ProjectArt'
 
-const MAX_TILT = 8
-
-/** Bento tile: 3D tilt toward the cursor + spotlight. Shares a layoutId with the modal. */
-export function ProjectCard({ project, onOpen, className }: { project: Project; onOpen: () => void; className?: string }) {
+export function ProjectCard({
+  project,
+  onOpen,
+  className,
+  reverse = false,
+}: {
+  project: Project
+  onOpen: () => void
+  className?: string
+  reverse?: boolean
+}) {
   const { ui } = useContent()
-  const hasDemoVideo = project.links.some(
-    (link) => link.kind === 'demo' && getYouTubeVideoId(link.href) !== null,
-  )
-  const fine = useFinePointer()
-  const reduce = useReducedMotion()
-  const ref = useRef<HTMLButtonElement>(null)
-  const rotateX = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 })
-  const rotateY = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 })
-
-  const onMove = (e: PointerEvent<HTMLButtonElement>) => {
-    const el = ref.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    const px = (e.clientX - r.left) / r.width
-    const py = (e.clientY - r.top) / r.height
-    el.style.setProperty('--mx', `${px * 100}%`)
-    el.style.setProperty('--my', `${py * 100}%`)
-    if (!fine || reduce) return
-    rotateY.set((px - 0.5) * MAX_TILT * 2)
-    rotateX.set((0.5 - py) * MAX_TILT * 2)
-  }
-  const onLeave = () => {
-    rotateX.set(0)
-    rotateY.set(0)
-  }
 
   return (
-    <motion.div
+    <motion.article
       layoutId={`project-${project.id}`}
       transition={springLayout}
-      style={{ borderRadius: 28 }}
-      className={cn('relative [perspective:1200px]', className)}
+      className={cn('grid gap-6 border-t border-line py-7 md:grid-cols-12 md:items-center md:gap-10 md:py-10', className)}
     >
-      <motion.button
-        ref={ref}
+      <button
         type="button"
         onClick={onOpen}
-        onPointerMove={onMove}
-        onPointerLeave={onLeave}
-        whileTap={{ scale: 0.98 }}
-        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
         aria-label={`${ui.openProject}: ${project.title}`}
-        className="glass spotlight group rounded-card flex h-full w-full flex-col overflow-hidden text-left"
+        className={cn(
+          'group relative block aspect-video w-full overflow-hidden border border-line bg-surface md:col-span-7',
+          reverse && 'md:col-start-6 md:row-start-1',
+        )}
       >
-        <div className="relative aspect-video w-full shrink-0 overflow-hidden">
-          <ProjectArt project={project} large={project.featured} />
-          {hasDemoVideo && (
-            <span className="glass-solid absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
-              <Play aria-hidden className="size-3 fill-current" />
-              Demo
-            </span>
-          )}
-        </div>
-        <div className="relative z-[2] flex flex-1 flex-col gap-3 p-6 sm:p-7">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-subtle text-xs font-semibold tracking-[0.18em] tabular-nums">{project.index}</p>
-              <h3
-                className={cn(
-                  'mt-2 font-semibold tracking-[-0.035em]',
-                  project.featured ? 'text-3xl sm:text-4xl' : 'text-2xl',
-                )}
-              >
-                {project.title}
-              </h3>
-            </div>
-            <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line)] transition-transform duration-500 ease-[var(--ease-apple)] group-hover:rotate-45">
-              <ArrowUpRight className="size-[18px]" />
-            </span>
-          </div>
-          <p className="text-muted text-[15px] leading-relaxed">{project.featured ? project.summary : project.tagline}</p>
-          {project.tags.length > 0 && <ul className="mt-1 flex flex-wrap gap-1.5">
-            {project.tags.slice(0, project.featured ? 4 : 3).map((tag, i) => (
-              <li key={`${i}-${tag}`} className="bg-fg/[0.05] text-fg/80 rounded-full border border-[var(--line)] px-3 py-1 text-xs font-medium">
-                {tag}
-              </li>
-            ))}
-          </ul>}
-        </div>
-      </motion.button>
-    </motion.div>
+        <ProjectArt project={project} large />
+        <span className="absolute right-3 bottom-3 border border-line bg-elevated px-3 py-1 text-xs font-medium text-fg transition-colors group-hover:border-accent">
+          {ui.openProject}
+        </span>
+      </button>
+
+      <div className={cn('flex min-w-0 flex-col items-start md:col-span-5', reverse && 'md:col-start-1 md:row-start-1')}>
+        <p className="label-mono">{project.index}</p>
+        <h3 className="mt-3 text-3xl font-medium tracking-tight sm:text-4xl">
+          <button type="button" onClick={onOpen} aria-haspopup="dialog" className="text-left transition-colors hover:text-accent">
+            {project.title}
+          </button>
+        </h3>
+        <p className="text-muted mt-3 line-clamp-1 leading-relaxed">{project.summary}</p>
+        {project.stack.length > 0 && (
+          <p className="text-subtle mt-5 text-sm leading-relaxed">{project.stack.join(' · ')}</p>
+        )}
+
+        <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
+          {project.links.map((link, index) => (
+            <li key={`${index}-${link.label}`}>
+              {isPlaceholder(link.href) ? (
+                <span className="text-subtle text-sm">{link.label} · {ui.notSetYet}</span>
+              ) : (
+                <a href={link.href} target="_blank" rel="noreferrer" className="link-accent inline-flex items-center gap-1 text-sm">
+                  {link.label}
+                  <ArrowUpRight aria-hidden className="size-3.5" />
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+        <button type="button" onClick={onOpen} className="mt-5 text-sm font-medium text-fg underline decoration-[var(--line-strong)] underline-offset-4 hover:decoration-accent">
+          Project details
+        </button>
+      </div>
+    </motion.article>
   )
 }

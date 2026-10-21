@@ -1,7 +1,6 @@
-import { ArrowUpRight, BookMarked, Github } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { isPlaceholder } from '../../lib/placeholder'
 import { useContent } from '../../lib/useContent'
-import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 
 export function GitHubStrip() {
@@ -10,85 +9,57 @@ export function GitHubStrip() {
   const hasProfile = !isPlaceholder(profile)
 
   return (
-    <section aria-labelledby="github-title" className="relative py-12 sm:py-20">
+    <section aria-labelledby="github-title" className="py-14 sm:py-20">
       <div className="container-x">
         <Reveal>
-          <GlassCard className="overflow-hidden">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
-                <span className="bg-fg text-bg rounded-control grid size-12 shrink-0 place-items-center">
-                  <Github className="size-6" />
-                </span>
-                <div className="min-w-0">
-                  <h2 id="github-title" className="text-2xl font-semibold tracking-tight">
-                    {github.title}
-                  </h2>
-                  <p className="text-muted truncate text-sm">
-                    @{person.githubUsername} · <span className="text-fg/90">{github.stat}</span>
-                  </p>
-                </div>
+          <div className="border-y border-line py-7 sm:py-9">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="label-mono">{github.title}</p>
+                <h2 id="github-title" className="mt-2 font-sans text-3xl font-normal tracking-tight sm:text-4xl">
+                  @{person.githubUsername}
+                </h2>
+                <p className="text-muted mt-2 text-sm">{github.stat}</p>
               </div>
               {hasProfile ? (
                 <a
                   href={profile}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-fg text-bg inline-flex h-11 items-center gap-2 self-start rounded-full px-5 text-sm font-medium transition-transform active:scale-[0.97] sm:self-auto"
+                  className="link-accent inline-flex items-center gap-2 self-start text-xl font-medium sm:self-auto sm:text-2xl"
                 >
                   {github.cta}
-                  <ArrowUpRight className="size-4" />
+                  <ArrowUpRight aria-hidden className="size-5" />
                 </a>
               ) : (
-                <span className="text-subtle inline-flex h-11 items-center self-start rounded-full border border-dashed border-[var(--line)] px-5 text-sm sm:self-auto">
-                  {ui.notSetYet}
-                </span>
+                <span className="text-subtle text-sm">{ui.notSetYet}</span>
               )}
             </div>
 
-            {/* Swipeable on mobile, grid from sm up */}
-            <ul
-              className="-mx-6 mt-7 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto px-6 pt-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0"
-            >
-              {github.pinned.map((repo) => {
-                const linked = !isPlaceholder(repo.url)
-                const body = (
-                  <>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="flex min-w-0 items-center gap-2 font-semibold">
-                        <BookMarked className="text-accent size-4 shrink-0" />
-                        <span className="truncate">{repo.name}</span>
-                      </span>
-                      <span className="text-subtle shrink-0 rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium">
-                        {github.pinnedLabel}
-                      </span>
-                    </div>
-                    <p className="text-muted mt-3 line-clamp-3 text-sm leading-relaxed">{repo.description}</p>
-                    <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
-                      {repo.tags.map((tag) => (
-                        <li key={tag} className="text-subtle flex items-center gap-1.5 text-xs">
-                          <span className="bg-accent-gradient size-2 rounded-full" />
-                          {tag}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )
-                const cls =
-                  'bg-fg/[0.03] rounded-tile relative block h-full border border-[var(--line)] p-5'
-                return (
-                  <li key={repo.name} className="w-[85%] shrink-0 snap-start sm:w-auto">
-                    {linked ? (
-                      <a href={repo.url} target="_blank" rel="noreferrer" data-focus-inset className={`${cls} card-hover`}>
-                        {body}
-                      </a>
-                    ) : (
-                      <div className={cls}>{body}</div>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
-          </GlassCard>
+            {github.pinned.length > 0 && (
+              <ul className="mt-8 grid gap-x-8 sm:grid-cols-3">
+                {github.pinned.map((repo) => {
+                  const linked = !isPlaceholder(repo.url)
+                  return (
+                    <li key={repo.name} className="border-t border-line py-4">
+                      {linked ? (
+                        <a href={repo.url} target="_blank" rel="noreferrer" className="group">
+                          <span className="link-underline font-medium text-fg">{repo.name}</span>
+                          <p className="text-muted mt-2 text-sm leading-relaxed">{repo.description}</p>
+                        </a>
+                      ) : (
+                        <>
+                          <span className="font-medium text-fg">{repo.name}</span>
+                          <p className="text-muted mt-2 text-sm leading-relaxed">{repo.description}</p>
+                        </>
+                      )}
+                      {repo.tags.length > 0 && <p className="text-subtle mt-2 text-xs">{repo.tags.join(' · ')}</p>}
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </div>
         </Reveal>
       </div>
     </section>
