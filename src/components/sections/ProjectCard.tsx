@@ -43,7 +43,7 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
     <motion.div
       layoutId={`project-${project.id}`}
       transition={springLayout}
-      style={{ borderRadius: 28 }}
+      style={{ borderRadius: 14 }}
       className={cn('relative [perspective:1200px]', className)}
     >
       <motion.button
@@ -56,18 +56,18 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
         aria-label={`${ui.openProject}: ${project.title}`}
-        className="glass group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
+        className="glass shadow-[var(--shadow-card)] group flex h-full w-full flex-col overflow-hidden rounded-card text-left"
       >
         <div className="relative aspect-video w-full shrink-0 overflow-hidden">
           <ProjectArt project={project} large={project.featured} />
           {hasDemoVideo && (
-            <span className="glass-strong absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
+            <span className="glass-strong absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium">
               <Play aria-hidden className="size-3 fill-current" />
               Demo
             </span>
           )}
         </div>
-        <div className="relative z-[2] flex flex-1 flex-col gap-3 p-6 sm:p-7">
+        <div className="relative z-[2] flex flex-1 flex-col gap-3 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-subtle text-xs font-semibold tracking-[0.18em] tabular-nums">{project.index}</p>
@@ -80,14 +80,14 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
                 {project.title}
               </h3>
             </div>
-            <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line)] transition-transform duration-500 ease-[var(--ease-apple)] group-hover:rotate-45">
+            <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-[10px] border border-[var(--line)] transition-transform duration-500 ease-[var(--ease-apple)] group-hover:rotate-45">
               <ArrowUpRight className="size-[18px]" />
             </span>
           </div>
           <p className="text-muted text-[15px] leading-relaxed">{project.featured ? project.summary : project.tagline}</p>
           <ul className="mt-1 flex flex-wrap gap-1.5">
             {project.tags.slice(0, project.featured ? 4 : 3).map((tag) => (
-              <li key={tag} className="bg-fg/[0.05] text-fg/80 rounded-full border border-[var(--line)] px-3 py-1 text-xs font-medium">
+              <li key={tag} className="bg-surface text-fg/80 rounded-lg border border-[var(--line)] px-3 py-1 text-xs font-medium">
                 {tag}
               </li>
             ))}

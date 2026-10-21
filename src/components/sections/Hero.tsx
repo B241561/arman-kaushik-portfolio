@@ -54,12 +54,14 @@ export function Hero(_props: { ready: boolean }) {
   }
 
   return (
-    <section id="home" className="grid border-b border-[var(--line)] md:min-h-[calc(100svh-57px)] md:grid-cols-2">
-      <div className="bg-white px-6 py-14 sm:px-12 md:flex md:items-center md:py-20 lg:px-20">
+    <section id="home" className="py-6 sm:py-8">
+      <div className="container-x">
+        <div className="grid overflow-hidden rounded-card border border-[var(--line)] md:min-h-[calc(100svh-73px)] md:grid-cols-2">
+      <div className="bg-surface px-6 py-14 sm:px-12 md:flex md:items-center md:py-20 lg:px-16">
         <div className="w-full max-w-md">
-          <div className="bg-gray size-40 overflow-hidden sm:size-48">
+          <div className="bg-gray size-40 overflow-hidden rounded-xl sm:size-48">
             {isPlaceholder(person.photo.src) || photoFailed ? (
-              <div role="img" aria-label={person.photo.alt} className="text-charcoal grid size-full place-items-center text-4xl font-bold">
+              <div role="img" aria-label={person.photo.alt} className="text-fg grid size-full place-items-center text-4xl font-bold">
                 {person.initials}
               </div>
             ) : (
@@ -71,13 +73,13 @@ export function Hero(_props: { ready: boolean }) {
                 loading="eager"
                 {...{ fetchpriority: 'high' }}
                 onError={() => setPhotoFailed(true)}
-                className="size-full object-cover object-top"
+                className="size-full rounded-xl object-cover object-top"
               />
             )}
           </div>
 
-          <h1 className="text-charcoal mt-8 text-3xl font-bold sm:text-4xl">{person.name}</h1>
-          <p className="text-charcoal mt-2 text-lg font-light">{hero.role}</p>
+          <h1 className="text-fg mt-8 text-3xl font-bold sm:text-4xl">{person.name}</h1>
+          <p className="text-fg mt-2 text-lg font-light">{hero.role}</p>
 
           <a href={emailMissing ? '#' : `mailto:${person.email}`} onClick={onEmail} className="btn-solid mt-8">
             {hero.emailCta}
@@ -87,11 +89,11 @@ export function Hero(_props: { ready: boolean }) {
             {socials.map(({ label, href, Icon }) => (
               <li key={label}>
                 {isPlaceholder(href) ? (
-                  <span aria-label={`${label} (not added yet)`} className="text-charcoal block opacity-40">
+                  <span aria-label={`${label} (not added yet)`} className="text-muted block opacity-60">
                     <Icon className="size-5" strokeWidth={1.75} />
                   </span>
                 ) : (
-                  <a href={href} target="_blank" rel="noreferrer" aria-label={label} className="text-charcoal hover:text-black block">
+                  <a href={href} target="_blank" rel="noreferrer" aria-label={label} className="text-fg hover:text-accent block">
                     <Icon className="size-5" strokeWidth={1.75} />
                   </a>
                 )}
@@ -101,10 +103,10 @@ export function Hero(_props: { ready: boolean }) {
         </div>
       </div>
 
-      <div className="bg-gray px-6 py-14 sm:px-12 md:flex md:items-center md:py-20 lg:px-20">
+      <div className="bg-bg px-6 py-14 sm:px-12 md:flex md:items-center md:py-20 lg:px-16">
         <div className="w-full max-w-md">
-          <h2 className="text-charcoal text-3xl font-bold sm:text-4xl">{hero.aboutTitle}</h2>
-          <p className="text-charcoal mt-5 text-base leading-relaxed">{person.tagline}</p>
+          <h2 className="text-fg text-3xl font-bold sm:text-4xl">{hero.aboutTitle}</h2>
+          <p className="text-muted mt-5 text-base leading-relaxed">{person.tagline}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               href={resumeMissing ? '#' : resumeDownloadUrl(person.resumeUrl)}
@@ -119,6 +121,8 @@ export function Hero(_props: { ready: boolean }) {
               {hero.portfolioCta}
             </button>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </section>

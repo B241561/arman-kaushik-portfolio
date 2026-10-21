@@ -56,7 +56,7 @@ export function About() {
           <div className="space-y-4">
             {cards.map((card, index) => (
               <Reveal key={card.title} delay={index * 0.08}>
-                <GlassCard className="h-full">
+                <GlassCard>
                   <h3 className="text-xl font-semibold tracking-tight">{card.title}</h3>
                   {card.result && <p className="text-muted mt-3 leading-relaxed">{card.result}</p>}
                   {card.tags.length > 0 && (

@@ -13,7 +13,7 @@ import { useToast } from '../primitives/Toast'
 const socialIcons = { github: Github, linkedin: Linkedin }
 
 const field =
-  'w-full rounded-2xl border border-[var(--line)] bg-fg/[0.04] px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent focus:ring-4 focus:ring-accent/20'
+  'w-full rounded-lg border border-[var(--line)] bg-surface px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-none transition-colors duration-200 focus:border-accent'
 
 export function Contact() {
   const { contact, person, ui } = useContent()
@@ -50,7 +50,7 @@ export function Contact() {
       <div className="container-x">
         <SectionHeading label={contact.label} title={contact.title} subtitle={contact.subtitle} />
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-5">
+        <div className="mt-14 grid gap-5 lg:grid-cols-5">
           <div className="flex flex-col gap-4 lg:col-span-2">
             <Reveal>
               <GlassCard>
@@ -60,7 +60,7 @@ export function Contact() {
                   <button
                     type="button"
                     onClick={copyEmail}
-                    className="bg-fg text-bg inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium transition-transform active:scale-[0.97]"
+                    className="bg-button-bg text-button-fg inline-flex h-11 items-center gap-2 rounded-[9px] px-5 text-sm font-medium transition-colors"
                   >
                     <AnimatePresence mode="popLayout" initial={false}>
                       <motion.span
@@ -78,7 +78,7 @@ export function Contact() {
                   {!emailMissing && (
                     <a
                       href={`mailto:${person.email}`}
-                      className="glass inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium"
+                      className="glass inline-flex h-11 items-center gap-2 rounded-[9px] px-5 text-sm font-medium"
                     >
                       <Mail className="size-4" />
                       {contact.emailLabel}
@@ -89,8 +89,8 @@ export function Contact() {
             </Reveal>
 
             <Reveal delay={0.06}>
-              <GlassCard className="!p-3">
-                <p className="text-subtle px-3 pt-3 pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
+              <GlassCard>
+                <p className="text-subtle px-5 pt-5 pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
                   {contact.elsewhere}
                 </p>
                 <ul>
@@ -99,7 +99,7 @@ export function Contact() {
                     const missing = isPlaceholder(s.href)
                     const row = (
                       <>
-                        <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-xl">
+                        <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-[10px]">
                           <Icon className="size-[18px]" />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -114,13 +114,13 @@ export function Contact() {
                     return (
                       <li key={s.label}>
                         {missing ? (
-                          <span className="flex items-center gap-3 rounded-2xl p-3 opacity-70">{row}</span>
+                          <span className="flex items-center gap-3 rounded-xl p-3 opacity-70">{row}</span>
                         ) : (
                           <a
                             href={s.href}
                             target="_blank"
                             rel="noreferrer"
-                            className="group hover:bg-fg/[0.05] flex items-center gap-3 rounded-2xl p-3 transition-colors"
+                            className="group hover:bg-fg/[0.05] flex items-center gap-3 rounded-xl p-3 transition-colors"
                           >
                             {row}
                           </a>
@@ -134,7 +134,7 @@ export function Contact() {
           </div>
 
           <Reveal delay={0.1} className="lg:col-span-3">
-            <GlassCard className="h-full">
+            <GlassCard>
               <h3 className="text-2xl font-semibold tracking-tight">{contact.form.title}</h3>
               <form onSubmit={onSubmit} className="mt-6 grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -162,7 +162,7 @@ export function Contact() {
                   <Magnetic className="self-start sm:self-auto">
                     <button
                       type="submit"
-                      className="bg-accent-gradient group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium text-white shadow-[0_15px_40px_-15px_var(--accent-2)] transition-transform active:scale-[0.97]"
+                      className="bg-button-bg text-button-fg group inline-flex h-11 items-center gap-2 rounded-[9px] px-5 text-[15px] font-medium transition-colors"
                     >
                       {contact.form.submit}
                       <Send className="size-4 transition-transform duration-500 ease-[var(--ease-apple)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

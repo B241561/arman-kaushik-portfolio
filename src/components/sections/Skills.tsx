@@ -11,6 +11,10 @@ const icons = { code: Code, brain: Brain, chart: ChartColumn, globe: Globe }
 export function Skills() {
   const { skills } = useContent()
   const allSkills = skills.groups.flatMap((group) => group.items)
+  const skillRows = [
+    allSkills.filter((_, index) => index % 2 === 0),
+    allSkills.filter((_, index) => index % 2 === 1),
+  ]
 
   if (skills.groups.length === 0) return null
 
@@ -23,18 +27,19 @@ export function Skills() {
       {/* Hovering anywhere on the band pauses both rows */}
       {allSkills.length > 0 && (
         <Reveal className="group/marquee mt-14 flex flex-col gap-3">
-          <Marquee items={allSkills} />
-          <Marquee items={[...allSkills].reverse()} reverse />
+        {skillRows.map((items, index) =>
+          items.length > 0 && <Marquee key={index} items={items} reverse={index === 1} />,
+        )}
         </Reveal>
       )}
 
-      <div className="container-x mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container-x mt-14 grid items-start gap-5 sm:grid-cols-2">
         {skills.groups.map((group, i) => {
           const Icon = icons[group.icon]
           return (
             <Reveal key={group.title} delay={i * 0.06}>
               <GlassCard className="h-full">
-                <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-2xl border border-[var(--line)]">
+                <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-[10px] border border-[var(--line)]">
                   <Icon className="text-accent size-5" />
                 </span>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{group.title}</h3>
@@ -42,7 +47,7 @@ export function Skills() {
                   {group.items.map((item) => (
                     <li
                       key={item}
-                      className="bg-fg/[0.05] text-fg/90 rounded-full border border-[var(--line)] px-3.5 py-1.5 text-sm font-medium"
+                      className="bg-surface text-fg/90 rounded-lg border border-[var(--line)] px-3.5 py-1.5 text-sm font-medium"
                     >
                       {item}
                     </li>
@@ -59,8 +64,8 @@ export function Skills() {
 
 function Chip({ label }: { label: string }) {
   return (
-    <span className="glass flex items-center gap-2.5 rounded-full px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
-      <span className="bg-accent-gradient size-1.5 rounded-full" />
+    <span className="glass flex items-center gap-2.5 rounded-lg px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
+      <span className="bg-accent size-1.5 rounded-full" />
       {label}
     </span>
   )
@@ -83,7 +88,7 @@ function Marquee({ items, reverse = false }: { items: string[]; reverse?: boolea
 
   // Two copies + per-item right padding make translateX(-50%) loop seamlessly.
   return (
-    <div className="relative overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+    <div className="relative overflow-hidden py-1">
       <div
         className={cn(
           'animate-marquee flex w-max group-hover/marquee:[animation-play-state:paused]',

@@ -93,9 +93,9 @@ const labels: Record<string, string> = {
 const inputClass =
   'w-full rounded-xl border border-[var(--line)] bg-fg/[0.04] px-3 py-2.5 text-sm text-fg outline-none focus:border-accent focus:ring-2 focus:ring-accent/20'
 const buttonClass =
-  'rounded-full border border-[var(--line)] px-4 py-2 text-sm font-medium transition-colors hover:bg-fg/[0.08] disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-[9px] border border-[var(--line)] px-4 py-2 text-sm font-medium transition-colors hover:bg-fg/[0.08] disabled:cursor-not-allowed disabled:opacity-50'
 const primaryButtonClass =
-  'rounded-full bg-fg px-5 py-2.5 text-sm font-semibold text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-[9px] bg-fg px-5 py-2.5 text-sm font-semibold text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
 
 function createDefaultDocument(): EditableContent {
   return {
@@ -378,7 +378,7 @@ function SchemaFields({
     return (
       <div className="grid min-w-0 gap-3">
         {value.map((item, index) => (
-          <div key={typeof item === 'object' && item !== null && 'id' in item ? String(item.id) : index} className="min-w-0 rounded-2xl border border-[var(--line)] bg-fg/[0.02] p-3 sm:p-4">
+          <div key={typeof item === 'object' && item !== null && 'id' in item ? String(item.id) : index} className="min-w-0 rounded-card border border-[var(--line)] bg-fg/[0.02] p-3 sm:p-4">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-subtle text-xs font-semibold uppercase">{labels[String(path[path.length - 1])] ?? 'Item'} {index + 1}</span>
               <div className="flex flex-wrap gap-1.5">
@@ -761,7 +761,7 @@ export default function AdminPage() {
   if (!token) {
     return (
       <main className="bg-bg text-fg min-h-screen px-4 py-10">
-        <div className="mx-auto max-w-md rounded-3xl border border-[var(--line)] bg-elevated p-6 sm:p-8">
+        <div className="mx-auto max-w-md rounded-sheet border border-[var(--line)] bg-elevated p-6 sm:p-8">
           <h1 className="text-3xl font-semibold tracking-tight">Owner sign in</h1>
           <form onSubmit={login} className="mt-6 grid gap-4">
             <label className="grid gap-2 text-sm font-medium">
@@ -801,7 +801,7 @@ export default function AdminPage() {
           ))}
         </div>
 
-        <section className="mt-5 rounded-3xl border border-[var(--line)] bg-elevated p-4 sm:p-6" role="tabpanel">
+        <section className="mt-5 rounded-sheet border border-[var(--line)] bg-elevated p-4 sm:p-6" role="tabpanel">
           <h2 className="mb-5 text-xl font-semibold">{labels[tab]}</h2>
           <ErrorBoundary key={tab} name="editor" fallback={<p role="alert" className="text-sm text-red-400">This editor tab couldn't be displayed. Your draft is kept; switch tabs or reload the page.</p>}>
           {mediaTab ? (
@@ -825,7 +825,7 @@ export default function AdminPage() {
               ) : (
                 <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {mediaFiles.map((file) => (
-                    <li key={file.id} className="surface min-w-0 rounded-2xl p-3">
+                    <li key={file.id} className="surface min-w-0 rounded-card p-3">
                       {file.type.startsWith('image/') ? (
                         <SafeImage src={file.url} alt="" fallbackLabel="Preview unavailable" className="mb-3 h-36 w-full rounded-xl object-cover" />
                       ) : (
@@ -851,7 +851,7 @@ export default function AdminPage() {
             ) : (
               <ul className="grid gap-3">
                 {versions.map((version) => (
-                  <li key={version.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--line)] p-3">
+                  <li key={version.id} className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-[var(--line)] p-3">
                     <time className="text-sm" dateTime={version.createdAt}>{new Date(version.createdAt).toLocaleString()}</time>
                     <button type="button" className={buttonClass} disabled={busy || loading} onClick={() => void restore(version.id)}>Restore</button>
                   </li>
@@ -869,7 +869,7 @@ export default function AdminPage() {
                 {previousResumes.length === 0 ? <p className="text-muted text-sm">No previous resumes.</p> : (
                   <ul className="grid gap-3">
                     {previousResumes.map((resume) => (
-                      <li key={resume.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--line)] p-3">
+                      <li key={resume.id} className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-[var(--line)] p-3">
                         <span className="min-w-0 text-sm">{resume.uploadedAt}</span>
                         <div className="flex gap-2">
                           <a href={resume.url} target="_blank" rel="noreferrer" className={buttonClass}>Open</a>

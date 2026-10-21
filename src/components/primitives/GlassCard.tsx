@@ -6,7 +6,7 @@ type GlassCardProps = HTMLAttributes<HTMLDivElement> & {
   padded?: boolean
 }
 
-/** Flat surface: solid background, 1px hairline border, square corners. */
+/** Flat surface: solid background, subtle border, and a restrained radius. */
 export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(function GlassCard(
   { strong = false, padded = true, className, ...rest },
   ref,
@@ -14,7 +14,12 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(function Gla
   return (
     <div
       ref={ref}
-      className={cn('relative', strong ? 'glass-strong' : 'glass', padded && 'p-6 sm:p-8', className)}
+      className={cn(
+        'rounded-card relative shadow-[var(--shadow-card)]',
+        strong ? 'glass-strong' : 'glass',
+        padded && 'p-5 sm:p-6',
+        className,
+      )}
       {...rest}
     />
   )
