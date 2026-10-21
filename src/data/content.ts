@@ -200,6 +200,10 @@ export const content = {
 
   about: {
     label: 'About',
+    copyVersion: 2,
+    heading: "I'm Armaan. I find out why ML models fail.",
+    paragraph: "I'm a third-year CSE student at SKIT Jaipur. I'm building FeynML solo, a platform that investigates why ML models fail. I've also built an AI Resume Analyzer and an AI travel planner. I'm looking for AI/ML and data science internships.",
+    internshipStatus: 'Open to AI/ML & data science internships',
     body: "I'm a third-year CSE student at SKIT Jaipur. I'm building FeynML solo, a platform that investigates why ML models fail. I've also built an AI Resume Analyzer and an AI travel planner. I'm looking for AI/ML and data science internships.",
     highlights: ['ML models fail'],
     stats: [

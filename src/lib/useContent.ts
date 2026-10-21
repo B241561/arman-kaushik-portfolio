@@ -159,7 +159,16 @@ function toContentPatch(saved: EditableContent): RecordValue {
       resumeUrl: restoreDefaultAssetPath(saved.resume.currentUrl),
     }
   }
-  if (saved.about) patch.about = saved.about
+  if (saved.about) {
+    const about = { ...saved.about }
+    if (saved.about.copyVersion !== 2) {
+      delete about.heading
+      delete about.paragraph
+      delete about.internshipStatus
+      delete about.copyVersion
+    }
+    patch.about = about
+  }
   if (saved.skills) patch.skills = saved.skills
   // The saved document stores projects as a bare array, but the site content keeps them under
   // projects.items next to the section's label/title/subtitle.
@@ -246,6 +255,12 @@ function normalizeContent(value: SiteContent): SiteContent {
     about: {
       ...value.about,
       label: text(about.label, content.about.label),
+      copyVersion: 2,
+      heading: about.copyVersion === 2 ? text(about.heading, content.about.heading) : content.about.heading,
+      paragraph: about.copyVersion === 2 ? text(about.paragraph, content.about.paragraph) : content.about.paragraph,
+      internshipStatus: about.copyVersion === 2
+        ? text(about.internshipStatus, content.about.internshipStatus)
+        : content.about.internshipStatus,
       body: text(about.body),
       highlights: textList(about.highlights),
       stats: records(about.stats)

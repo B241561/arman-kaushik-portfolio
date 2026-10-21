@@ -4,7 +4,7 @@ import { useContent } from '../../lib/useContent'
 import { Reveal } from '../primitives/Reveal'
 import { ProfilePhoto } from './ProfilePhoto'
 
-const projectCopy: Record<string, { title: string; result: string; href?: string; linkLabel: string }> = {
+const projectCopy: Record<string, { title: string; result?: string; href?: string; linkLabel?: string }> = {
   feynml: {
     title: 'FeynML',
     result: 'ML auditing and failure investigation platform.',
@@ -18,13 +18,12 @@ const projectCopy: Record<string, { title: string; result: string; href?: string
   },
   tripcraft: {
     title: 'AI Travel Planner',
-    result: '[One-line description to be added.]',
-    linkLabel: 'Watch demo',
   },
 }
 
 export function About() {
   const { about, projects } = useContent()
+  // TODO: Add projectCopy.tripcraft.result after the user supplies its one-line description.
   const cards = Object.entries(projectCopy).map(([id, copy]) => {
     const defaultProject = defaultContent.projects.items.find((project) => project.id === id)
     const project = projects.items.find((item) => item.id === id) ?? defaultProject
@@ -46,14 +45,14 @@ export function About() {
           <div>
             <Reveal>
               <h2 className="max-w-[18ch] font-sans text-[clamp(2.25rem,5vw,4rem)] leading-[1.08] font-medium tracking-[-0.02em]">
-                I&apos;m Armaan. I find out why ML models <span className="text-[#C6FF3D]">fail.</span>
+                {about.heading}
               </h2>
               <p className="mt-5 max-w-[62ch] font-mono text-[14px] leading-[1.7] text-[#BDBDBD]">
-                I&apos;m a third-year CSE student at SKIT Jaipur. I&apos;m building FeynML solo, a platform that investigates why ML models fail. I&apos;ve also built an AI Resume Analyzer and an AI travel planner. I&apos;m looking for AI/ML and data science internships.
+                {about.paragraph}
               </p>
               <p className="mt-5 flex items-center gap-2 font-mono text-[13px] leading-[1.7] text-[#EDEDED]">
                 <span aria-hidden className="size-2 shrink-0 rounded-full bg-[#C6FF3D]" />
-                Open to AI/ML &amp; data science internships
+                {about.internshipStatus}
               </p>
             </Reveal>
 
@@ -71,23 +70,23 @@ export function About() {
                       <h3 className="font-sans text-xl font-medium tracking-[-0.02em] text-[#EDEDED]">
                         {card.title}
                       </h3>
-                      <p className="mt-2 font-mono text-[13px] leading-[1.7] text-[#BDBDBD]">
-                        {card.result}
-                      </p>
+                      {card.result && <p className="mt-2 font-mono text-[13px] leading-[1.7] text-[#BDBDBD]">{card.result}</p>}
                       {card.tags.length > 0 && (
                         <p className="mt-2 font-mono text-[13px] leading-[1.7] text-[#8F8F8F]">
                           {card.tags.join(' · ')}
                         </p>
                       )}
-                      <a
-                        href={card.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-3 inline-flex items-center gap-1 font-mono text-[13px] leading-[1.7] text-[#C6FF3D] underline decoration-transparent underline-offset-4 transition-colors hover:text-[#EDEDED] hover:decoration-current"
-                      >
-                        {card.linkLabel}
-                        <ArrowUpRight aria-hidden className="size-3.5" />
-                      </a>
+                      {card.href && card.linkLabel && (
+                        <a
+                          href={card.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex items-center gap-1 font-mono text-[13px] leading-[1.7] text-[#C6FF3D] underline decoration-transparent underline-offset-4 transition-colors hover:text-[#EDEDED] hover:decoration-current"
+                        >
+                          {card.linkLabel}
+                          <ArrowUpRight aria-hidden className="size-3.5" />
+                        </a>
+                      )}
                     </article>
                   </Reveal>
                 </li>

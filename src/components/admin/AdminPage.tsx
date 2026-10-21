@@ -56,6 +56,10 @@ const labels: Record<string, string> = {
   resumeUrl: 'Resume URL',
   label: 'Label',
   body: 'About text',
+  heading: 'About heading',
+  paragraph: 'About paragraph',
+  internshipStatus: 'Internship status line',
+  copyVersion: 'About copy version',
   highlights: 'Highlighted words',
   stats: 'Statistics',
   value: 'Value',
@@ -103,6 +107,10 @@ function createDefaultDocument(): EditableContent {
     resume: { currentUrl: persistedAssetUrl(content.person.resumeUrl), previous: [] },
     about: {
       label: content.about.label,
+      copyVersion: content.about.copyVersion,
+      heading: content.about.heading,
+      paragraph: content.about.paragraph,
+      internshipStatus: content.about.internshipStatus,
       body: content.about.body,
       highlights: [...content.about.highlights],
       stats: content.about.stats.map((stat) => ({ ...stat })),
@@ -235,8 +243,10 @@ function Field({ label, value, path, update, mediaFiles, onUpload, onDeleteMedia
     }
     update(path, path[0] === 'person' && key === 'src' ? '' : undefined)
   }
-  const isLongText = ['body', 'description', 'problem', 'text'].includes(key)
-  const maxLength = ['title', 'name', 'label'].includes(key) ? 120 : isLongText ? 1500 : undefined
+  const isLongText = ['body', 'description', 'paragraph', 'problem', 'text'].includes(key)
+  const maxLength = ['title', 'name', 'label', 'internshipStatus'].includes(key)
+    ? 120
+    : key === 'heading' ? 240 : isLongText ? 1500 : undefined
   const stringValue = typeof value === 'string' || typeof value === 'number' ? String(value) : ''
 
   if (key === 'icon' || key === 'kind' || key === 'type') {
@@ -409,7 +419,9 @@ function SchemaFields({
   if (typeof value === 'object' && value !== null) {
     return (
       <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
-        {Object.entries(value).map(([key, child]) => (
+        {Object.entries(value)
+          .filter(([key]) => !(path[0] === 'about' && ['body', 'status', 'copyVersion'].includes(key)))
+          .map(([key, child]) => (
           <div key={key} className={`min-w-0 ${['body', 'description', 'problem', 'text', 'approach', 'lines', 'items', 'stack', 'tags', 'highlights'].includes(key) ? 'sm:col-span-2' : ''}`}>
             <SchemaFields value={child} path={[...path, key]} update={update} mediaFiles={mediaFiles} onUpload={onUpload} onDeleteMedia={onDeleteMedia} onSelectAsset={onSelectAsset} onRemove={onRemove} />
           </div>
