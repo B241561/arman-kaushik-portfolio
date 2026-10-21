@@ -10,13 +10,13 @@ export function GitHubStrip() {
   const hasProfile = !isPlaceholder(profile)
 
   return (
-    <section aria-labelledby="github-title" className="relative py-12 sm:py-20">
+    <section aria-labelledby="github-title" className="relative py-10 sm:py-14">
       <div className="container-x">
         <Reveal>
           <GlassCard className="overflow-hidden">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
-                <span className="bg-fg text-bg grid size-12 shrink-0 place-items-center rounded-2xl">
+                <span className="bg-fg text-bg grid size-12 shrink-0 place-items-center rounded-[10px]">
                   <Github className="size-6" />
                 </span>
                 <div className="min-w-0">
@@ -47,7 +47,7 @@ export function GitHubStrip() {
 
             {/* Swipeable on mobile, grid from sm up */}
             <ul
-              className="-mx-6 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0"
+              className="mt-8 grid gap-5 sm:grid-cols-2"
             >
               {github.pinned.map((repo) => {
                 const linked = !isPlaceholder(repo.url)
@@ -58,7 +58,7 @@ export function GitHubStrip() {
                         <BookMarked className="text-accent size-4 shrink-0" />
                         <span className="truncate">{repo.name}</span>
                       </span>
-                      <span className="text-subtle shrink-0 rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium">
+                      <span className="text-subtle bg-surface shrink-0 rounded-[8px] border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium">
                         {github.pinnedLabel}
                       </span>
                     </div>
@@ -74,9 +74,9 @@ export function GitHubStrip() {
                   </>
                 )
                 const cls =
-                  'bg-fg/[0.03] block h-full rounded-[22px] border border-[var(--line)] p-5 transition-colors'
+                  'bg-surface block h-full rounded-card border border-[var(--line)] p-5 shadow-[var(--shadow-card)] transition-colors'
                 return (
-                  <li key={repo.name} className="w-[78%] shrink-0 snap-start sm:w-auto">
+                  <li key={repo.name}>
                     {linked ? (
                       <a href={repo.url} target="_blank" rel="noreferrer" className={`${cls} hover:bg-fg/[0.06]`}>
                         {body}

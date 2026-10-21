@@ -5,7 +5,6 @@ import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
 import { useContent } from '../../lib/useContent'
 import { GlassCard } from '../primitives/GlassCard'
-import { Magnetic } from '../primitives/Magnetic'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 import { useToast } from '../primitives/Toast'
@@ -13,7 +12,7 @@ import { useToast } from '../primitives/Toast'
 const socialIcons = { github: Github, linkedin: Linkedin }
 
 const field =
-  'w-full rounded-2xl border border-[var(--line)] bg-fg/[0.04] px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent focus:ring-4 focus:ring-accent/20'
+  'w-full rounded-[9px] border border-[var(--line)] bg-surface px-4 text-[15px] text-fg placeholder:text-subtle outline-none transition-colors duration-200 focus:border-accent'
 
 export function Contact() {
   const { contact, person, ui } = useContent()
@@ -46,17 +45,22 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="relative py-28 sm:py-40">
+    <section id="contact" className="relative py-10 sm:py-16">
       <div className="container-x">
-        <SectionHeading label={contact.label} title={contact.title} subtitle={contact.subtitle} />
+        <SectionHeading
+          label={contact.label}
+          title={contact.title}
+          subtitle={contact.subtitle}
+          titleClassName="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] leading-tight tracking-[-0.035em]"
+        />
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-5">
-          <div className="flex flex-col gap-4 lg:col-span-2">
+        <div className="mt-8 grid items-start gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-4">
             <Reveal>
-              <GlassCard>
+              <GlassCard className="!p-4 sm:!p-5">
                 <p className="text-subtle text-xs font-semibold tracking-[0.18em] uppercase">{contact.emailLabel}</p>
                 <p className="mt-3 text-xl font-semibold tracking-tight break-all sm:text-2xl">{person.email}</p>
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={copyEmail}
@@ -89,8 +93,8 @@ export function Contact() {
             </Reveal>
 
             <Reveal delay={0.06}>
-              <GlassCard className="!p-3">
-                <p className="text-subtle px-3 pt-3 pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
+              <GlassCard className="!p-4">
+                <p className="text-subtle pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
                   {contact.elsewhere}
                 </p>
                 <ul>
@@ -99,7 +103,7 @@ export function Contact() {
                     const missing = isPlaceholder(s.href)
                     const row = (
                       <>
-                        <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-xl">
+                        <span className="bg-surface grid size-9 shrink-0 place-items-center rounded-[10px] border border-[var(--line)]">
                           <Icon className="size-[18px]" />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -114,13 +118,13 @@ export function Contact() {
                     return (
                       <li key={s.label}>
                         {missing ? (
-                          <span className="flex items-center gap-3 rounded-2xl p-3 opacity-70">{row}</span>
+                          <span className="flex items-center gap-3 rounded-[9px] px-2 py-1.5 opacity-70">{row}</span>
                         ) : (
                           <a
                             href={s.href}
                             target="_blank"
                             rel="noreferrer"
-                            className="group hover:bg-fg/[0.05] flex items-center gap-3 rounded-2xl p-3 transition-colors"
+                            className="group hover:bg-fg/[0.05] flex items-center gap-3 rounded-[9px] px-2 py-1.5 transition-colors"
                           >
                             {row}
                           </a>
@@ -133,18 +137,18 @@ export function Contact() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.1} className="lg:col-span-3">
-            <GlassCard className="h-full">
+          <Reveal delay={0.1}>
+            <GlassCard className="!p-5">
               <h3 className="text-2xl font-semibold tracking-tight">{contact.form.title}</h3>
               <form onSubmit={onSubmit} className="mt-6 grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="grid gap-2">
                     <span className="text-muted text-sm font-medium">{contact.form.name}</span>
-                    <input name="name" autoComplete="name" placeholder={contact.form.namePlaceholder} className={field} />
+                    <input name="name" autoComplete="name" placeholder={contact.form.namePlaceholder} className={`${field} h-10 py-2`} />
                   </label>
                   <label className="grid gap-2">
                     <span className="text-muted text-sm font-medium">{contact.form.subject}</span>
-                    <input name="subject" placeholder={contact.form.subjectPlaceholder} className={field} />
+                    <input name="subject" placeholder={contact.form.subjectPlaceholder} className={`${field} h-10 py-2`} />
                   </label>
                 </div>
                 <label className="grid gap-2">
@@ -152,22 +156,20 @@ export function Contact() {
                   <textarea
                     name="message"
                     required
-                    rows={6}
+                    rows={4}
                     placeholder={contact.form.messagePlaceholder}
-                    className={`${field} resize-none`}
+                    className={`${field} h-28 resize-y py-3`}
                   />
                 </label>
-                <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-subtle text-sm">{contact.form.note}</p>
-                  <Magnetic className="self-start sm:self-auto">
+                <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                  <p className="text-subtle text-sm sm:mr-auto">{contact.form.note}</p>
                     <button
                       type="submit"
-                      className="bg-accent-gradient group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium text-white shadow-[0_15px_40px_-15px_var(--accent-2)] transition-transform active:scale-[0.97]"
+                      className="bg-accent-gradient inline-flex h-10 w-auto shrink-0 items-center gap-2 self-end whitespace-nowrap rounded-[9px] px-4 py-2 text-[15px] font-medium transition-transform active:scale-[0.97] sm:self-auto"
                     >
-                      {contact.form.submit}
-                      <Send className="size-4 transition-transform duration-500 ease-[var(--ease-apple)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      Send
+                      <Send className="size-4" />
                     </button>
-                  </Magnetic>
                 </div>
               </form>
             </GlassCard>

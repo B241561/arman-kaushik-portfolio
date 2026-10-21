@@ -21,7 +21,7 @@ export function Journey() {
   if (journey.items.length === 0) return null
 
   return (
-    <section id="journey" className="relative py-28 sm:py-40">
+    <section id="journey" className="relative py-10 sm:py-16">
       <div className="container-x">
         <SectionHeading label={journey.label} title={journey.title} />
 
@@ -31,7 +31,7 @@ export function Journey() {
           <motion.span
             aria-hidden
             style={{ scaleY: reduce ? 1 : scaleY }}
-            className="from-accent to-accent-2 absolute top-2 bottom-2 left-[15px] w-px origin-top bg-linear-to-b shadow-[0_0_12px_var(--accent)] sm:left-[23px]"
+            className="bg-fg absolute top-2 bottom-2 left-[15px] w-px origin-top sm:left-[23px]"
           />
 
           {journey.items.map((item, i) => {
@@ -46,7 +46,7 @@ export function Journey() {
                   transition={springSnappy}
                   className={cn(
                     'bg-elevated absolute top-6 -left-12 grid size-8 place-items-center rounded-full border border-[var(--line)] sm:-left-16 sm:size-12',
-                    item.type === 'next' && 'bg-accent-gradient border-transparent text-white',
+                    item.type === 'next' && 'bg-fg text-bg border-line',
                   )}
                 >
                   <Icon className="size-3.5 sm:size-5" />

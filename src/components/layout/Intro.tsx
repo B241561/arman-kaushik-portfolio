@@ -30,7 +30,7 @@ export function Intro({ onFinish }: { onFinish: () => void }) {
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={springSnappy}
-          className="bg-accent-gradient grid size-16 place-items-center rounded-[22px] text-xl font-semibold tracking-tight text-white shadow-[0_20px_60px_-15px_var(--accent-2)]"
+          className="bg-accent-gradient grid size-16 place-items-center rounded-[10px] text-xl font-semibold tracking-tight"
         >
           {content.person.initials}
         </motion.div>
@@ -49,14 +49,14 @@ export function Intro({ onFinish }: { onFinish: () => void }) {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
-            className="bg-accent-gradient h-full origin-left"
+            className="bg-fg h-full origin-left"
           />
         </div>
       </div>
       <button
         type="button"
         onClick={onFinish}
-        className="text-muted hover:text-fg absolute right-6 bottom-6 rounded-full px-4 py-2 text-sm font-medium transition-colors"
+        className="text-muted hover:text-fg absolute right-6 bottom-6 rounded-[9px] px-4 py-2 text-sm font-medium transition-colors"
       >
         {content.intro.skip}
       </button>

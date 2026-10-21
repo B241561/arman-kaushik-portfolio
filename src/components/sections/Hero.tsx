@@ -6,9 +6,7 @@ import { useScrollTo } from '../../lib/lenis'
 import { spring, springSoft } from '../../lib/motion'
 import { isPlaceholder } from '../../lib/placeholder'
 import { isContentLoaded, loadContent, useContent } from '../../lib/useContent'
-import { Magnetic } from '../primitives/Magnetic'
 import { useToast } from '../primitives/Toast'
-import { Aurora } from './Aurora'
 
 const RESUME_FILENAME = 'Armaan-Kaushik-Resume.pdf'
 
@@ -46,7 +44,7 @@ export function Hero({ ready }: { ready: boolean }) {
     loading: 'eager' as const,
     fetchpriority: 'high',
     onError: () => setPhotoFailed(true),
-    className: 'size-full rounded-full border border-[var(--line)] object-cover',
+    className: 'size-full rounded-xl border border-[var(--line)] object-cover',
   }
 
   const onResume = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -63,23 +61,22 @@ export function Hero({ ready }: { ready: boolean }) {
   }
 
   return (
-    <section id="home" ref={ref} className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-20 pb-20 sm:pt-28 sm:pb-28 [@media(max-height:700px)]:pt-16 [@media(max-height:700px)]:pb-28">
-      <Aurora />
+    <section id="home" ref={ref} className="relative flex min-h-[100svh] items-center overflow-hidden pt-10 pb-10 sm:pt-16 sm:pb-16 [@media(max-height:700px)]:pt-10 [@media(max-height:700px)]:pb-16">
       <motion.div style={{ y, opacity }} className="container-x relative text-center">
         <motion.div
-          initial={reduce ? false : { opacity: 0, y: 16, filter: 'blur(8px)' }}
-          animate={reduce ? undefined : ready ? { opacity: 1, y: 0, filter: 'blur(0px)' } : undefined}
+          initial={reduce ? false : { opacity: 0, y: 16 }}
+          animate={reduce ? undefined : ready ? { opacity: 1, y: 0 } : undefined}
           transition={{ ...spring, delay: 0 }}
           className="mx-auto mb-6 flex justify-center sm:mb-8 [@media(max-height:700px)]:mb-3"
         >
-          <div className="bg-accent-gradient rounded-full p-[2px] opacity-25 shadow-[var(--shadow-card)]">
-            <div className="bg-glass rounded-full p-[2px] backdrop-blur-sm">
-              <div className="relative size-[120px] overflow-hidden rounded-full min-[768px]:size-[152px] [@media(max-height:700px)]:!size-[96px]">
+          <div className="rounded-xl border border-line p-1">
+            <div className="bg-surface rounded-xl p-[2px]">
+              <div className="relative size-[120px] overflow-hidden rounded-xl min-[768px]:size-[152px] [@media(max-height:700px)]:!size-[96px]">
                 {isPlaceholder(person.photo.src) || photoFailed ? (
                   <div
                     role="img"
                     aria-label={person.photo.alt}
-                    className="bg-elevated text-gradient grid size-full place-items-center rounded-full border border-[var(--line)] text-2xl font-bold sm:text-3xl"
+                    className="bg-elevated text-gradient grid size-full place-items-center rounded-xl border border-[var(--line)] text-2xl font-bold sm:text-3xl"
                   >
                     {person.initials}
                   </div>
@@ -95,10 +92,9 @@ export function Hero({ ready }: { ready: boolean }) {
           initial={{ opacity: 0, y: 14, scale: 0.96 }}
           animate={ready ? { opacity: 1, y: 0, scale: 1 } : undefined}
           transition={{ ...spring, delay: 0.15 }}
-          className="glass text-muted mx-auto inline-flex max-w-full items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium sm:text-sm"
+          className="glass text-muted mx-auto inline-flex max-w-full items-center gap-2 rounded-[9px] px-4 py-1.5 text-xs font-medium sm:text-sm"
         >
           <span className="relative flex size-2 shrink-0">
-            <span className="bg-accent absolute inline-flex size-full animate-ping rounded-full opacity-60" />
             <span className="bg-accent relative inline-flex size-2 rounded-full" />
           </span>
           <span className="min-w-0 whitespace-normal break-words">{hero.eyebrow}</span>
@@ -130,8 +126,8 @@ export function Hero({ ready }: { ready: boolean }) {
             <Fragment key={i}>
               <motion.span
                 className="inline-block"
-                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10, filter: 'blur(8px)' }}
-                animate={ready ? { opacity: 1, y: 0, filter: 'blur(0px)' } : undefined}
+                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                animate={ready ? { opacity: 1, y: 0 } : undefined}
                 transition={{ ...spring, delay: 0.45 + i * 0.035 }}
               >
                 {word}
@@ -147,28 +143,24 @@ export function Hero({ ready }: { ready: boolean }) {
           transition={{ ...spring, delay: 0.7 }}
           className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4 [@media(max-height:700px)]:mt-5 [@media(max-height:700px)]:gap-2"
         >
-          <Magnetic>
             <button
               type="button"
               onClick={() => scrollTo('#projects')}
-              className="group bg-fg text-bg inline-flex h-13 items-center gap-2 rounded-full px-7 text-[15px] font-medium transition-transform duration-300 active:scale-[0.97]"
+              className="group bg-fg text-bg inline-flex h-13 items-center gap-2 rounded-[9px] px-7 text-[15px] font-medium transition-transform duration-200 active:scale-[0.97]"
             >
               {hero.primaryCta}
               <ArrowRight className="size-4 transition-transform duration-500 ease-[var(--ease-apple)] group-hover:translate-x-1" />
             </button>
-          </Magnetic>
-          <Magnetic>
             <a
               href={resumeMissing ? '#' : resumeDownloadUrl(person.resumeUrl)}
               download={resumeMissing ? undefined : RESUME_FILENAME}
               onClick={onResume}
               aria-disabled={resumeMissing || undefined}
-              className="group glass inline-flex h-13 items-center gap-2 rounded-full px-7 text-[15px] font-medium transition-transform duration-300 active:scale-[0.97]"
+              className="group glass inline-flex h-13 items-center gap-2 rounded-[9px] px-7 text-[15px] font-medium transition-transform duration-200 active:scale-[0.97]"
             >
               <Download className="size-4 transition-transform duration-500 ease-[var(--ease-apple)] group-hover:translate-y-0.5" />
               {hero.secondaryCta}
             </a>
-          </Magnetic>
         </motion.div>
       </motion.div>
 
@@ -184,8 +176,6 @@ export function Hero({ ready }: { ready: boolean }) {
         <span className="flex h-9 w-[22px] justify-center rounded-full border border-current pt-1.5">
           <motion.span
             className="block h-1.5 w-1 rounded-full bg-current"
-            animate={reduce ? undefined : { y: [0, 12, 0], opacity: [1, 0.2, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         </span>
         {hero.scrollCue}

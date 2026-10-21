@@ -24,10 +24,10 @@ export function Certificates() {
   if (certificates.length === 0) return null
 
   return (
-    <section id="certificates" className="relative py-28 sm:py-40">
+    <section id="certificates" className="relative py-10 sm:py-16">
       <div className="container-x">
         <SectionHeading label="Certificates" title="Learning in practice." />
-        <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-14 grid gap-5 sm:grid-cols-2">
           {certificates.map((certificate, index) => {
             const Icon = certificate.type === 'image' ? ImageIcon : FileText
             return (
@@ -39,7 +39,7 @@ export function Certificates() {
                         type="button"
                         onClick={() => setSelected(certificate)}
                         aria-label={`Open ${certificate.title} certificate`}
-                        className="mb-5 block w-full overflow-hidden rounded-2xl border border-[var(--line)]"
+                        className="mb-5 block w-full overflow-hidden rounded-xl border border-[var(--line)]"
                       >
                         <SafeImage
                           key={certificate.file}
@@ -51,7 +51,7 @@ export function Certificates() {
                         />
                       </button>
                     )}
-                    <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-2xl border border-[var(--line)]">
+                    <span className="bg-surface grid size-11 place-items-center rounded-[10px] border border-[var(--line)]">
                       <Icon className="text-accent size-5" />
                     </span>
                     <h3 className="mt-5 text-xl font-semibold tracking-tight">{certificate.title}</h3>
@@ -79,11 +79,11 @@ export function Certificates() {
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-black/75 p-3 backdrop-blur-md sm:p-8" onMouseDown={(event) => {
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-fg/50 p-3 sm:p-8" onMouseDown={(event) => {
           if (event.target === event.currentTarget) setSelected(null)
         }}>
-          <section role="dialog" aria-modal="true" aria-label={`${selected.title} certificate`} className="bg-elevated relative max-h-full w-full max-w-5xl overflow-auto rounded-3xl border border-[var(--line)] p-4 sm:p-6">
-            <button type="button" aria-label="Close certificate" onClick={() => setSelected(null)} className="glass-strong absolute top-3 right-3 z-10 grid size-10 place-items-center rounded-full">
+          <section role="dialog" aria-modal="true" aria-label={`${selected.title} certificate`} className="bg-elevated relative max-h-full w-full max-w-5xl overflow-auto rounded-sheet border border-[var(--line)] p-5 sm:p-6">
+            <button type="button" aria-label="Close certificate" onClick={() => setSelected(null)} className="glass-strong absolute top-3 right-3 z-10 grid size-10 place-items-center rounded-[9px]">
               <X aria-hidden className="size-5" />
             </button>
             {selected.type === 'image' ? (

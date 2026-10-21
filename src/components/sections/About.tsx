@@ -37,49 +37,50 @@ export function About() {
   })
 
   return (
-    <section id="about" className="relative py-28 sm:py-40">
+    <section id="about" className="relative py-10 sm:py-16">
       <div className="container-x">
-        <SectionHeading label={about.label} title={about.heading} />
-
-        <div className="mt-8 grid gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
-          <div className="space-y-8">
+        <div className="grid items-start gap-6 sm:grid-cols-[minmax(0,1fr)_280px] sm:gap-8">
+          <div className="min-w-0">
+            <SectionHeading label={about.label} title={about.heading} />
             <Reveal>
-              <p className="text-muted max-w-2xl text-lg leading-relaxed">{about.paragraph}</p>
-              <p className="mt-5 flex items-center gap-3 text-sm font-medium">
+              <p className="text-muted mt-4 max-w-2xl text-lg leading-relaxed">{about.paragraph}</p>
+              <p className="mt-3 flex items-center gap-2 text-sm">
                 <span aria-hidden className="bg-accent size-2 shrink-0 rounded-full" />
                 {about.internshipStatus}
               </p>
             </Reveal>
+          </div>
+          <div className="w-full max-w-[280px] justify-self-center sm:justify-self-end">
             <ProfilePhoto />
           </div>
+        </div>
 
-          <div className="space-y-4">
-            {cards.map((card, index) => (
-              <Reveal key={card.title} delay={index * 0.08}>
-                <GlassCard className="h-full">
-                  <h3 className="text-xl font-semibold tracking-tight">{card.title}</h3>
-                  {card.result && <p className="text-muted mt-3 leading-relaxed">{card.result}</p>}
-                  {card.tags.length > 0 && (
-                    <p className="text-subtle mt-3 text-sm">{card.tags.join(' · ')}</p>
-                  )}
-                  {card.href && card.linkLabel && (
-                    <a
-                      href={card.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-fg hover:text-accent mt-4 inline-flex items-center gap-2 text-sm font-medium transition-colors"
-                    >
-                      {card.linkLabel}
-                      <ArrowUpRight aria-hidden className="size-4" />
-                    </a>
-                  )}
-                </GlassCard>
-              </Reveal>
-            ))}
-            <p className="text-subtle pt-2 text-sm">
-              {about.stats.find((stat) => stat.value === 224)?.value.toLocaleString() ?? '224'} GitHub contributions in the last year
-            </p>
-          </div>
+        <div className="mt-6 grid items-start gap-4 sm:grid-cols-2">
+          {cards.map((card, index) => (
+            <Reveal key={card.title} delay={index * 0.08}>
+              <GlassCard className="!p-4 sm:!p-5">
+                <h3 className="text-xl font-semibold tracking-tight">{card.title}</h3>
+                {card.result && <p className="text-muted mt-2 leading-relaxed">{card.result}</p>}
+                {card.tags.length > 0 && (
+                  <p className="text-subtle mt-2 text-sm">{card.tags.join(' · ')}</p>
+                )}
+                {card.href && card.linkLabel && (
+                  <a
+                    href={card.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-fg hover:text-accent mt-3 inline-flex items-center gap-2 text-sm font-medium transition-colors"
+                  >
+                    {card.linkLabel}
+                    <ArrowUpRight aria-hidden className="size-4" />
+                  </a>
+                )}
+              </GlassCard>
+            </Reveal>
+          ))}
+          <GlassCard className="flex h-14 items-center !p-4 text-subtle text-sm">
+            {about.stats.find((stat) => stat.value === 224)?.value.toLocaleString() ?? '224'} GitHub contributions in the last year
+          </GlassCard>
         </div>
       </div>
     </section>

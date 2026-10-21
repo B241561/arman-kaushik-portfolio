@@ -52,15 +52,14 @@ export function Navbar({ ready }: { ready: boolean }) {
           }}
           transition={spring}
           className={cn(
-            'glass-strong pointer-events-auto flex w-full max-w-max items-center gap-1 rounded-full transition-shadow duration-500',
-            scrolled && 'shadow-[0_20px_50px_-20px_rgb(0_0_0/0.6)]',
+            'glass-strong pointer-events-auto flex w-full max-w-max items-center gap-1 rounded-[12px]',
           )}
         >
           <button
             type="button"
             onClick={() => go('home')}
             aria-label={nav.homeLabel}
-            className="bg-accent-gradient grid size-9 shrink-0 place-items-center rounded-full text-[13px] font-semibold tracking-tight text-white"
+            className="bg-accent-gradient grid size-9 shrink-0 place-items-center rounded-[10px] text-[13px] font-semibold tracking-tight"
           >
             {person.initials}
           </button>
@@ -75,7 +74,7 @@ export function Navbar({ ready }: { ready: boolean }) {
                     onClick={() => go(item.id)}
                     aria-current={isActive ? 'true' : undefined}
                     className={cn(
-                      'relative rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                      'relative rounded-[9px] px-4 py-2 text-sm font-medium transition-colors',
                       isActive ? 'text-fg' : 'text-muted hover:text-fg',
                     )}
                   >
@@ -83,7 +82,7 @@ export function Navbar({ ready }: { ready: boolean }) {
                       <motion.span
                         layoutId="nav-active"
                         transition={springSnappy}
-                        className="bg-fg/10 absolute inset-0 rounded-full"
+                        className="bg-fg/10 absolute inset-0 rounded-[9px]"
                       />
                     )}
                     <span className="relative">{item.label}</span>
@@ -101,7 +100,7 @@ export function Navbar({ ready }: { ready: boolean }) {
             onClick={() => setOpen(true)}
             aria-label={nav.openMenu}
             aria-expanded={open}
-            className="text-fg/80 hover:bg-fg/10 grid size-9 shrink-0 place-items-center rounded-full md:hidden"
+            className="text-fg hover:bg-fg/10 grid size-9 shrink-0 place-items-center rounded-[9px] md:hidden"
           >
             <Menu className="size-[18px]" />
           </button>
@@ -118,7 +117,7 @@ export function Navbar({ ready }: { ready: boolean }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-[60] bg-fg/40 md:hidden"
             />
             <motion.div
               key="sheet"
@@ -129,7 +128,7 @@ export function Navbar({ ready }: { ready: boolean }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.97 }}
               transition={spring}
-              className="glass-strong fixed inset-x-3 top-3 z-[61] origin-top rounded-[28px] p-5 md:hidden"
+              className="glass-strong fixed inset-x-3 top-3 z-[61] origin-top rounded-sheet p-5 md:hidden"
             >
               <div className="flex items-center justify-between">
                 <span className="text-muted text-sm font-medium">{nav.menuTitle}</span>
@@ -138,7 +137,7 @@ export function Navbar({ ready }: { ready: boolean }) {
                   autoFocus
                   onClick={() => setOpen(false)}
                   aria-label={nav.closeMenu}
-                  className="hover:bg-fg/10 grid size-9 place-items-center rounded-full"
+                  className="hover:bg-fg/10 grid size-9 place-items-center rounded-[9px]"
                 >
                   <X className="size-[18px]" />
                 </button>
@@ -155,7 +154,7 @@ export function Navbar({ ready }: { ready: boolean }) {
                       type="button"
                       onClick={() => go(item.id)}
                       className={cn(
-                        'flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-[28px] font-semibold tracking-[-0.03em]',
+                        'flex w-full items-center justify-between rounded-[9px] px-3 py-3 text-left text-[28px] font-semibold tracking-[-0.03em]',
                         active === item.id ? 'text-fg' : 'text-muted',
                       )}
                     >

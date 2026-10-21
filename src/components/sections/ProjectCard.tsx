@@ -1,62 +1,30 @@
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowUpRight, Play } from 'lucide-react'
-import { useRef, type PointerEvent } from 'react'
 import { getYouTubeVideoId, type Project } from '../../data/schema'
 import { cn } from '../../lib/cn'
-import { useFinePointer } from '../../lib/hooks'
 import { springLayout } from '../../lib/motion'
 import { useContent } from '../../lib/useContent'
 import { ProjectArt } from './ProjectArt'
 
-const MAX_TILT = 8
-
-/** Bento tile: 3D tilt toward the cursor + spotlight. Shares a layoutId with the modal. */
+/** Project card shares a layoutId with the modal. */
 export function ProjectCard({ project, onOpen, className }: { project: Project; onOpen: () => void; className?: string }) {
   const { ui } = useContent()
   const hasDemoVideo = project.links.some(
     (link) => link.kind === 'demo' && getYouTubeVideoId(link.href) !== null,
   )
-  const fine = useFinePointer()
-  const reduce = useReducedMotion()
-  const ref = useRef<HTMLButtonElement>(null)
-  const rotateX = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 })
-  const rotateY = useSpring(useMotionValue(0), { stiffness: 200, damping: 20 })
-
-  const onMove = (e: PointerEvent<HTMLButtonElement>) => {
-    const el = ref.current
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    const px = (e.clientX - r.left) / r.width
-    const py = (e.clientY - r.top) / r.height
-    el.style.setProperty('--mx', `${px * 100}%`)
-    el.style.setProperty('--my', `${py * 100}%`)
-    if (!fine || reduce) return
-    rotateY.set((px - 0.5) * MAX_TILT * 2)
-    rotateX.set((0.5 - py) * MAX_TILT * 2)
-  }
-  const onLeave = () => {
-    rotateX.set(0)
-    rotateY.set(0)
-  }
-
   return (
     <motion.div
       layoutId={`project-${project.id}`}
       transition={springLayout}
-      style={{ borderRadius: 28 }}
-      className={cn('relative [perspective:1200px]', className)}
+      style={{ borderRadius: 14 }}
+      className={cn('relative', className)}
     >
       <motion.button
-        ref={ref}
         type="button"
         onClick={onOpen}
-        onPointerMove={onMove}
-        onPointerLeave={onLeave}
-        whileTap={{ scale: 0.98 }}
-        style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
         aria-label={`${ui.openProject}: ${project.title}`}
-        className="glass spotlight group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
+        className="glass shadow-[var(--shadow-card)] group flex h-full w-full flex-col overflow-hidden rounded-card text-left"
       >
         <div className="relative aspect-video w-full shrink-0 overflow-hidden">
           <ProjectArt project={project} large={project.featured} />
@@ -80,14 +48,14 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
                 {project.title}
               </h3>
             </div>
-            <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line)] transition-transform duration-500 ease-[var(--ease-apple)] group-hover:rotate-45">
+            <span className="bg-surface grid size-10 shrink-0 place-items-center rounded-[10px] border border-[var(--line)]">
               <ArrowUpRight className="size-[18px]" />
             </span>
           </div>
           <p className="text-muted text-[15px] leading-relaxed">{project.featured ? project.summary : project.tagline}</p>
           <ul className="mt-1 flex flex-wrap gap-1.5">
             {project.tags.slice(0, project.featured ? 4 : 3).map((tag) => (
-              <li key={tag} className="bg-fg/[0.05] text-fg/80 rounded-full border border-[var(--line)] px-3 py-1 text-xs font-medium">
+              <li key={tag} className="bg-surface text-fg rounded-[8px] border border-[var(--line)] px-3 py-1 text-xs font-medium">
                 {tag}
               </li>
             ))}

@@ -12,7 +12,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === 'dark' ? nav.themeToLight : nav.themeToDark}
-      className="text-fg/80 hover:text-fg hover:bg-fg/10 relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-full transition-colors"
+      className="text-fg hover:bg-fg/10 relative grid size-9 shrink-0 place-items-center overflow-hidden rounded-[9px] transition-colors"
     >
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span

@@ -1,29 +1,33 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useLayoutEffect, useState, type ReactNode } from 'react'
 
 type Theme = 'dark' | 'light'
 const ThemeContext = createContext<{ theme: Theme; toggle: () => void }>({ theme: 'dark', toggle: () => {} })
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // index.html sets data-theme before paint (dark by default) to avoid a flash.
   const [theme, setTheme] = useState<Theme>(() =>
-    typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light',
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('dark', theme === 'dark')
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fbfbfd' : '#050507')
-    try {
-      localStorage.setItem('theme', theme)
-    } catch {
-      /* storage unavailable */
-    }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f5f5f5' : '#121212')
   }, [theme])
 
   const toggle = useCallback(() => {
     const root = document.documentElement
-    root.classList.add('theming')
-    window.setTimeout(() => root.classList.remove('theming'), 500)
-    setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+    root.classList.add('theme-changing')
+    window.setTimeout(() => root.classList.remove('theme-changing'), 200)
+    setTheme((current) => {
+      const next = current === 'dark' ? 'light' : 'dark'
+      try {
+        localStorage.setItem('theme', next)
+      } catch {
+        /* storage unavailable */
+      }
+      return next
+    })
   }, [])
 
   return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>
