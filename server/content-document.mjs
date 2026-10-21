@@ -15,8 +15,22 @@ export function mergeContentDocuments(existing, incoming) {
   return incoming
 }
 
+export function parseContentRevision(value) {
+  if (value === undefined) return { valid: true, revision: 0 }
+
+  const revision = typeof value === 'string' && value.trim() !== ''
+    ? Number(value)
+    : value
+  if (typeof revision !== 'number' || !Number.isSafeInteger(revision) || revision < 0) {
+    const receivedType = value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value
+    return { valid: false, receivedType }
+  }
+
+  return { valid: true, revision }
+}
+
 export function applyVersionedContentSave(existing, currentVersion, incoming, expectedVersion) {
-  if (currentVersion !== expectedVersion) return { status: 409 }
+  if (expectedVersion < currentVersion) return { status: 409 }
 
   return {
     status: 200,

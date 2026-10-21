@@ -2,6 +2,7 @@ import { isEditableContent } from '../../src/data/schema'
 import { isAuthorized, jsonResponse, readJsonBody } from './_admin-auth'
 import type { StorageAdapter } from '../../server/storage'
 import { netlifyStorage } from './_storage'
+import { parseContentRevision } from '../../server/content-document.mjs'
 
 export function createContentSaveHandler(storage: StorageAdapter) {
   return async function handler(request: Request): Promise<Response> {
@@ -17,12 +18,14 @@ export function createContentSaveHandler(storage: StorageAdapter) {
       : { content: body, version: undefined }
     if (!isEditableContent(envelope.content)) return jsonResponse({ error: 'Invalid content document' }, 400)
 
-    const expectedVersion = envelope.version
-    if (typeof expectedVersion !== 'number' || !Number.isSafeInteger(expectedVersion) || expectedVersion < 0) {
-      return jsonResponse({ error: 'Invalid content version' }, 400)
+    const parsedRevision = parseContentRevision(envelope.version)
+    if (!parsedRevision.valid) {
+      return jsonResponse({
+        error: `Invalid content version: received ${parsedRevision.receivedType}; expected a non-negative integer (number or numeric string)`,
+      }, 400)
     }
 
-    const result = await storage.commitContent(envelope.content, expectedVersion)
+    const result = await storage.commitContent(envelope.content, parsedRevision.revision)
     if (result.status === 409) return jsonResponse({ error: 'Content changed elsewhere, reload' }, 409)
     return jsonResponse({ saved: true, content: result.content, version: result.version })
   } catch {

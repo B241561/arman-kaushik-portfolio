@@ -659,9 +659,14 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${token}` },
       }).then(async (response) => {
         if (!response.ok) throw new Error(`Could not load saved content (${response.status})`)
+        const versionHeader = response.headers.get('X-Content-Version')
+        const version = versionHeader === null ? 0 : Number(versionHeader)
+        if (!Number.isSafeInteger(version) || version < 0) {
+          throw new Error(`Saved content revision: received ${versionHeader === null ? 'missing' : 'string'}; expected a non-negative integer.`)
+        }
         return {
           content: await response.json(),
-          version: Number(response.headers.get('X-Content-Version') ?? 0),
+          version,
         }
       }),
     ]).then(([history, , savedResult]) => {
