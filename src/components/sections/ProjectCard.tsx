@@ -10,7 +10,7 @@ import { ProjectArt } from './ProjectArt'
 
 const MAX_TILT = 8
 
-/** Project card shares a layoutId with the modal. */
+/** Bento tile: 3D tilt toward the cursor + spotlight. Shares a layoutId with the modal. */
 export function ProjectCard({ project, onOpen, className }: { project: Project; onOpen: () => void; className?: string }) {
   const { ui } = useContent()
   const hasDemoVideo = project.links.some(
@@ -28,6 +28,8 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
     const r = el.getBoundingClientRect()
     const px = (e.clientX - r.left) / r.width
     const py = (e.clientY - r.top) / r.height
+    el.style.setProperty('--mx', `${px * 100}%`)
+    el.style.setProperty('--my', `${py * 100}%`)
     if (!fine || reduce) return
     rotateY.set((px - 0.5) * MAX_TILT * 2)
     rotateX.set((0.5 - py) * MAX_TILT * 2)
@@ -54,12 +56,12 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
         aria-label={`${ui.openProject}: ${project.title}`}
-        className="bg-elevated border-line group flex h-full w-full flex-col overflow-hidden rounded-card border text-left"
+        className="glass spotlight group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
       >
         <div className="relative aspect-video w-full shrink-0 overflow-hidden">
           <ProjectArt project={project} large={project.featured} />
           {hasDemoVideo && (
-            <span className="bg-bg border-line absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium">
+            <span className="glass-strong absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium">
               <Play aria-hidden className="size-3 fill-current" />
               Demo
             </span>
@@ -83,13 +85,13 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
             </span>
           </div>
           <p className="text-muted text-[15px] leading-relaxed">{project.featured ? project.summary : project.tagline}</p>
-          {project.tags.length > 0 && <ul className="mt-1 flex flex-wrap gap-1.5">
-            {project.tags.slice(0, project.featured ? 4 : 3).map((tag, i) => (
-              <li key={`${i}-${tag}`} className="bg-fg/[0.05] text-fg/80 rounded-full border border-[var(--line)] px-3 py-1 text-xs font-medium">
+          <ul className="mt-1 flex flex-wrap gap-1.5">
+            {project.tags.slice(0, project.featured ? 4 : 3).map((tag) => (
+              <li key={tag} className="bg-fg/[0.05] text-fg/80 rounded-full border border-[var(--line)] px-3 py-1 text-xs font-medium">
                 {tag}
               </li>
             ))}
-          </ul>}
+          </ul>
         </div>
       </motion.button>
     </motion.div>

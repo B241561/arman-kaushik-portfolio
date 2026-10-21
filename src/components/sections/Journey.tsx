@@ -5,6 +5,7 @@ import { cn } from '../../lib/cn'
 import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
 import { useContent } from '../../lib/useContent'
+import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 
@@ -30,13 +31,13 @@ export function Journey() {
           <motion.span
             aria-hidden
             style={{ scaleY: reduce ? 1 : scaleY }}
-            className="bg-accent absolute top-2 bottom-2 left-[15px] w-px origin-top sm:left-[23px]"
+            className="from-accent to-accent-2 absolute top-2 bottom-2 left-[15px] w-px origin-top bg-linear-to-b shadow-[0_0_12px_var(--accent)] sm:left-[23px]"
           />
 
           {journey.items.map((item, i) => {
             const Icon = icons[item.type]
             return (
-              <li key={item.id} className="relative">
+              <li key={`${item.title}-${i}`} className="relative">
                 <motion.span
                   aria-hidden
                   initial={{ scale: 0 }}
@@ -45,17 +46,17 @@ export function Journey() {
                   transition={springSnappy}
                   className={cn(
                     'bg-elevated absolute top-6 -left-12 grid size-8 place-items-center rounded-full border border-[var(--line)] sm:-left-16 sm:size-12',
-                    item.type === 'next' && 'bg-accent border-accent text-bg',
+                    item.type === 'next' && 'bg-accent-gradient border-transparent text-white',
                   )}
                 >
                   <Icon className="size-3.5 sm:size-5" />
                 </motion.span>
                 <Reveal delay={0.05}>
-                  <div className="surface rounded-card !p-5 sm:!p-7">
+                  <GlassCard className="!p-5 sm:!p-7">
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                       {item.date && !isPlaceholder(item.date) && (
                         <>
-                          <span className="text-accent text-sm font-semibold tabular-nums">{item.date}</span>
+                          <span className="text-gradient text-sm font-semibold tabular-nums">{item.date}</span>
                           <span className="text-subtle text-xs">·</span>
                         </>
                       )}
@@ -63,7 +64,7 @@ export function Journey() {
                     </div>
                     <h3 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{item.title}</h3>
                     <p className="text-muted mt-2 leading-relaxed">{item.text}</p>
-                  </div>
+                  </GlassCard>
                 </Reveal>
               </li>
             )

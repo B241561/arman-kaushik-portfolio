@@ -11,7 +11,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f6f3ee' : '#121110')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#fbfbfd' : '#050507')
     try {
       localStorage.setItem('theme', theme)
     } catch {
@@ -22,7 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggle = useCallback(() => {
     const root = document.documentElement
     root.classList.add('theming')
-    window.setTimeout(() => root.classList.remove('theming'), 350)
+    window.setTimeout(() => root.classList.remove('theming'), 500)
     setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
   }, [])
 

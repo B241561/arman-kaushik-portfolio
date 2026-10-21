@@ -2,6 +2,7 @@ import { useReducedMotion } from 'framer-motion'
 import { Brain, ChartColumn, Code, Globe } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import { useContent } from '../../lib/useContent'
+import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 
@@ -31,23 +32,23 @@ export function Skills() {
         {skills.groups.map((group, i) => {
           const Icon = icons[group.icon]
           return (
-            <Reveal key={`${group.title}-${i}`} delay={i * 0.06}>
-              <div className="surface rounded-card h-full p-6 sm:p-8">
-                <span className="bg-fg/[0.06] rounded-control grid size-11 place-items-center border border-[var(--line)]">
+            <Reveal key={group.title} delay={i * 0.06}>
+              <GlassCard className="h-full">
+                <span className="bg-fg/[0.06] grid size-11 place-items-center rounded-2xl border border-[var(--line)]">
                   <Icon className="text-accent size-5" />
                 </span>
                 <h3 className="mt-6 text-xl font-semibold tracking-tight">{group.title}</h3>
                 <ul className="mt-4 flex flex-wrap gap-2">
-                  {group.items.map((item, j) => (
+                  {group.items.map((item) => (
                     <li
-                      key={`${item}-${j}`}
+                      key={item}
                       className="bg-fg/[0.05] text-fg/90 rounded-full border border-[var(--line)] px-3.5 py-1.5 text-sm font-medium"
                     >
                       {item}
                     </li>
                   ))}
                 </ul>
-              </div>
+              </GlassCard>
             </Reveal>
           )
         })}
@@ -56,11 +57,10 @@ export function Skills() {
   )
 }
 
-/** Flat translucent pill — no backdrop-filter or shadow, since ~30 of these move continuously. */
 function Chip({ label }: { label: string }) {
   return (
-    <span className="bg-elevated flex items-center gap-2.5 rounded-full border border-[var(--line)] px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
-      <span className="bg-accent size-1.5 rounded-full" />
+    <span className="glass flex items-center gap-2.5 rounded-full px-5 py-2.5 text-base font-medium whitespace-nowrap sm:px-6 sm:py-3 sm:text-lg">
+      <span className="bg-accent-gradient size-1.5 rounded-full" />
       {label}
     </span>
   )
@@ -72,8 +72,8 @@ function Marquee({ items, reverse = false }: { items: string[]; reverse?: boolea
   if (reduce) {
     return (
       <ul className="container-x flex flex-wrap justify-center gap-3">
-        {items.map((item, j) => (
-          <li key={`${item}-${j}`}>
+        {items.map((item) => (
+          <li key={item}>
             <Chip label={item} />
           </li>
         ))}
@@ -83,10 +83,10 @@ function Marquee({ items, reverse = false }: { items: string[]; reverse?: boolea
 
   // Two copies + per-item right padding make translateX(-50%) loop seamlessly.
   return (
-    <div className="relative overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] sm:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+    <div className="relative overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
       <div
         className={cn(
-          'animate-marquee flex w-max will-change-transform group-hover/marquee:[animation-play-state:paused]',
+          'animate-marquee flex w-max group-hover/marquee:[animation-play-state:paused]',
           reverse && '[animation-direction:reverse]',
         )}
       >

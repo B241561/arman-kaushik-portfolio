@@ -4,47 +4,40 @@
 
 /* ---------- Design tokens ---------- */
 
-/*
- * "Editorial engineer's notebook": warm paper / warm near-black, one vermilion accent.
- * Contrast (WCAG AA), measured on --bg / --surface / --elevated:
- *   light — fg 15.9:1, muted 7.1:1, subtle 5.2:1 (4.7 on surface), accent 5.5:1 (5.0 on surface)
- *   dark  — fg 15.7:1, muted 8.9:1, subtle 6.4:1, accent 6.9:1 (6.3 on elevated)
- * --accent is reserved for links, small markers, selection and focus rings.
- */
 :root {
   color-scheme: dark;
-  --bg: #121110;
-  --surface: #1b1a18;
-  --elevated: #1d1b19;
-  --fg: #eeeae4;
-  --muted: #b8b1a7;
-  --subtle: #9c958b;
-  --line: rgb(238 234 228 / 0.12);
-  --line-strong: rgb(238 234 228 / 0.24);
-  --accent: #e9805f;
-  --warn: #e0b25c;
-  --danger: #f08a7a;
-  --scrim: rgb(8 7 6 / 0.72);
-  --nav-bg: rgb(18 17 16 / 0.82);
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --bg: #050507;
+  --surface: #0b0b0f;
+  --elevated: #111116;
+  --fg: #f5f5f7;
+  --muted: rgb(245 245 247 / 0.64);
+  --subtle: rgb(245 245 247 / 0.42);
+  --line: rgb(255 255 255 / 0.1);
+  --glass: rgb(255 255 255 / 0.045);
+  --glass-strong: rgb(20 20 26 / 0.62);
+  --accent: #3b82f6;
+  --accent-2: #8b5cf6;
+  --spot: rgb(255 255 255 / 0.09);
+  --aurora-opacity: 0.55;
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.06) inset, 0 30px 80px -40px rgb(0 0 0 / 0.8);
 }
 
 [data-theme='light'] {
   color-scheme: light;
-  --bg: #f6f3ee;
-  --surface: #ede8e0;
-  --elevated: #fbfaf7;
-  --fg: #1b1916;
-  --muted: #57514a;
-  --subtle: #6b655c;
-  --line: rgb(27 25 22 / 0.12);
-  --line-strong: rgb(27 25 22 / 0.26);
-  --accent: #b03a1f;
-  --warn: #8a5a00;
-  --danger: #a3281a;
-  --scrim: rgb(27 25 22 / 0.5);
-  --nav-bg: rgb(246 243 238 / 0.85);
-  --shadow: 0 1px 2px rgb(27 25 22 / 0.06), 0 12px 32px -16px rgb(27 25 22 / 0.22);
+  --bg: #fbfbfd;
+  --surface: #f2f2f6;
+  --elevated: #ffffff;
+  --fg: #1d1d1f;
+  --muted: rgb(29 29 31 / 0.66);
+  --subtle: rgb(29 29 31 / 0.44);
+  --line: rgb(0 0 0 / 0.08);
+  --glass: rgb(255 255 255 / 0.6);
+  --glass-strong: rgb(255 255 255 / 0.74);
+  --accent: #2563eb;
+  --accent-2: #7c3aed;
+  --spot: rgb(37 99 235 / 0.08);
+  --aurora-opacity: 0.32;
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.8) inset, 0 30px 60px -40px rgb(15 23 42 / 0.25);
 }
 
 @theme inline {
@@ -55,18 +48,39 @@
   --color-muted: var(--muted);
   --color-subtle: var(--subtle);
   --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
+  --color-glass: var(--glass);
   --color-accent: var(--accent);
-  --color-warn: var(--warn);
-  --color-danger: var(--danger);
+  --color-accent-2: var(--accent-2);
 }
 
 @theme {
-  --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  /* The one radius used across the site. */
-  --radius-card: 10px;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --radius-card: 1.75rem;
+  --radius-sheet: 2rem;
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-aurora-a: aurora-a 18s ease-in-out infinite;
+  --animate-aurora-b: aurora-b 22s ease-in-out infinite;
+  --animate-aurora-c: aurora-c 26s ease-in-out infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  @keyframes aurora-a {
+    0%, 100% { transform: translate3d(-12%, -6%, 0) scale(1); }
+    50% { transform: translate3d(10%, 8%, 0) scale(1.18); }
+  }
+  @keyframes aurora-b {
+    0%, 100% { transform: translate3d(14%, 4%, 0) scale(1.1); }
+    50% { transform: translate3d(-10%, -10%, 0) scale(0.92); }
+  }
+  @keyframes aurora-c {
+    0%, 100% { transform: translate3d(0, 10%, 0) scale(0.95); }
+    50% { transform: translate3d(-6%, -4%, 0) scale(1.2); }
+  }
 }
 
 /* ---------- Base ---------- */
@@ -81,38 +95,24 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    line-height: 1.7;
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv11';
     background: var(--bg);
     overflow-x: clip;
     min-width: 320px;
   }
-  h1,
-  h2,
-  h3 {
-    font-family: var(--font-sans);
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
   ::selection {
-    background: var(--accent);
-    color: var(--bg);
+    background: color-mix(in oklab, var(--accent) 45%, transparent);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
-    border-radius: 4px;
-  }
-  /* Inside clipping containers the ring sits inset. */
-  [data-focus-inset]:focus-visible {
-    outline-offset: -2px;
   }
   button {
     cursor: pointer;
   }
   section[id] {
-    scroll-margin-top: 4.5rem;
+    scroll-margin-top: 5rem;
   }
 }
 
@@ -134,7 +134,17 @@ html.lenis body {
 /* Smooth colour change while toggling theme */
 html.theming,
 html.theming * {
-  transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out), border-color 0.3s var(--ease-out) !important;
+  transition: background-color 0.45s var(--ease-apple), color 0.45s var(--ease-apple),
+    border-color 0.45s var(--ease-apple) !important;
+}
+
+/* Custom cursor (desktop only — class added by <Cursor />) */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+html.has-cursor :is(input, textarea, select) {
+  cursor: text !important;
 }
 
 /* ---------- Utilities ---------- */
@@ -149,49 +159,48 @@ html.theming * {
   }
 }
 
-/* Flat surface: one hairline, no fill tricks. */
-@utility surface {
-  background: var(--elevated);
+@utility glass {
+  background: var(--glass);
   border: 1px solid var(--line);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: var(--shadow-card);
 }
 
-/* The single soft shadow level (modal, menu sheet, toast). */
-@utility shadow-soft {
-  box-shadow: var(--shadow);
+@utility glass-strong {
+  background: var(--glass-strong);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: var(--shadow-card);
 }
 
-/* Small mono label for dates, tags and section numbers. */
-@utility label-mono {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  line-height: 1.7;
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
-  color: var(--subtle);
+@utility text-gradient {
+  background-image: linear-gradient(115deg, var(--accent) 0%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-/* Text link with an underline that draws in on hover. */
-@utility link-underline {
-  text-decoration: none;
-  transition: color 0.2s var(--ease-out), text-decoration-color 0.2s var(--ease-out);
-  &:hover,
-  &:focus-visible {
-    text-decoration: underline;
-    text-decoration-color: currentColor;
-    text-underline-offset: 0.2em;
+@utility bg-accent-gradient {
+  background-image: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+}
+
+/* Cursor-following spotlight — position set via --mx / --my */
+@utility spotlight {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), var(--spot), transparent 42%);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-apple);
   }
-}
-
-/* Accent link: always underlined faintly, solid on hover. */
-@utility link-accent {
-  color: var(--accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-  text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
-  transition: text-decoration-color 0.2s var(--ease-out);
-  &:hover {
-    text-decoration-color: var(--accent);
+  &:hover::before {
+    opacity: 1;
   }
 }
 

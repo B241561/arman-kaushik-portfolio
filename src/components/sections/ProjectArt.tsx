@@ -7,6 +7,13 @@ import { LazyImage } from '../primitives/LazyImage'
 
 const icons = { feynml: Activity, resume: FileText, tripcraft: Plane }
 
+/** Per-project gradient position, all within the single blue→violet accent. */
+const tints: Record<Project['icon'], string> = {
+  feynml: 'from-accent/50 via-accent-2/25 to-transparent',
+  resume: 'from-accent-2/50 via-accent/20 to-transparent',
+  tripcraft: 'from-accent/40 via-accent-2/35 to-transparent',
+}
+
 /** Cover visual: the project's image when provided, otherwise abstract artwork. */
 export function ProjectArt({ project, large = false }: { project: Project; large?: boolean }) {
   const Icon = icons[project.icon]
@@ -30,7 +37,7 @@ export function ProjectArt({ project, large = false }: { project: Project; large
 
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-surface" />
+      <div className={cn('absolute inset-0 bg-radial-[at_30%_20%]', tints[project.icon])} />
       <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)] bg-[linear-gradient(to_right,var(--line)_1px,transparent_1px),linear-gradient(to_bottom,var(--line)_1px,transparent_1px)] bg-[size:32px_32px]" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         {[0, 1, 2].map((ring) => (
@@ -42,7 +49,7 @@ export function ProjectArt({ project, large = false }: { project: Project; large
         ))}
         <span
           className={cn(
-            'relative grid place-items-center rounded-tile border border-line bg-elevated',
+            'glass-strong relative grid place-items-center rounded-[22px]',
             large ? 'size-20' : 'size-16',
           )}
         >

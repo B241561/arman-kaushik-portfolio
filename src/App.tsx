@@ -1,9 +1,11 @@
 import { AnimatePresence, MotionConfig } from 'framer-motion'
 import { lazy, Suspense, useCallback, useState } from 'react'
 import { ErrorBoundary } from './components/primitives/ErrorBoundary'
+import { Cursor } from './components/layout/Cursor'
 import { Footer } from './components/layout/Footer'
 import { Intro } from './components/layout/Intro'
 import { Navbar } from './components/layout/Navbar'
+import { ScrollProgress } from './components/layout/ScrollProgress'
 import { About } from './components/sections/About'
 import { Contact } from './components/sections/Contact'
 import { Certificates } from './components/sections/Certificates'
@@ -65,6 +67,8 @@ function PublicApp() {
 
       <AnimatePresence>{!ready && <Intro key="intro" onFinish={finishIntro} />}</AnimatePresence>
 
+      <ScrollProgress />
+      <Cursor />
       <Navbar ready={ready} />
 
       <main id="main">

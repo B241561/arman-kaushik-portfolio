@@ -4,6 +4,8 @@ import { useState, type FormEvent } from 'react'
 import { isPlaceholder } from '../../lib/placeholder'
 import { springSnappy } from '../../lib/motion'
 import { useContent } from '../../lib/useContent'
+import { GlassCard } from '../primitives/GlassCard'
+import { Magnetic } from '../primitives/Magnetic'
 import { Reveal } from '../primitives/Reveal'
 import { SectionHeading } from '../primitives/SectionHeading'
 import { useToast } from '../primitives/Toast'
@@ -11,7 +13,7 @@ import { useToast } from '../primitives/Toast'
 const socialIcons = { github: Github, linkedin: Linkedin }
 
 const field =
-  'rounded-control w-full border border-[var(--line)] bg-fg/[0.04] px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-hidden focus:border-accent focus:ring-[3px] focus:ring-accent/35'
+  'w-full rounded-2xl border border-[var(--line)] bg-fg/[0.04] px-4 py-3.5 text-[15px] text-fg placeholder:text-subtle outline-none transition-[border-color,box-shadow] duration-300 focus:border-accent focus:ring-4 focus:ring-accent/20'
 
 export function Contact() {
   const { contact, person, ui } = useContent()
@@ -51,7 +53,7 @@ export function Contact() {
         <div className="mt-14 grid gap-4 lg:grid-cols-5">
           <div className="flex flex-col gap-4 lg:col-span-2">
             <Reveal>
-              <div className="surface rounded-card p-6 sm:p-8">
+              <GlassCard>
                 <p className="text-subtle text-xs font-semibold tracking-[0.18em] uppercase">{contact.emailLabel}</p>
                 <p className="mt-3 text-xl font-semibold tracking-tight break-all sm:text-2xl">{person.email}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
@@ -76,18 +78,18 @@ export function Contact() {
                   {!emailMissing && (
                     <a
                       href={`mailto:${person.email}`}
-                      className="surface inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium"
+                      className="glass inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium"
                     >
                       <Mail className="size-4" />
                       {contact.emailLabel}
                     </a>
                   )}
                 </div>
-              </div>
+              </GlassCard>
             </Reveal>
 
             <Reveal delay={0.06}>
-              <div className="surface rounded-card !p-3">
+              <GlassCard className="!p-3">
                 <p className="text-subtle px-3 pt-3 pb-2 text-xs font-semibold tracking-[0.18em] uppercase">
                   {contact.elsewhere}
                 </p>
@@ -97,7 +99,7 @@ export function Contact() {
                     const missing = isPlaceholder(s.href)
                     const row = (
                       <>
-                        <span className="bg-fg/[0.06] rounded-control grid size-10 shrink-0 place-items-center">
+                        <span className="bg-fg/[0.06] grid size-10 shrink-0 place-items-center rounded-xl">
                           <Icon className="size-[18px]" />
                         </span>
                         <span className="min-w-0 flex-1">
@@ -112,13 +114,13 @@ export function Contact() {
                     return (
                       <li key={s.label}>
                         {missing ? (
-                          <span className="rounded-tile flex items-center gap-3 p-3 opacity-70">{row}</span>
+                          <span className="flex items-center gap-3 rounded-2xl p-3 opacity-70">{row}</span>
                         ) : (
                           <a
                             href={s.href}
                             target="_blank"
                             rel="noreferrer"
-                            className="group hover:bg-fg/[0.05] rounded-tile flex items-center gap-3 p-3 transition-colors"
+                            className="group hover:bg-fg/[0.05] flex items-center gap-3 rounded-2xl p-3 transition-colors"
                           >
                             {row}
                           </a>
@@ -127,12 +129,12 @@ export function Contact() {
                     )
                   })}
                 </ul>
-              </div>
+              </GlassCard>
             </Reveal>
           </div>
 
           <Reveal delay={0.1} className="lg:col-span-3">
-            <div className="surface rounded-card h-full p-6 sm:p-8">
+            <GlassCard className="h-full">
               <h3 className="text-2xl font-semibold tracking-tight">{contact.form.title}</h3>
               <form onSubmit={onSubmit} className="mt-6 grid gap-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -157,16 +159,18 @@ export function Contact() {
                 </label>
                 <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-subtle text-sm">{contact.form.note}</p>
-                  <button
-                    type="submit"
-                    className="bg-fg text-bg group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium transition-transform active:scale-[0.97]"
-                  >
-                    {contact.form.submit}
-                    <Send className="size-4 transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </button>
+                  <Magnetic className="self-start sm:self-auto">
+                    <button
+                      type="submit"
+                      className="bg-accent-gradient group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[15px] font-medium text-white shadow-[0_15px_40px_-15px_var(--accent-2)] transition-transform active:scale-[0.97]"
+                    >
+                      {contact.form.submit}
+                      <Send className="size-4 transition-transform duration-500 ease-[var(--ease-apple)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </button>
+                  </Magnetic>
                 </div>
               </form>
-            </div>
+            </GlassCard>
           </Reveal>
         </div>
       </div>
