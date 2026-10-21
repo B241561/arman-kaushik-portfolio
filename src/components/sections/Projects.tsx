@@ -20,12 +20,12 @@ export function Projects() {
         <SectionHeading label={projects.label} title={projects.title} subtitle={projects.subtitle} />
 
         <LayoutGroup>
-          <div className="mt-14 grid grid-cols-1 gap-4 md:auto-rows-[minmax(300px,auto)] md:grid-cols-6">
+          <div className="mt-14 grid grid-cols-1 items-start gap-5 sm:grid-cols-2">
             {projects.items.map((project, i) => (
               <Reveal
                 key={project.id}
                 delay={i * 0.08}
-                className={project.featured ? 'md:col-span-4 md:row-span-2' : 'md:col-span-2'}
+                className="h-full"
               >
                 <ProjectCard project={project} onOpen={() => setOpenId(project.id)} className="h-full" />
               </Reveal>

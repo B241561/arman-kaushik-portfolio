@@ -4,6 +4,7 @@ import { cn } from '../../lib/cn'
 import { useActiveSection } from '../../lib/hooks'
 import { useScrollTo } from '../../lib/lenis'
 import { useContent } from '../../lib/useContent'
+import { ThemeToggle } from './ThemeToggle'
 
 /** Plain static top bar: name on the left, text links on the right, 1px bottom border. */
 export function Navbar(_props: { ready: boolean }) {
@@ -26,13 +27,13 @@ export function Navbar(_props: { ready: boolean }) {
   }
 
   return (
-    <header className="border-b border-[var(--line)] bg-white">
-      <nav aria-label="Primary" className="container-x flex h-14 items-center justify-between gap-6">
-        <button type="button" onClick={() => go('home')} aria-label={nav.homeLabel} className="text-charcoal text-[15px] font-bold">
+    <header className="bg-bg border-b border-[var(--line)]">
+      <nav aria-label="Primary" className="container-x flex h-14 items-center gap-4">
+        <button type="button" onClick={() => go('home')} aria-label={nav.homeLabel} className="text-fg shrink-0 text-[15px] font-bold">
           {person.name}
         </button>
 
-        <ul className="hidden items-center gap-7 md:flex">
+        <ul className="ml-auto hidden items-center gap-7 md:flex">
           {nav.items.map((item) => (
             <li key={item.id}>
               <button
@@ -40,7 +41,7 @@ export function Navbar(_props: { ready: boolean }) {
                 onClick={() => go(item.id)}
                 aria-current={active === item.id ? 'true' : undefined}
                 className={cn(
-                  'text-charcoal text-sm hover:underline hover:underline-offset-4',
+                  'text-fg text-sm hover:underline hover:underline-offset-4',
                   active === item.id ? 'font-bold' : 'font-normal',
                 )}
               >
@@ -50,13 +51,15 @@ export function Navbar(_props: { ready: boolean }) {
           ))}
         </ul>
 
+        <ThemeToggle />
+
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-label={open ? nav.closeMenu : nav.openMenu}
           aria-expanded={open}
           aria-controls="mobile-nav"
-          className="text-charcoal grid size-9 place-items-center md:hidden"
+          className="text-fg grid size-9 place-items-center rounded-[9px] md:hidden"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
@@ -69,7 +72,7 @@ export function Navbar(_props: { ready: boolean }) {
               <button
                 type="button"
                 onClick={() => go(item.id)}
-                className={cn('text-charcoal block w-full py-3 text-left text-base', active === item.id ? 'font-bold' : 'font-normal')}
+                className={cn('text-fg block w-full py-3 text-left text-base', active === item.id ? 'font-bold' : 'font-normal')}
               >
                 {item.label}
               </button>

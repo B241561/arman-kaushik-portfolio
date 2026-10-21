@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: armaan-kaushik-portfolio
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node server
+    healthCheckPath: /healthz
+    envVars:
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_TOKEN_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_CA
+        sync: false
+      - key: NODE_VERSION
+        value: "22"

@@ -1,8 +1,11 @@
 import { isEditableContent } from '../../src/data/schema'
 import { isAuthorized, jsonResponse, readJsonBody } from './_admin-auth'
 import { readCurrentContent, saveVersion, writeCurrentContent } from './_admin-content'
+import type { StorageAdapter } from '../../server/storage'
+import { netlifyStorage } from './_storage'
 
-export default async function handler(request: Request): Promise<Response> {
+export function createContentSaveHandler(storage: StorageAdapter) {
+  return async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed' }, 405, { Allow: 'POST' })
   }
@@ -12,11 +15,14 @@ export default async function handler(request: Request): Promise<Response> {
     const body = await readJsonBody(request)
     if (!isEditableContent(body)) return jsonResponse({ error: 'Invalid content document' }, 400)
 
-    const previous = await readCurrentContent()
-    if (previous !== null) await saveVersion(previous)
-    await writeCurrentContent(body)
+    const previous = await readCurrentContent(storage)
+    if (previous !== null) await saveVersion(previous, storage)
+    await writeCurrentContent(body, storage)
     return jsonResponse({ saved: true })
   } catch {
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
+  }
 }
+
+export default createContentSaveHandler(netlifyStorage)

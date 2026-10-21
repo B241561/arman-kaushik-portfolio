@@ -2,8 +2,11 @@ import { content } from '../../src/data/content'
 import { isEditableContent, migrateLegacyAssetUrls } from '../../src/data/schema'
 import { isAuthorized, jsonResponse, readJsonBody } from './_admin-auth'
 import { readCurrentContent, readVersions, saveVersion, writeCurrentContent } from './_admin-content'
+import type { StorageAdapter } from '../../server/storage'
+import { netlifyStorage } from './_storage'
 
-export default async function handler(request: Request): Promise<Response> {
+export function createContentRestoreHandler(storage: StorageAdapter) {
+  return async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed' }, 405, { Allow: 'POST' })
   }
@@ -15,16 +18,19 @@ export default async function handler(request: Request): Promise<Response> {
       return jsonResponse({ error: 'A version id is required' }, 400)
     }
 
-    const version = (await readVersions()).find((candidate) => candidate.id === body.id)
+    const version = (await readVersions(storage)).find((candidate) => candidate.id === body.id)
     if (!version) return jsonResponse({ error: 'Version not found or invalid' }, 404)
     const restored = migrateLegacyAssetUrls(version.data, content.site.url)
     if (!isEditableContent(restored)) return jsonResponse({ error: 'Version not found or invalid' }, 404)
 
-    const previous = await readCurrentContent()
-    if (previous !== null) await saveVersion(previous)
-    await writeCurrentContent(restored)
+    const previous = await readCurrentContent(storage)
+    if (previous !== null) await saveVersion(previous, storage)
+    await writeCurrentContent(restored, storage)
     return jsonResponse({ restored: true })
   } catch {
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
+  }
 }
+
+export default createContentRestoreHandler(netlifyStorage)

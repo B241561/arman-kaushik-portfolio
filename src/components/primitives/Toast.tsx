@@ -29,7 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               transition={springSnappy}
               className="glass-strong flex items-center gap-2.5 rounded-full py-3 pr-5 pl-3 text-sm font-medium"
             >
-              <span className="bg-accent-gradient grid size-6 place-items-center rounded-full text-white">
+              <span className="bg-button-bg text-button-fg grid size-6 place-items-center rounded-full">
                 <Check className="size-3.5" strokeWidth={3} />
               </span>
               {toast.message}

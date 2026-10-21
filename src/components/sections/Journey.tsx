@@ -46,17 +46,17 @@ export function Journey() {
                   transition={springSnappy}
                   className={cn(
                     'bg-elevated absolute top-6 -left-12 grid size-8 place-items-center rounded-full border border-[var(--line)] sm:-left-16 sm:size-12',
-                    item.type === 'next' && 'bg-accent-gradient border-transparent text-white',
+                    item.type === 'next' && 'bg-button-bg border-transparent text-button-fg',
                   )}
                 >
                   <Icon className="size-3.5 sm:size-5" />
                 </motion.span>
                 <Reveal delay={0.05}>
-                  <GlassCard className="!p-5 sm:!p-7">
+                  <GlassCard>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                       {item.date && !isPlaceholder(item.date) && (
                         <>
-                          <span className="text-gradient text-sm font-semibold tabular-nums">{item.date}</span>
+                          <span className="text-accent text-sm font-semibold tabular-nums">{item.date}</span>
                           <span className="text-subtle text-xs">·</span>
                         </>
                       )}

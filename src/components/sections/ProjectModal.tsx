@@ -88,7 +88,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
         exit={{ opacity: 0 }}
         transition={{ duration: 0.35 }}
         onClick={handleClose}
-        className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-md"
+        className="fixed inset-0 z-[80] bg-[var(--overlay)]"
       />
       <div className="pointer-events-none fixed inset-0 z-[81] flex justify-center sm:p-6 md:p-10">
         <motion.div
@@ -100,7 +100,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
           onKeyDown={onDialogKeyDown}
           aria-modal="true"
           aria-labelledby={`project-title-${project.id}`}
-          className="bg-elevated pointer-events-auto relative max-h-full w-full max-w-5xl overflow-hidden border border-[var(--line)] shadow-[0_40px_120px_-30px_rgb(0_0_0/0.7)]"
+          className="bg-elevated rounded-sheet pointer-events-auto relative max-h-full w-full max-w-5xl overflow-hidden border border-[var(--line)] shadow-[var(--shadow-card)]"
         >
           <span
             data-focus-sentinel="start"
@@ -135,7 +135,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                   alt={screenshot.alt}
                   width={1200}
                   height={675}
-                  className="aspect-video w-full rounded-[20px] object-cover object-top"
+                  className="aspect-video w-full rounded-xl object-cover object-top"
                 />
               </div>
             ))}
@@ -149,7 +149,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                 >
                   {project.title}
                 </h2>
-                <p className="text-gradient mt-3 text-lg font-medium sm:text-xl">{project.tagline}</p>
+                <p className="text-accent mt-3 text-lg font-medium sm:text-xl">{project.tagline}</p>
               </motion.div>
 
               <div className="mt-10 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-14">
@@ -160,7 +160,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                       <ol className="mt-4 flex flex-col items-stretch gap-2 sm:flex-row sm:items-stretch sm:gap-0">
                         {project.flowSteps.map((step, index) => (
                           <li key={step.id} className="flex min-w-0 flex-1 flex-col items-center gap-2 sm:flex-row">
-                            <div className="glass w-full rounded-2xl p-3 sm:h-full">
+                            <div className="glass w-full rounded-card p-3 sm:h-full">
                               <p className="font-semibold">{step.label}</p>
                               <p className="text-muted mt-1 text-sm leading-relaxed">{step.description}</p>
                             </div>
@@ -184,7 +184,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     <ul className="mt-4 space-y-3">
                       {project.approach.map((step) => (
                         <li key={step} className="text-muted flex gap-3 text-[16px] leading-relaxed">
-                          <span className="bg-accent-gradient mt-2.5 size-1.5 shrink-0 rounded-full" />
+                          <span className="bg-accent mt-2.5 size-1.5 shrink-0 rounded-full" />
                           {step}
                         </li>
                       ))}
@@ -197,7 +197,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
                     <ModalLabel>{projects.sections.stack}</ModalLabel>
                     <ul className="mt-4 flex flex-wrap gap-2">
                       {project.stack.map((tag) => (
-                        <li key={tag} className="glass rounded-full px-3.5 py-1.5 text-sm font-medium">
+                        <li key={tag} className="glass rounded-lg px-3.5 py-1.5 text-sm font-medium">
                           {tag}
                         </li>
                       ))}
@@ -254,7 +254,7 @@ export function ProjectModal({ project, onClose }: { project: Project; onClose: 
             type="button"
             onClick={handleClose}
             aria-label={ui.close}
-            className="glass-strong absolute top-4 right-4 z-10 grid size-10 place-items-center rounded-full transition-transform active:scale-90"
+            className="glass-strong absolute top-4 right-4 z-10 grid size-10 place-items-center rounded-[10px] transition-transform active:scale-90"
           >
             <X className="size-[18px]" />
           </button>
@@ -287,7 +287,7 @@ function DemoVideo({
 
   return (
     <div className="px-6 pt-5 sm:px-12">
-      <div className="relative aspect-video overflow-hidden rounded-[20px] bg-black">
+      <div className="bg-[var(--black)] relative aspect-video overflow-hidden rounded-xl">
         {playing ? (
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
@@ -311,7 +311,7 @@ function DemoVideo({
                 className="absolute inset-0 size-full object-cover"
               />
             )}
-            <span className="glass-strong relative grid size-16 place-items-center rounded-full shadow-xl">
+            <span className="glass-strong relative grid size-16 place-items-center rounded-[10px]">
               <Play aria-hidden className="size-7 fill-current" />
             </span>
           </button>

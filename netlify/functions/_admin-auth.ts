@@ -1,12 +1,12 @@
 import { createHash, createHmac, randomUUID, timingSafeEqual } from 'node:crypto'
-import { getStore } from '@netlify/blobs'
+import type { StorageAdapter } from '../../server/storage'
+import { netlifyStorage } from './_storage'
 
 const NO_STORE = { 'Cache-Control': 'no-store', 'Content-Type': 'application/json; charset=utf-8' }
 const TOKEN_LIFETIME_SECONDS = 2 * 60 * 60
 const FAILURE_WINDOW_MS = 15 * 60 * 1000
 const FAILURE_LIMIT = 5
 
-type FailureState = { count: number; expiresAt: number }
 type SignedClaims = { sub: 'admin'; exp: number; nonce: string }
 
 export function jsonResponse(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
@@ -55,28 +55,18 @@ export function isAuthorized(request: Request): boolean {
   }
 }
 
-function clientIp(request: Request) {
-  return request.headers.get('x-nf-client-connection-ip')?.trim() || 'unknown'
+export function clientIp(request: Request) {
+  const netlifyIp = request.headers.get('x-nf-client-connection-ip')?.trim()
+  const forwardedIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+  return netlifyIp || forwardedIp || 'unknown'
 }
 
 function failureKey(ip: string) {
   return `admin-login-failures/${createHash('sha256').update(ip).digest('hex')}`
 }
 
-async function getFailureState(key: string): Promise<FailureState> {
-  const value = await getStore('site').get(key, { type: 'json' })
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    'count' in value &&
-    'expiresAt' in value &&
-    typeof value.count === 'number' &&
-    typeof value.expiresAt === 'number'
-  ) return value as FailureState
-  return { count: 0, expiresAt: 0 }
-}
-
-export async function handleAdminLogin(request: Request): Promise<Response> {
+export function createAdminLoginHandler(storage: StorageAdapter) {
+  return async function handleAdminLogin(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return jsonResponse({ error: 'Method not allowed' }, 405, { Allow: 'POST' })
   }
@@ -87,14 +77,9 @@ export async function handleAdminLogin(request: Request): Promise<Response> {
   if (!password || !secret) return jsonResponse({ error: 'Admin authentication is not configured' }, 503)
 
   const key = failureKey(clientIp(request))
-  const failures = await getFailureState(key)
   const now = Date.now()
-  if (failures.expiresAt > now && failures.count >= FAILURE_LIMIT) {
+  if (await storage.isRateLimited(key, now, FAILURE_LIMIT)) {
     return jsonResponse({ error: 'Too many failed attempts. Try again later.' }, 429)
-  }
-  if (failures.expiresAt <= now) {
-    failures.count = 0
-    failures.expiresAt = now + FAILURE_WINDOW_MS
   }
 
   let submitted = ''
@@ -108,12 +93,11 @@ export async function handleAdminLogin(request: Request): Promise<Response> {
   }
 
   if (constantTimeEqual(password, submitted)) {
-    await getStore('site').delete(key)
+    await storage.clearLoginFailures(key)
     return jsonResponse({ token: createAdminToken(secret), expiresIn: TOKEN_LIFETIME_SECONDS })
   }
 
-  failures.count += 1
-  await getStore('site').set(key, JSON.stringify(failures))
+  const failures = await storage.recordLoginFailure(key, now, FAILURE_WINDOW_MS)
   await new Promise((resolve) => setTimeout(resolve, 350))
   if (failures.count >= FAILURE_LIMIT) {
     return jsonResponse({ error: 'Too many failed attempts. Try again later.' }, 429)
@@ -122,7 +106,10 @@ export async function handleAdminLogin(request: Request): Promise<Response> {
   } catch {
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
+  }
 }
+
+export const handleAdminLogin = createAdminLoginHandler(netlifyStorage)
 
 export async function readJsonBody(request: Request): Promise<unknown | null> {
   try {

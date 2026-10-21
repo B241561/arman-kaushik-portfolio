@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import { isAuthorized, jsonResponse } from './_admin-auth'
-import { MEDIA_STORE_NAME, MEDIA_TYPES, mediaStore, mediaUrl, sniffMediaType } from './_media'
+import { MEDIA_TYPES, mediaUrl, sniffMediaType } from './_media'
+import type { StorageAdapter } from '../../server/storage'
+import { netlifyStorage } from './_storage'
 
 const MAX_SIZE = 4 * 1024 * 1024
 
-export default async function handler(request: Request): Promise<Response> {
+export function createMediaUploadHandler(storage: StorageAdapter) {
+  return async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405, { Allow: 'POST' })
   if (!isAuthorized(request)) return jsonResponse({ error: 'Unauthorized' }, 401)
 
@@ -47,11 +50,13 @@ export default async function handler(request: Request): Promise<Response> {
     if (sniffMediaType(bytes) !== type) return jsonResponse({ error: 'File contents do not match the selected type' }, 400)
 
     const id = randomUUID().toLowerCase()
-    await mediaStore().set(id, bytes, { metadata: { name, type, size: bytes.length } })
-    console.log(`[media-upload] stored store=${MEDIA_STORE_NAME} key=${id} size=${bytes.length} type=${type}`)
+    await storage.putMedia({ id, data: bytes, name, type, size: bytes.length })
     return jsonResponse({ id, url: mediaUrl(id), name, type, size: bytes.length })
-  } catch (error) {
-    console.error(`[media-upload] failed store=${MEDIA_STORE_NAME}`, error instanceof Error ? error.message : error)
+  } catch {
+    console.error('[media-upload] failed')
     return jsonResponse({ error: 'Upload failed' }, 500)
   }
+  }
 }
+
+export default createMediaUploadHandler(netlifyStorage)

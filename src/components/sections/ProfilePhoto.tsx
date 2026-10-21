@@ -15,18 +15,18 @@ export function ProfilePhoto() {
   return (
     <Reveal delay={0.2}>
       <figure>
-        <div className="bg-gray relative aspect-[4/5] w-full overflow-hidden">
+        <div className="bg-gray relative aspect-[4/5] w-full overflow-hidden rounded-xl">
           {hasPhoto ? (
             <LazyImage
               src={person.photo.src}
               alt={person.photo.alt}
               width={640}
               height={800}
-              className="absolute inset-0 size-full object-cover object-top"
+              className="absolute inset-0 size-full rounded-xl object-cover object-top"
               onError={() => setPhotoFailed(true)}
             />
           ) : (
-            <div role="img" aria-label={person.photo.alt} className="text-charcoal absolute inset-0 grid place-items-center text-5xl font-bold">
+            <div role="img" aria-label={person.photo.alt} className="text-fg absolute inset-0 grid place-items-center text-5xl font-bold">
               {person.initials}
             </div>
           )}

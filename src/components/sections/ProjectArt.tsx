@@ -30,8 +30,8 @@ export function ProjectArt({ project, large = false }: { project: Project; large
 
   return (
     <div aria-hidden className="bg-gray absolute inset-0 grid place-items-center overflow-hidden">
-      <span className={cn('bg-charcoal grid place-items-center', large ? 'size-20' : 'size-16')}>
-        <Icon className={cn('text-white', large ? 'size-9' : 'size-7')} strokeWidth={1.6} />
+      <span className={cn('bg-charcoal grid place-items-center rounded-[10px]', large ? 'size-20' : 'size-16')}>
+        <Icon className={cn('text-button-fg', large ? 'size-9' : 'size-7')} strokeWidth={1.6} />
       </span>
     </div>
   )
