@@ -1,6 +1,7 @@
 import { ArrowUpRight, BookMarked, Github } from 'lucide-react'
 import { isPlaceholder } from '../../lib/placeholder'
 import { useContent } from '../../lib/useContent'
+import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
 
 export function GitHubStrip() {
@@ -12,10 +13,10 @@ export function GitHubStrip() {
     <section aria-labelledby="github-title" className="relative py-12 sm:py-20">
       <div className="container-x">
         <Reveal>
-          <div className="surface rounded-card overflow-hidden p-6 sm:p-8">
+          <GlassCard className="overflow-hidden">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
-                <span className="bg-fg text-bg rounded-control grid size-12 shrink-0 place-items-center">
+                <span className="bg-fg text-bg grid size-12 shrink-0 place-items-center rounded-2xl">
                   <Github className="size-6" />
                 </span>
                 <div className="min-w-0">
@@ -46,7 +47,7 @@ export function GitHubStrip() {
 
             {/* Swipeable on mobile, grid from sm up */}
             <ul
-              className="-mx-6 mt-7 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto px-6 pt-1 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0"
+              className="-mx-6 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0"
             >
               {github.pinned.map((repo) => {
                 const linked = !isPlaceholder(repo.url)
@@ -65,7 +66,7 @@ export function GitHubStrip() {
                     <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
                       {repo.tags.map((tag) => (
                         <li key={tag} className="text-subtle flex items-center gap-1.5 text-xs">
-                          <span className="bg-accent size-2 rounded-full" />
+                          <span className="bg-accent-gradient size-2 rounded-full" />
                           {tag}
                         </li>
                       ))}
@@ -73,11 +74,11 @@ export function GitHubStrip() {
                   </>
                 )
                 const cls =
-                  'bg-fg/[0.03] rounded-tile relative block h-full border border-[var(--line)] p-5'
+                  'bg-fg/[0.03] block h-full rounded-[22px] border border-[var(--line)] p-5 transition-colors'
                 return (
-                  <li key={repo.name} className="w-[85%] shrink-0 snap-start sm:w-auto">
+                  <li key={repo.name} className="w-[78%] shrink-0 snap-start sm:w-auto">
                     {linked ? (
-                      <a href={repo.url} target="_blank" rel="noreferrer" data-focus-inset className={`${cls} card-hover`}>
+                      <a href={repo.url} target="_blank" rel="noreferrer" className={`${cls} hover:bg-fg/[0.06]`}>
                         {body}
                       </a>
                     ) : (
@@ -87,7 +88,7 @@ export function GitHubStrip() {
                 )
               })}
             </ul>
-          </div>
+          </GlassCard>
         </Reveal>
       </div>
     </section>

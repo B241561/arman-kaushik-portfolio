@@ -51,13 +51,16 @@ export function Navbar({ ready }: { ready: boolean }) {
             paddingRight: scrolled ? 5 : 7,
           }}
           transition={spring}
-          className="pointer-events-auto flex w-full max-w-max items-center gap-1 rounded-full border border-line bg-bg shadow-soft"
+          className={cn(
+            'glass-strong pointer-events-auto flex w-full max-w-max items-center gap-1 rounded-full transition-shadow duration-500',
+            scrolled && 'shadow-[0_20px_50px_-20px_rgb(0_0_0/0.6)]',
+          )}
         >
           <button
             type="button"
             onClick={() => go('home')}
             aria-label={nav.homeLabel}
-            className="bg-fg text-bg grid size-9 shrink-0 place-items-center rounded-full text-[13px] font-semibold tracking-tight"
+            className="bg-accent-gradient grid size-9 shrink-0 place-items-center rounded-full text-[13px] font-semibold tracking-tight text-white"
           >
             {person.initials}
           </button>
@@ -126,7 +129,7 @@ export function Navbar({ ready }: { ready: boolean }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.97 }}
               transition={spring}
-              className="rounded-card fixed inset-x-3 top-3 z-[61] origin-top border border-line bg-bg p-5 shadow-soft md:hidden"
+              className="glass-strong fixed inset-x-3 top-3 z-[61] origin-top rounded-[28px] p-5 md:hidden"
             >
               <div className="flex items-center justify-between">
                 <span className="text-muted text-sm font-medium">{nav.menuTitle}</span>
@@ -152,12 +155,12 @@ export function Navbar({ ready }: { ready: boolean }) {
                       type="button"
                       onClick={() => go(item.id)}
                       className={cn(
-                        'rounded-tile flex w-full items-center justify-between px-3 py-3 text-left text-[28px] font-semibold tracking-[-0.03em]',
+                        'flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-[28px] font-semibold tracking-[-0.03em]',
                         active === item.id ? 'text-fg' : 'text-muted',
                       )}
                     >
                       {item.label}
-                      {active === item.id && <span className="bg-accent size-2 rounded-full" />}
+                      {active === item.id && <span className="bg-accent-gradient size-2 rounded-full" />}
                     </button>
                   </motion.li>
                 ))}

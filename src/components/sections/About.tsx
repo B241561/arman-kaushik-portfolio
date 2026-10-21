@@ -1,7 +1,9 @@
 import { ArrowUpRight } from 'lucide-react'
 import { content as defaultContent } from '../../data/content'
 import { useContent } from '../../lib/useContent'
+import { GlassCard } from '../primitives/GlassCard'
 import { Reveal } from '../primitives/Reveal'
+import { SectionHeading } from '../primitives/SectionHeading'
 import { ProfilePhoto } from './ProfilePhoto'
 
 const projectCopy: Record<string, { title: string; result?: string; href?: string; linkLabel?: string }> = {
@@ -35,64 +37,46 @@ export function About() {
   })
 
   return (
-    <section id="about" className="bg-[#0E0E0E] py-20 text-[#EDEDED] sm:py-28">
+    <section id="about" className="relative py-28 sm:py-40">
       <div className="container-x">
-        <Reveal>
-          <p className="font-mono text-[13px] leading-[1.7] text-[#BDBDBD]">{about.label}</p>
-        </Reveal>
+        <SectionHeading label={about.label} title={about.heading} />
 
-        <div className="mt-7 grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:gap-12">
-          <div>
+        <div className="mt-8 grid gap-12 md:grid-cols-[1.15fr_0.85fr] md:gap-16">
+          <div className="space-y-8">
             <Reveal>
-              <h2 className="max-w-[18ch] font-sans text-[clamp(2.25rem,5vw,4rem)] leading-[1.08] font-medium tracking-[-0.02em]">
-                {about.heading}
-              </h2>
-              <p className="mt-5 max-w-[62ch] font-mono text-[14px] leading-[1.7] text-[#BDBDBD]">
-                {about.paragraph}
-              </p>
-              <p className="mt-5 flex items-center gap-2 font-mono text-[13px] leading-[1.7] text-[#EDEDED]">
-                <span aria-hidden className="size-2 shrink-0 rounded-full bg-[#C6FF3D]" />
+              <p className="text-muted max-w-2xl text-lg leading-relaxed">{about.paragraph}</p>
+              <p className="mt-5 flex items-center gap-3 text-sm font-medium">
+                <span aria-hidden className="bg-accent size-2 shrink-0 rounded-full" />
                 {about.internshipStatus}
               </p>
             </Reveal>
-
-            <Reveal delay={0.08} className="mt-8">
-              <ProfilePhoto />
-            </Reveal>
+            <ProfilePhoto />
           </div>
 
-          <div>
-            <ul className="border-t border-white/20">
-              {cards.map((card, index) => (
-                <li key={card.title} className="border-b border-white/20">
-                  <Reveal delay={index * 0.06}>
-                    <article className="py-5">
-                      <h3 className="font-sans text-xl font-medium tracking-[-0.02em] text-[#EDEDED]">
-                        {card.title}
-                      </h3>
-                      {card.result && <p className="mt-2 font-mono text-[13px] leading-[1.7] text-[#BDBDBD]">{card.result}</p>}
-                      {card.tags.length > 0 && (
-                        <p className="mt-2 font-mono text-[13px] leading-[1.7] text-[#8F8F8F]">
-                          {card.tags.join(' · ')}
-                        </p>
-                      )}
-                      {card.href && card.linkLabel && (
-                        <a
-                          href={card.href}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-3 inline-flex items-center gap-1 font-mono text-[13px] leading-[1.7] text-[#C6FF3D] underline decoration-transparent underline-offset-4 transition-colors hover:text-[#EDEDED] hover:decoration-current"
-                        >
-                          {card.linkLabel}
-                          <ArrowUpRight aria-hidden className="size-3.5" />
-                        </a>
-                      )}
-                    </article>
-                  </Reveal>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 font-mono text-[13px] leading-[1.7] text-[#8F8F8F]">
+          <div className="space-y-4">
+            {cards.map((card, index) => (
+              <Reveal key={card.title} delay={index * 0.08}>
+                <GlassCard className="h-full">
+                  <h3 className="text-xl font-semibold tracking-tight">{card.title}</h3>
+                  {card.result && <p className="text-muted mt-3 leading-relaxed">{card.result}</p>}
+                  {card.tags.length > 0 && (
+                    <p className="text-subtle mt-3 text-sm">{card.tags.join(' · ')}</p>
+                  )}
+                  {card.href && card.linkLabel && (
+                    <a
+                      href={card.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-fg hover:text-accent mt-4 inline-flex items-center gap-2 text-sm font-medium transition-colors"
+                    >
+                      {card.linkLabel}
+                      <ArrowUpRight aria-hidden className="size-4" />
+                    </a>
+                  )}
+                </GlassCard>
+              </Reveal>
+            ))}
+            <p className="text-subtle pt-2 text-sm">
               {about.stats.find((stat) => stat.value === 224)?.value.toLocaleString() ?? '224'} GitHub contributions in the last year
             </p>
           </div>
