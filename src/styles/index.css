@@ -5,80 +5,46 @@
 /* ---------- Design tokens ---------- */
 
 /*
- * Contrast (WCAG AA, measured on --bg and on .glass cards):
- *   dark  — fg 18:1, muted ≈7.5:1, subtle ≈6:1, accent ≈5.2:1, accent-2 ≈7:1
- *   light — fg 16:1, muted ≈6.2:1, subtle ≈5:1, accent ≈5:1, accent-2 ≈5.5:1
- * Filled accent surfaces (--fill-*) carry white text at ≥5:1 in both themes.
+ * "Editorial engineer's notebook": warm paper / warm near-black, one vermilion accent.
+ * Contrast (WCAG AA), measured on --bg / --surface / --elevated:
+ *   light — fg 15.9:1, muted 7.1:1, subtle 5.2:1 (4.7 on surface), accent 5.5:1 (5.0 on surface)
+ *   dark  — fg 15.7:1, muted 8.9:1, subtle 6.4:1, accent 6.9:1 (6.3 on elevated)
+ * --accent is reserved for links, small markers, selection and focus rings.
  */
 :root {
   color-scheme: dark;
-  --bg: #050507;
-  --surface: #0b0b0f;
-  --elevated: #111116;
-  --fg: #f5f5f7;
-  --muted: rgb(245 245 247 / 0.66);
-  --subtle: rgb(245 245 247 / 0.56);
-  --line: rgb(255 255 255 / 0.1);
-  --line-strong: rgb(255 255 255 / 0.18);
-  --accent: #3b82f6;
-  --accent-2: #a78bfa;
-  --fill-1: #2563eb;
-  --fill-2: #7c3aed;
-  --spot: rgb(255 255 255 / 0.07);
-  --aurora-opacity: 0.5;
-
-  /* Liquid glass */
-  --glass: rgb(255 255 255 / 0.05);
-  --glass-sheen: rgb(255 255 255 / 0.05);
-  --glass-strong: rgb(20 20 26 / 0.62);
-  --glass-solid: rgb(22 22 28 / 0.84);
-  --glass-fallback: rgb(17 17 22 / 0.96);
-  --glass-edge: rgb(255 255 255 / 0.08);
-  --glass-blur: 28px;
-  --glass-saturate: 170%;
-
-  /* Elevation scale */
-  --elev-1: inset 0 1px 0 0 var(--glass-edge), 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -24px rgb(0 0 0 / 0.7);
-  --elev-2: inset 0 1px 0 0 var(--glass-edge), 0 2px 8px rgb(0 0 0 / 0.3), 0 24px 56px -24px rgb(0 0 0 / 0.75);
-  --elev-3: inset 0 1px 0 0 var(--glass-edge), 0 40px 120px -30px rgb(0 0 0 / 0.75);
-  --shadow-card: var(--elev-1);
+  --bg: #121110;
+  --surface: #1b1a18;
+  --elevated: #1d1b19;
+  --fg: #eeeae4;
+  --muted: #b8b1a7;
+  --subtle: #9c958b;
+  --line: rgb(238 234 228 / 0.12);
+  --line-strong: rgb(238 234 228 / 0.24);
+  --accent: #e9805f;
+  --warn: #e0b25c;
+  --danger: #f08a7a;
+  --scrim: rgb(8 7 6 / 0.72);
+  --nav-bg: rgb(18 17 16 / 0.82);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
 }
 
 [data-theme='light'] {
   color-scheme: light;
-  --bg: #fbfbfd;
-  --surface: #f2f2f6;
-  --elevated: #ffffff;
-  --fg: #1d1d1f;
-  --muted: rgb(29 29 31 / 0.7);
-  --subtle: rgb(29 29 31 / 0.64);
-  --line: rgb(0 0 0 / 0.11);
-  --line-strong: rgb(0 0 0 / 0.18);
-  --accent: #2563eb;
-  --accent-2: #7c3aed;
-  --fill-1: #2563eb;
-  --fill-2: #7c3aed;
-  --spot: rgb(37 99 235 / 0.06);
-  --aurora-opacity: 0.3;
-
-  --glass: rgb(255 255 255 / 0.68);
-  --glass-sheen: rgb(255 255 255 / 0.6);
-  --glass-strong: rgb(255 255 255 / 0.72);
-  --glass-solid: rgb(255 255 255 / 0.9);
-  --glass-fallback: rgb(255 255 255 / 0.97);
-  --glass-edge: rgb(255 255 255 / 0.9);
-
-  --elev-1: inset 0 1px 0 0 var(--glass-edge), 0 1px 2px rgb(15 23 42 / 0.05), 0 16px 40px -24px rgb(15 23 42 / 0.22);
-  --elev-2: inset 0 1px 0 0 var(--glass-edge), 0 2px 8px rgb(15 23 42 / 0.06), 0 24px 56px -24px rgb(15 23 42 / 0.28);
-  --elev-3: inset 0 1px 0 0 var(--glass-edge), 0 40px 120px -30px rgb(15 23 42 / 0.35);
-}
-
-/* Cheaper blur on small screens */
-@media (width < 40rem) {
-  :root {
-    --glass-blur: 16px;
-    --glass-saturate: 150%;
-  }
+  --bg: #f6f3ee;
+  --surface: #ede8e0;
+  --elevated: #fbfaf7;
+  --fg: #1b1916;
+  --muted: #57514a;
+  --subtle: #6b655c;
+  --line: rgb(27 25 22 / 0.12);
+  --line-strong: rgb(27 25 22 / 0.26);
+  --accent: #b03a1f;
+  --warn: #8a5a00;
+  --danger: #a3281a;
+  --scrim: rgb(27 25 22 / 0.5);
+  --nav-bg: rgb(246 243 238 / 0.85);
+  --shadow: 0 1px 2px rgb(27 25 22 / 0.06), 0 12px 32px -16px rgb(27 25 22 / 0.22);
 }
 
 @theme inline {
@@ -89,49 +55,19 @@
   --color-muted: var(--muted);
   --color-subtle: var(--subtle);
   --color-line: var(--line);
-  --color-glass: var(--glass);
+  --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
-  --color-accent-2: var(--accent-2);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
 }
 
 @theme {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-  /* Radius scale → rounded-sheet / -card / -tile / -control */
-  --radius-sheet: 2rem;
-  --radius-card: 1.75rem;
-  --radius-tile: 1.125rem;
-  --radius-control: 0.75rem;
-  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
-
-  --animate-marquee: marquee 40s linear infinite;
-  --animate-aurora-a: aurora-a 18s ease-in-out infinite;
-  --animate-aurora-b: aurora-b 22s ease-in-out infinite;
-  --animate-aurora-c: aurora-c 26s ease-in-out infinite;
-  /* Status dot halo: a few gentle pulses, then rests (no infinite loop). */
-  --animate-halo: halo 1.8s var(--ease-apple) 0.8s 3 both;
-
-  @keyframes halo {
-    0% { transform: scale(1); opacity: 0.6; }
-    80%, 100% { transform: scale(2.4); opacity: 0; }
-  }
-
-  @keyframes marquee {
-    to {
-      transform: translate3d(-50%, 0, 0);
-    }
-  }
-  @keyframes aurora-a {
-    0%, 100% { transform: translate3d(-12%, -6%, 0) scale(1); }
-    50% { transform: translate3d(10%, 8%, 0) scale(1.18); }
-  }
-  @keyframes aurora-b {
-    0%, 100% { transform: translate3d(14%, 4%, 0) scale(1.1); }
-    50% { transform: translate3d(-10%, -10%, 0) scale(0.92); }
-  }
-  @keyframes aurora-c {
-    0%, 100% { transform: translate3d(0, 10%, 0) scale(0.95); }
-    50% { transform: translate3d(-6%, -4%, 0) scale(1.2); }
-  }
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  /* The one radius used across the site. */
+  --radius-card: 10px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ---------- Base ---------- */
@@ -147,19 +83,27 @@
   }
   body {
     font-family: var(--font-sans);
-    font-feature-settings: 'ss01', 'cv11';
+    font-size: 1rem;
+    line-height: 1.6;
     background: var(--bg);
     overflow-x: clip;
     min-width: 320px;
   }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
   ::selection {
-    background: color-mix(in oklab, var(--accent) 45%, transparent);
+    background: var(--accent);
+    color: var(--bg);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
+    border-radius: 4px;
   }
-  /* Inside clipping containers (scrollers, overflow-hidden cards) the ring sits inset. */
+  /* Inside clipping containers the ring sits inset. */
   [data-focus-inset]:focus-visible {
     outline-offset: -2px;
   }
@@ -167,7 +111,7 @@
     cursor: pointer;
   }
   section[id] {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: 4.5rem;
   }
 }
 
@@ -189,17 +133,7 @@ html.lenis body {
 /* Smooth colour change while toggling theme */
 html.theming,
 html.theming * {
-  transition: background-color 0.45s var(--ease-apple), color 0.45s var(--ease-apple),
-    border-color 0.45s var(--ease-apple) !important;
-}
-
-/* Custom cursor (desktop only — class added by <Cursor />) */
-html.has-cursor,
-html.has-cursor * {
-  cursor: none !important;
-}
-html.has-cursor :is(input, textarea, select) {
-  cursor: text !important;
+  transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out), border-color 0.3s var(--ease-out) !important;
 }
 
 /* ---------- Utilities ---------- */
@@ -214,106 +148,50 @@ html.has-cursor :is(input, textarea, select) {
   }
 }
 
-/* Card surface: translucent fill + specular sheen + hairline. No backdrop-filter —
-   cards sit on the flat page background, where a blur costs GPU time for no visual gain. */
-@utility glass {
-  background: linear-gradient(180deg, var(--glass-sheen), transparent 42%), var(--glass);
+/* Flat surface: one hairline, no fill tricks. */
+@utility surface {
+  background: var(--elevated);
   border: 1px solid var(--line);
-  box-shadow: var(--elev-1);
 }
 
-/* Floating chrome over moving content (navbar, menu sheet, toast). The only blurred surfaces. */
-@utility glass-strong {
-  background: var(--glass-fallback);
-  border: 1px solid var(--line);
-  box-shadow: var(--elev-2);
-  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background: linear-gradient(180deg, var(--glass-sheen), transparent 50%), var(--glass-strong);
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    background: var(--glass-fallback);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
+/* The single soft shadow level (modal, menu sheet, toast). */
+@utility shadow-soft {
+  box-shadow: var(--shadow);
 }
 
-/* Small controls/badges over imagery: near-opaque so they stay legible without a blur. */
-@utility glass-solid {
-  background: var(--glass-solid);
-  border: 1px solid var(--line);
-  box-shadow: var(--elev-2);
+/* Small mono label for dates, tags and section numbers. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--subtle);
 }
 
-@utility elevation-1 {
-  box-shadow: var(--elev-1);
-}
-@utility elevation-2 {
-  box-shadow: var(--elev-2);
-}
-@utility elevation-3 {
-  box-shadow: var(--elev-3);
-}
-
-/* Shared hover for static cards: a 2px lift plus a stronger shadow/hairline that fades in.
-   Only transform and opacity animate; the shadow lives on ::after. */
-@utility card-hover {
-  isolation: isolate;
-  transition: transform 0.4s var(--ease-apple);
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-    box-shadow: var(--elev-2), inset 0 0 0 1px var(--line-strong);
-    opacity: 0;
-    transition: opacity 0.4s var(--ease-apple);
-  }
-  @media (hover: hover) {
-    &:hover {
-      transform: translate3d(0, -2px, 0);
-    }
-    &:hover::after {
-      opacity: 1;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    &:hover {
-      transform: none;
-    }
+/* Text link with an underline that draws in on hover. */
+@utility link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.3s var(--ease-out), color 0.2s var(--ease-out);
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 1px;
   }
 }
 
-@utility text-gradient {
-  background-image: linear-gradient(115deg, var(--accent) 0%, var(--accent-2) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Filled surfaces use the deeper --fill pair so white text on them passes AA. */
-@utility bg-accent-gradient {
-  background-image: linear-gradient(120deg, var(--fill-1) 0%, var(--fill-2) 100%);
-}
-
-/* Cursor-following spotlight — position set via --mx / --my */
-@utility spotlight {
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border-radius: inherit;
-    pointer-events: none;
-    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), var(--spot), transparent 42%);
-    opacity: 0;
-    transition: opacity 0.4s var(--ease-apple);
-  }
-  &:hover::before {
-    opacity: 1;
+/* Accent link: always underlined faintly, solid on hover. */
+@utility link-accent {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  transition: text-decoration-color 0.2s var(--ease-out);
+  &:hover {
+    text-decoration-color: var(--accent);
   }
 }
 

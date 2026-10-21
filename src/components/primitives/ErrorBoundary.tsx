@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, { failed: boole
     if (!this.state.failed) return this.props.children
     return this.props.fallback ?? (
       <div role="alert" className="container-x py-10">
-        <p className="text-muted rounded-2xl border border-[var(--line)] p-4 text-sm">
+        <p className="text-muted rounded-card border border-line p-4 text-sm">
           The {this.props.name} section couldn't be displayed.
         </p>
       </div>
