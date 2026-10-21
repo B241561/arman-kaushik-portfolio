@@ -30,14 +30,29 @@ function toWebRequest(request: Request): globalThis.Request {
   })
 }
 
-function route(handler: WebHandler, forceQuery?: string) {
+function route(handler: WebHandler, isReady: () => boolean, forceQuery?: string) {
   return async (request: Request, response: Response, next: NextFunction) => {
+    if (!isReady()) {
+      response.setHeader('Cache-Control', 'no-store')
+      response.status(503).json({ error: 'database unavailable' })
+      return
+    }
     try {
       if (forceQuery) request.originalUrl = `${request.path}?${forceQuery}`
       const result = await handler(toWebRequest(request))
       response.status(result.status)
       result.headers.forEach((value, name) => response.setHeader(name, value))
       const bytes = new Uint8Array(await result.arrayBuffer())
+      if (result.status >= 400) {
+        const contentType = result.headers.get('content-type') ?? ''
+        if (!contentType.includes('application/json') || bytes.length === 0) {
+          const detail = new TextDecoder().decode(bytes).trim()
+          response.setHeader('Cache-Control', 'no-store')
+          response.setHeader('Content-Type', 'application/json; charset=utf-8')
+          response.send(JSON.stringify({ error: detail || 'Request failed' }))
+          return
+        }
+      }
       response.send(Buffer.from(bytes))
     } catch (error) {
       next(error)
@@ -45,8 +60,8 @@ function route(handler: WebHandler, forceQuery?: string) {
   }
 }
 
-function mediaPathRoute(handler: WebHandler) {
-  const handle = route(handler)
+function mediaPathRoute(handler: WebHandler, isReady: () => boolean) {
+  const handle = route(handler, isReady)
   return (request: Request, response: Response, next: NextFunction) => {
     const url = new URL(request.originalUrl, `${request.protocol}://${request.get('host') ?? 'localhost'}`)
     url.searchParams.set('id', request.params.id)
@@ -55,12 +70,18 @@ function mediaPathRoute(handler: WebHandler) {
   }
 }
 
-function registerAliases(app: ReturnType<typeof express>, name: string, handler: WebHandler, forceQuery?: string) {
+function registerAliases(
+  app: ReturnType<typeof express>,
+  name: string,
+  handler: WebHandler,
+  isReady: () => boolean,
+  forceQuery?: string,
+) {
   const paths = [`/api/${name}`, `/.netlify/functions/${name}`]
-  for (const path of paths) app.all(path, route(handler, forceQuery))
+  for (const path of paths) app.all(path, route(handler, isReady, forceQuery))
 }
 
-function createApp(storage: StorageAdapter) {
+function createApp(storage: StorageAdapter, isReady: () => boolean, setReady: (ready: boolean) => void) {
   const app = express()
   app.set('trust proxy', 1)
 
@@ -76,32 +97,37 @@ function createApp(storage: StorageAdapter) {
     'media-delete': createMediaDeleteHandler(storage),
   }
 
-  app.get('/healthz', async (_request, response) => {
+  app.get('/healthz', (_request, response) => {
+    response.setHeader('Cache-Control', 'no-store')
+    response.status(200).send('ok')
+  })
+  app.get('/readyz', async (_request, response) => {
     try {
       await storage.healthCheck()
       response.setHeader('Cache-Control', 'no-store')
       response.status(200).send('ok')
     } catch {
+      setReady(false)
       response.setHeader('Cache-Control', 'no-store')
       response.status(503).send('database unavailable')
     }
   })
   app.use(express.raw({ type: () => true, limit: '4mb' }))
 
-  registerAliases(app, 'content-get', handlers['content-get'])
-  registerAliases(app, 'admin-login', handlers['admin-login'])
-  registerAliases(app, 'content-save', handlers['content-save'])
-  registerAliases(app, 'content-history', handlers['content-history'])
-  registerAliases(app, 'content-restore', handlers['content-restore'])
-  registerAliases(app, 'content-reset', handlers['content-reset'])
-  registerAliases(app, 'media-upload', handlers['media-upload'])
-  registerAliases(app, 'media-get', handlers['media-get'])
-  registerAliases(app, 'media-list', handlers['media-get'], 'list=1')
-  registerAliases(app, 'media-delete', handlers['media-delete'])
-  app.get('/media/:id', mediaPathRoute(handlers['media-get']))
-  app.head('/media/:id', mediaPathRoute(handlers['media-get']))
-  app.get('/api/media/:id', mediaPathRoute(handlers['media-get']))
-  app.head('/api/media/:id', mediaPathRoute(handlers['media-get']))
+  registerAliases(app, 'content-get', handlers['content-get'], isReady)
+  registerAliases(app, 'admin-login', handlers['admin-login'], isReady)
+  registerAliases(app, 'content-save', handlers['content-save'], isReady)
+  registerAliases(app, 'content-history', handlers['content-history'], isReady)
+  registerAliases(app, 'content-restore', handlers['content-restore'], isReady)
+  registerAliases(app, 'content-reset', handlers['content-reset'], isReady)
+  registerAliases(app, 'media-upload', handlers['media-upload'], isReady)
+  registerAliases(app, 'media-get', handlers['media-get'], isReady)
+  registerAliases(app, 'media-list', handlers['media-get'], isReady, 'list=1')
+  registerAliases(app, 'media-delete', handlers['media-delete'], isReady)
+  app.get('/media/:id', mediaPathRoute(handlers['media-get'], isReady))
+  app.head('/media/:id', mediaPathRoute(handlers['media-get'], isReady))
+  app.get('/api/media/:id', mediaPathRoute(handlers['media-get'], isReady))
+  app.head('/api/media/:id', mediaPathRoute(handlers['media-get'], isReady))
 
   app.use((error: unknown, _request: Request, response: Response, _next: NextFunction) => {
     if (typeof error === 'object' && error !== null && 'type' in error && error.type === 'entity.too.large') {
@@ -135,11 +161,57 @@ function createApp(storage: StorageAdapter) {
 async function start() {
   const connectionString = process.env.DATABASE_URL
   if (!connectionString) throw new Error('DATABASE_URL is required')
-  const storage = await createPostgresStorage(connectionString)
+  const storage = createPostgresStorage(connectionString)
   const port = Number(process.env.PORT ?? 3000)
-  createApp(storage).listen(port, () => {
+  let ready = false
+  let stopping = false
+  let initialized = false
+  const setReady = (value: boolean) => { ready = value }
+  const server = createApp(storage, () => ready, setReady).listen(port, '0.0.0.0', () => {
     console.log(`Portfolio service listening on port ${port}`)
   })
+
+  const retryDatabase = async () => {
+    let delayMs = 1000
+    while (!stopping) {
+      try {
+        if (!initialized) {
+          await storage.initialize()
+          initialized = true
+        }
+        await storage.healthCheck()
+        if (!ready) console.log('Database ready')
+        ready = true
+        delayMs = 10_000
+      } catch (error) {
+        ready = false
+        const details = safeErrorDetails(error)
+        if (details.code === '42501') {
+          console.error('[server] Database role needs CREATE permission on the public schema.')
+        }
+        console.error('[server] Database startup attempt failed.', `code=${details.code}`, `message=${details.message}`)
+      }
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, delayMs)
+        timer.unref()
+      })
+      delayMs = Math.min(delayMs * 2, 60_000)
+    }
+  }
+  void retryDatabase()
+
+  const shutdown = () => {
+    if (stopping) return
+    stopping = true
+    ready = false
+    server.close(() => {
+      void storage.close().catch(() => {
+        console.error('[server] Database pool close failed')
+      })
+    })
+  }
+  process.once('SIGTERM', shutdown)
+  process.once('SIGINT', shutdown)
 }
 
 function safeErrorDetails(error: unknown) {

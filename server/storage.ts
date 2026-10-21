@@ -34,3 +34,8 @@ export interface StorageAdapter {
   deleteMedia(id: string): Promise<void>
   listMedia(): Promise<MediaMetadata[]>
 }
+
+export interface ManagedStorage extends StorageAdapter {
+  initialize(): Promise<void>
+  close(): Promise<void>
+}

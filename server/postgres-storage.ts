@@ -1,5 +1,5 @@
 import { Pool } from 'pg'
-import type { HistoryVersion, LoginFailureState, MediaMetadata, MediaRecord, StorageAdapter } from './storage'
+import type { HistoryVersion, LoginFailureState, ManagedStorage, MediaMetadata, MediaRecord } from './storage'
 
 function postgresTlsOptions(hostname: string): false | { rejectUnauthorized: boolean; ca?: string } {
   const ca = process.env.DATABASE_CA
@@ -15,7 +15,7 @@ function postgresTlsOptions(hostname: string): false | { rejectUnauthorized: boo
   return { rejectUnauthorized: true }
 }
 
-export async function createPostgresStorage(connectionString: string): Promise<StorageAdapter> {
+export function createPostgresStorage(connectionString: string): ManagedStorage {
   const databaseUrl = new URL(connectionString)
   const hostname = databaseUrl.hostname
   for (const key of ['sslmode', 'sslrootcert', 'sslcert', 'sslkey']) {
@@ -29,33 +29,27 @@ export async function createPostgresStorage(connectionString: string): Promise<S
     idleTimeoutMillis: 30_000,
   })
 
-  try {
-    await pool.query(`
-    CREATE TABLE IF NOT EXISTS public.kv (
-      key text PRIMARY KEY,
-      value jsonb NOT NULL,
-      updated_at timestamptz NOT NULL DEFAULT NOW()
-    );
-    CREATE TABLE IF NOT EXISTS public.media (
-      id uuid PRIMARY KEY,
-      name text NOT NULL,
-      type text NOT NULL,
-      size integer NOT NULL,
-      data bytea NOT NULL,
-      created_at timestamptz NOT NULL DEFAULT NOW()
-    );
-  `)
-  } catch (error) {
-    const code = typeof error === 'object' && error !== null && 'code' in error
-      ? String(error.code)
-      : undefined
-    if (code === '42501') {
-      throw new Error('Database role lacks permission to create tables in the public schema.', { cause: error })
-    }
-    throw error
-  }
-
   return {
+    async initialize() {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS public.kv (
+          key text PRIMARY KEY,
+          value jsonb NOT NULL,
+          updated_at timestamptz NOT NULL DEFAULT NOW()
+        );
+        CREATE TABLE IF NOT EXISTS public.media (
+          id uuid PRIMARY KEY,
+          name text NOT NULL,
+          type text NOT NULL,
+          size integer NOT NULL,
+          data bytea NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT NOW()
+        );
+      `)
+    },
+    async close() {
+      await pool.end()
+    },
     async healthCheck() {
       await pool.query('SELECT 1')
     },

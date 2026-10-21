@@ -30,7 +30,7 @@ declare module 'express' {
     all(path: string, handler: Handler): this
     get(path: string, handler: Handler): this
     head(path: string, handler: Handler): this
-    listen(port: number, callback: () => void): Server
+    listen(port: number, host: string, callback: () => void): Server
   }
 
   export interface RawOptions {
@@ -66,5 +66,6 @@ declare module 'pg' {
       idleTimeoutMillis: number
     })
     query<Row = Record<string, unknown>>(text: string, values?: readonly unknown[]): Promise<QueryResult<Row>>
+    end(): Promise<void>
   }
 }
