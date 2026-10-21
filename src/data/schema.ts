@@ -66,6 +66,9 @@ export type EditableSkillGroup = {
 export type EditableProject = {
   id: string
   name?: string
+  image?: string
+  imageAlt?: string
+  featured?: boolean
   tagline?: string
   description?: string
   problem?: string
@@ -81,6 +84,7 @@ export type EditableProject = {
 export type EditableTimelineItem = {
   id: string
   date?: string
+  type?: 'education' | 'project' | 'next'
   kicker: string
   title: string
   text: string
@@ -260,13 +264,16 @@ function hasUniqueIds(items: unknown[]) {
 
 function isProject(value: unknown): value is EditableProject {
   if (!isRecord(value) || !hasOnlyKeys(value, [
-    'id', 'name', 'tagline', 'description', 'problem', 'approach', 'stack', 'tags',
+    'id', 'name', 'image', 'imageAlt', 'featured', 'tagline', 'description', 'problem', 'approach', 'stack', 'tags',
     'screenshots', 'demoVideoUrl', 'links', 'flowSteps',
   ])) return false
 
   return (
     isNonEmptyText(value.id, 80) &&
     (!('name' in value) || isNonEmptyText(value.name, 120)) &&
+    (!('image' in value) || value.image === '' || isMediaAssetUrl(value.image)) &&
+    isOptionalText(value, 'imageAlt', 120) &&
+    (!('featured' in value) || typeof value.featured === 'boolean') &&
     (!('tagline' in value) || isNonEmptyText(value.tagline, 120)) &&
     isOptionalText(value, 'description', 1500) &&
     isOptionalText(value, 'problem', 1500) &&
@@ -350,10 +357,11 @@ function isSkills(value: unknown): value is { groups?: EditableSkillGroup[] } {
 }
 
 function isTimelineItem(value: unknown): value is EditableTimelineItem {
-  if (!isRecord(value) || !hasOnlyKeys(value, ['id', 'date', 'kicker', 'title', 'text'])) return false
+  if (!isRecord(value) || !hasOnlyKeys(value, ['id', 'date', 'type', 'kicker', 'title', 'text'])) return false
   return (
     isNonEmptyText(value.id, 80) &&
     isOptionalText(value, 'date', 120) &&
+    (!('type' in value) || ['education', 'project', 'next'].includes(String(value.type))) &&
     isNonEmptyText(value.kicker, 120) &&
     isNonEmptyText(value.title, 120) &&
     isNonEmptyText(value.text, 1500)

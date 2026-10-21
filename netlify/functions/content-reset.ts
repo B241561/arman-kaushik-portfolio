@@ -14,7 +14,7 @@ export function createContentResetHandler(storage: StorageAdapter) {
     const previous = await readCurrentContent(storage)
     if (previous !== null) await saveVersion(previous, storage)
     await deleteCurrentContent(storage)
-    return jsonResponse({ reset: true })
+    return jsonResponse({ reset: true, version: await storage.getContentVersion() })
   } catch {
     return jsonResponse({ error: 'Internal server error' }, 500)
   }

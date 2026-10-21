@@ -120,6 +120,9 @@ function createDefaultDocument(): EditableContent {
     projects: content.projects.items.map((project) => ({
       id: project.id,
       name: project.title,
+      image: persistedAssetUrl(project.image),
+      ...(project.imageAlt !== undefined ? { imageAlt: project.imageAlt } : {}),
+      ...(project.featured !== undefined ? { featured: project.featured } : {}),
       tagline: project.tagline,
       description: project.summary,
       problem: project.problem,
@@ -128,12 +131,13 @@ function createDefaultDocument(): EditableContent {
       tags: [...project.tags],
       screenshots: project.screenshots.map((screenshot) => ({ ...screenshot, src: persistedAssetUrl(screenshot.src) })),
       demoVideoUrl: project.demoVideoUrl,
-      links: project.links.filter((link) => link.kind !== 'demo').map((link) => ({ ...link })),
+      links: project.links.map((link) => ({ ...link })),
       flowSteps: project.flowSteps.map((step) => ({ ...step })),
     })),
     timeline: content.journey.items.map((item) => ({
       id: item.id,
       ...(item.date !== undefined ? { date: item.date } : {}),
+      type: item.type,
       kicker: item.kicker,
       title: item.title,
       text: item.text,
@@ -187,7 +191,7 @@ function defaultRow(path: PathPart[]): unknown {
       flowSteps: [],
     }
   }
-  if (field === 'timeline') return { id: `timeline-${crypto.randomUUID()}`, kicker: '', title: '', text: '' }
+  if (field === 'timeline') return { id: `timeline-${crypto.randomUUID()}`, type: 'project', kicker: '', title: '', text: '' }
   if (field === 'certificates') return { id: `certificate-${crypto.randomUUID()}`, title: '', issuer: '', year: '', type: 'image', file: '' }
   if (field === 'previous') return { id: `resume-${crypto.randomUUID()}`, url: '', uploadedAt: new Date().toISOString() }
   if (field === 'stats') return { value: 0, label: '' }
@@ -421,6 +425,8 @@ function SchemaFields({
       <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
         {Object.entries(value)
           .filter(([key]) => !(path[0] === 'about' && ['body', 'status', 'copyVersion'].includes(key)))
+          .filter(([key]) => !(path[0] === 'projects' && ['image', 'imageAlt', 'featured'].includes(key)))
+          .filter(([key]) => !(path[0] === 'timeline' && key === 'type'))
           .map(([key, child]) => (
           <div key={key} className={`min-w-0 ${['body', 'description', 'problem', 'text', 'approach', 'lines', 'items', 'stack', 'tags', 'highlights'].includes(key) ? 'sm:col-span-2' : ''}`}>
             <SchemaFields value={child} path={[...path, key]} update={update} mediaFiles={mediaFiles} onUpload={onUpload} onDeleteMedia={onDeleteMedia} onSelectAsset={onSelectAsset} onRemove={onRemove} />
@@ -438,6 +444,7 @@ function SchemaFields({
 async function requestJson(path: string, token: string, method = 'GET', body?: unknown) {
   const response = await fetch(`/.netlify/functions/${path}`, {
     method,
+    cache: 'no-store',
     headers: {
       Authorization: `Bearer ${token}`,
       ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
@@ -477,7 +484,9 @@ export default function AdminPage() {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [contentLoaded, setContentLoaded] = useState(false)
   const [versions, setVersions] = useState<Version[]>([])
+  const [contentVersion, setContentVersion] = useState(0)
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([])
   const valid = isEditableContent(draft)
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(savedDraft), [draft, savedDraft])
@@ -639,6 +648,7 @@ export default function AdminPage() {
     if (!token) return
     let active = true
     setLoading(true)
+    setContentLoaded(false)
     void Promise.all([
       requestJson('content-history', token),
       loadMedia(token).catch((error: unknown) => {
@@ -649,15 +659,22 @@ export default function AdminPage() {
         headers: { Authorization: `Bearer ${token}` },
       }).then(async (response) => {
         if (!response.ok) throw new Error(`Could not load saved content (${response.status})`)
-        return response.json()
+        return {
+          content: await response.json(),
+          version: Number(response.headers.get('X-Content-Version') ?? 0),
+        }
       }),
-    ]).then(([history, saved]) => {
+    ]).then(([history, , savedResult]) => {
       if (!active) return
+      const saved = savedResult.content
       setVersions(parseVersions(history))
       const normalized = migrateLegacyAssetUrls(saved, content.site.url)
-      const loaded = isEditableContent(normalized) ? mergeDocument(createDefaultDocument(), normalized) : createDefaultDocument()
+      if (!isEditableContent(normalized)) throw new Error('Saved content failed validation; it was not loaded into the editor.')
+      const loaded = mergeDocument(createDefaultDocument(), normalized)
       setDraft(loaded)
       setSavedDraft(JSON.parse(JSON.stringify(loaded)) as EditableContent)
+      setContentVersion(savedResult.version)
+      setContentLoaded(true)
     }).catch((error: Error) => {
       if (active) setMessage(error.message)
     }).finally(() => { if (active) setLoading(false) })
@@ -665,7 +682,17 @@ export default function AdminPage() {
   }, [token])
 
   const update = (path: PathPart[], value: unknown) => {
-    setDraft((current: unknown) => setPath(current, path, value))
+    setDraft((current: unknown) => {
+      const next = setPath(current, path, value)
+      if (path[0] !== 'projects' || !path.includes('screenshots') || !isRecordValue(next)) return next
+      const projectIndex = Number(path[1])
+      const project = Array.isArray(next.projects) ? next.projects[projectIndex] : undefined
+      if (!isRecordValue(project)) return next
+      const screenshots = Array.isArray(project.screenshots) ? project.screenshots : []
+      const primary = isRecordValue(screenshots[0]) ? screenshots[0] : {}
+      const withImage = setPath(next, ['projects', projectIndex, 'image'], primary.src ?? '')
+      return setPath(withImage, ['projects', projectIndex, 'imageAlt'], primary.alt)
+    })
     setMessage('')
   }
 
@@ -695,13 +722,18 @@ export default function AdminPage() {
   }
 
   const save = async () => {
-    if (!token || !valid) return
+    if (!token || !valid || !contentLoaded) return
     setBusy(true)
     setMessage('')
     try {
-      await requestJson('content-save', token, 'POST', draft)
-      setSavedDraft(draft)
-      try { localStorage.setItem('portfolio-content-v1', JSON.stringify(draft)) } catch { /* cache is optional */ }
+      const result = await requestJson('content-save', token, 'POST', { content: draft, version: contentVersion })
+      if (!isRecordValue(result) || !isEditableContent(result.content) || typeof result.version !== 'number') {
+        throw new Error('Save response did not contain a valid document.')
+      }
+      const saved = mergeDocument(createDefaultDocument(), result.content)
+      setDraft(saved)
+      setSavedDraft(JSON.parse(JSON.stringify(saved)) as EditableContent)
+      setContentVersion(result.version)
       setMessage('Changes saved.')
       setVersions(parseVersions(await requestJson('content-history', token)))
     } catch (error) {
@@ -716,11 +748,12 @@ export default function AdminPage() {
     setBusy(true)
     setMessage('')
     try {
-      await requestJson('content-reset', token, 'POST', {})
+      const result = await requestJson('content-reset', token, 'POST', {})
       const defaults = createDefaultDocument()
       setDraft(defaults)
       setSavedDraft(defaults)
-      try { localStorage.removeItem('portfolio-content-v1') } catch { /* cache is optional */ }
+      if (isRecordValue(result) && typeof result.version === 'number') setContentVersion(result.version)
+      setContentLoaded(true)
       setMessage('Content reset to defaults.')
       setVersions(parseVersions(await requestJson('content-history', token)))
     } catch (error) {
@@ -735,13 +768,18 @@ export default function AdminPage() {
     setBusy(true)
     setMessage('')
     try {
-      await requestJson('content-restore', token, 'POST', { id })
-      const restored = await fetch('/.netlify/functions/content-get', { cache: 'no-store' }).then((response) => response.json())
+      const result = await requestJson('content-restore', token, 'POST', { id })
+      if (!isRecordValue(result) || typeof result.version !== 'number' || !('content' in result)) {
+        throw new Error('Restore response did not contain a valid document.')
+      }
+      const restored = result.content
       const normalized = migrateLegacyAssetUrls(restored, content.site.url)
       if (!isEditableContent(normalized)) throw new Error('The restored version failed validation.')
-      setDraft(normalized)
-      setSavedDraft(normalized)
-      try { localStorage.setItem('portfolio-content-v1', JSON.stringify(normalized)) } catch { /* cache is optional */ }
+      const restoredDocument = mergeDocument(createDefaultDocument(), normalized)
+      setDraft(restoredDocument)
+      setSavedDraft(restoredDocument)
+      setContentVersion(result.version)
+      setContentLoaded(true)
       setMessage('Version restored.')
       setVersions(parseVersions(await requestJson('content-history', token)))
     } catch (error) {
@@ -903,7 +941,7 @@ export default function AdminPage() {
             {loading ? 'Loading saved content…' : dirty ? 'Unsaved changes' : 'All changes saved'}
           </p>
           <button type="button" className={buttonClass} disabled={busy || loading} onClick={reset}>Reset to defaults</button>
-          <button type="button" className={primaryButtonClass} disabled={busy || loading || !dirty || !valid} onClick={save}>{busy ? 'Saving…' : 'Save'}</button>
+          <button type="button" className={primaryButtonClass} disabled={busy || loading || !contentLoaded || !dirty || !valid} onClick={save}>{busy ? 'Saving…' : 'Save'}</button>
         </div>
         {!valid && <p className="mt-3 text-sm text-red-400">Some fields are invalid. Check required fields, URLs, text lengths, and duplicate IDs.</p>}
         {message && <p role="status" className="mt-3 text-sm">{message}</p>}

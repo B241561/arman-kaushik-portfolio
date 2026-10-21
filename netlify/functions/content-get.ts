@@ -19,7 +19,7 @@ export function createContentGetHandler(storage: StorageAdapter) {
   const content = await storage.getContent()
   return new Response(request.method === 'HEAD' ? null : JSON.stringify(content ?? {}), {
     status: 200,
-    headers,
+    headers: { ...headers, 'X-Content-Version': String(await storage.getContentVersion()) },
   })
   }
 }

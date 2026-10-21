@@ -1,6 +1,5 @@
 import { isEditableContent } from '../../src/data/schema'
 import { isAuthorized, jsonResponse, readJsonBody } from './_admin-auth'
-import { readCurrentContent, saveVersion, writeCurrentContent } from './_admin-content'
 import type { StorageAdapter } from '../../server/storage'
 import { netlifyStorage } from './_storage'
 
@@ -13,12 +12,19 @@ export function createContentSaveHandler(storage: StorageAdapter) {
 
   try {
     const body = await readJsonBody(request)
-    if (!isEditableContent(body)) return jsonResponse({ error: 'Invalid content document' }, 400)
+    const envelope = typeof body === 'object' && body !== null && 'content' in body
+      ? body as { content: unknown; version?: unknown }
+      : { content: body, version: undefined }
+    if (!isEditableContent(envelope.content)) return jsonResponse({ error: 'Invalid content document' }, 400)
 
-    const previous = await readCurrentContent(storage)
-    if (previous !== null) await saveVersion(previous, storage)
-    await writeCurrentContent(body, storage)
-    return jsonResponse({ saved: true })
+    const expectedVersion = envelope.version
+    if (typeof expectedVersion !== 'number' || !Number.isSafeInteger(expectedVersion) || expectedVersion < 0) {
+      return jsonResponse({ error: 'Invalid content version' }, 400)
+    }
+
+    const result = await storage.commitContent(envelope.content, expectedVersion)
+    if (result.status === 409) return jsonResponse({ error: 'Content changed elsewhere, reload' }, 409)
+    return jsonResponse({ saved: true, content: result.content, version: result.version })
   } catch {
     return jsonResponse({ error: 'Internal server error' }, 500)
   }

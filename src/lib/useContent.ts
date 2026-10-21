@@ -78,6 +78,10 @@ function mapProject(project: EditableProject, index: number): Partial<Project> &
     icon: defaultProject?.icon ?? 'feynml',
   }
 
+  if (project.image !== undefined) mapped.image = restoreDefaultAssetPath(project.image)
+  if (project.imageAlt !== undefined) mapped.imageAlt = project.imageAlt
+  if (project.featured !== undefined) mapped.featured = project.featured
+
   if (project.name !== undefined) mapped.title = project.name
   if (project.tagline !== undefined) mapped.tagline = project.tagline
   if (project.description !== undefined) mapped.summary = project.description
@@ -93,28 +97,24 @@ function mapProject(project: EditableProject, index: number): Partial<Project> &
       ...screenshot,
       src: restoreDefaultAssetPath(screenshot.src),
     }))
-    mapped.image = mapped.screenshots[0]?.src ?? ''
-    mapped.imageAlt = mapped.screenshots[0]?.alt
+    if (project.image === undefined) mapped.image = mapped.screenshots[0]?.src ?? ''
+    if (project.imageAlt === undefined) mapped.imageAlt = mapped.screenshots[0]?.alt
   }
 
   let links: ProjectLink[] | undefined
   if (project.links !== undefined) {
     links = project.links.map((link) => ({ ...link, kind: link.kind ?? 'live' }))
   }
-  if (project.demoVideoUrl) {
-    links ??= defaultProject?.links ?? []
-    links = links.filter((link) => link.kind !== 'demo')
-    links.push({ label: 'Demo video', href: project.demoVideoUrl, kind: 'demo' })
+  if (project.demoVideoUrl !== undefined) {
     mapped.demoVideoUrl = project.demoVideoUrl
+    if (project.demoVideoUrl && links !== undefined &&
+      !links.some((link) => link.kind === 'demo' && link.href === project.demoVideoUrl)) {
+      links.push({ label: 'Demo video', href: project.demoVideoUrl, kind: 'demo' })
+    }
   } else if (links !== undefined) {
     const savedDemo = links.find((link) => link.kind === 'demo')
-    links = links.filter((link) => link.kind !== 'demo')
-    if (project.demoVideoUrl === undefined && savedDemo) {
-      mapped.demoVideoUrl = savedDemo.href
-      links.push(savedDemo)
-    }
+    if (savedDemo) mapped.demoVideoUrl = savedDemo.href
   }
-  if (project.demoVideoUrl === '') mapped.demoVideoUrl = ''
   if (links !== undefined) mapped.links = links
 
   // Fields still missing on a new project are filled in by normalizeProject after the merge.
@@ -129,7 +129,7 @@ function mapTimelineItem(item: EditableTimelineItem): JourneyItem {
     title: item.title,
     kicker: item.kicker,
     text: item.text,
-    type: defaultItem?.type ?? 'project',
+    type: item.type ?? defaultItem?.type ?? 'project',
   }
 }
 

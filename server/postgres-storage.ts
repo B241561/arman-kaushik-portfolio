@@ -1,5 +1,6 @@
 import { Pool } from 'pg'
 import type { HistoryVersion, LoginFailureState, ManagedStorage, MediaMetadata, MediaRecord } from './storage'
+import { applyVersionedContentSave } from './content-document.mjs'
 
 function postgresTlsOptions(hostname: string): false | { rejectUnauthorized: boolean; ca?: string } {
   const ca = process.env.DATABASE_CA
@@ -45,6 +46,9 @@ export function createPostgresStorage(connectionString: string): ManagedStorage 
           data bytea NOT NULL,
           created_at timestamptz NOT NULL DEFAULT NOW()
         );
+        INSERT INTO public.kv (key, value)
+        VALUES ('content-version', '0'::jsonb)
+        ON CONFLICT (key) DO NOTHING;
       `)
     },
     async close() {
@@ -57,15 +61,102 @@ export function createPostgresStorage(connectionString: string): ManagedStorage 
       const result = await pool.query<{ value: unknown }>('SELECT value FROM kv WHERE key = $1', ['content'])
       return result.rows[0]?.value ?? null
     },
+    async getContentVersion() {
+      const result = await pool.query<{ value: unknown }>('SELECT value FROM kv WHERE key = $1', ['content-version'])
+      const value = result.rows[0]?.value
+      return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : 0
+    },
+    async commitContent(value, expectedVersion) {
+      const client = await pool.connect()
+      try {
+        await client.query('BEGIN')
+        const versionResult = await client.query<{ value: unknown }>(
+          'SELECT value FROM kv WHERE key = $1 FOR UPDATE',
+          ['content-version'],
+        )
+        const storedVersion = versionResult.rows[0]?.value
+        const currentVersion = typeof storedVersion === 'number' ? storedVersion : 0
+        const contentResult = await client.query<{ value: unknown }>(
+          'SELECT value FROM kv WHERE key = $1',
+          ['content'],
+        )
+        const previous = contentResult.rows[0]?.value ?? null
+        const result = applyVersionedContentSave(previous, currentVersion, value, expectedVersion)
+        if (result.status === 409) {
+          await client.query('ROLLBACK')
+          return result
+        }
+
+        if (previous !== null) {
+          const historyResult = await client.query<{ value: HistoryVersion[] }>(
+            'SELECT value FROM kv WHERE key = $1',
+            ['content-history'],
+          )
+          const history = Array.isArray(historyResult.rows[0]?.value) ? historyResult.rows[0].value : []
+          history.push({ id: crypto.randomUUID(), createdAt: new Date().toISOString(), data: previous })
+          await client.query(
+            `INSERT INTO kv (key, value, updated_at) VALUES ($1, $2::jsonb, NOW())
+             ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+            ['content-history', JSON.stringify(history.slice(-10))],
+          )
+        }
+        await client.query(
+          `INSERT INTO kv (key, value, updated_at) VALUES ($1, $2::jsonb, NOW())
+           ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+          ['content', JSON.stringify(result.content)],
+        )
+        await client.query(
+          'UPDATE kv SET value = $1::jsonb, updated_at = NOW() WHERE key = $2',
+          [JSON.stringify(result.version), 'content-version'],
+        )
+        await client.query('COMMIT')
+        return result
+      } catch (error) {
+        await client.query('ROLLBACK')
+        throw error
+      } finally {
+        client.release()
+      }
+    },
     async setContent(value) {
-      await pool.query(
-        `INSERT INTO kv (key, value, updated_at) VALUES ($1, $2::jsonb, NOW())
-         ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
-        ['content', JSON.stringify(value)],
-      )
+      const client = await pool.connect()
+      try {
+        await client.query('BEGIN')
+        await client.query(
+          `INSERT INTO kv (key, value, updated_at) VALUES ($1, $2::jsonb, NOW())
+           ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+          ['content', JSON.stringify(value)],
+        )
+        await client.query(
+          `INSERT INTO kv (key, value, updated_at) VALUES ($1, '1'::jsonb, NOW())
+           ON CONFLICT (key) DO UPDATE SET value = (kv.value::text::bigint + 1)::text::jsonb, updated_at = NOW()`,
+          ['content-version'],
+        )
+        await client.query('COMMIT')
+      } catch (error) {
+        await client.query('ROLLBACK')
+        throw error
+      } finally {
+        client.release()
+      }
     },
     async deleteContent() {
-      await pool.query('DELETE FROM kv WHERE key = $1', ['content'])
+      const client = await pool.connect()
+      try {
+        await client.query('BEGIN')
+        await client.query('DELETE FROM kv WHERE key = $1', ['content'])
+        await client.query(
+          `INSERT INTO kv (key, value, updated_at) VALUES ($1, '1'::jsonb, NOW())
+           ON CONFLICT (key) DO UPDATE SET value = (kv.value::text::bigint + 1)::text::jsonb, updated_at = NOW()`,
+          ['content-version'],
+        )
+        await client.query('COMMIT')
+      } catch (error) {
+        await client.query('ROLLBACK')
+        throw error
+      } finally {
+        client.release()
+      }
     },
     async getHistory() {
       const result = await pool.query<{ value: HistoryVersion[] }>('SELECT value FROM kv WHERE key = $1', ['content-history'])

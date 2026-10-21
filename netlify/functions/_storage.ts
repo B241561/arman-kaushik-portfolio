@@ -1,10 +1,13 @@
 import { getStore } from '@netlify/blobs'
 import type { HistoryVersion, LoginFailureState, MediaMetadata, MediaRecord, StorageAdapter } from '../../server/storage'
 import { MEDIA_STORE_NAME } from './_media'
+import { applyVersionedContentSave } from '../../server/content-document.mjs'
 
 const siteStore = () => getStore({ name: 'site', consistency: 'strong' })
 const mediaStore = () => getStore({ name: MEDIA_STORE_NAME, consistency: 'strong' })
 const HISTORY_KEY = 'content-history'
+const CONTENT_VERSION_KEY = 'content-version'
+const HISTORY_LIMIT = 10
 
 function isLoginFailureState(value: unknown): value is LoginFailureState {
   return typeof value === 'object'
@@ -20,11 +23,35 @@ export const netlifyStorage: StorageAdapter = {
   async getContent() {
     return siteStore().get('content', { type: 'json' })
   },
+  async getContentVersion() {
+    const value: unknown = await siteStore().get(CONTENT_VERSION_KEY, { type: 'json' })
+    return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : 0
+  },
+  async commitContent(value, expectedVersion) {
+    const store = siteStore()
+    const currentVersion = await this.getContentVersion()
+    const previous = await store.get('content', { type: 'json' })
+    const result = applyVersionedContentSave(previous, currentVersion, value, expectedVersion)
+    if (result.status === 409) return result
+
+    if (previous !== null) {
+      const history = await this.getHistory()
+      history.push({ id: crypto.randomUUID(), createdAt: new Date().toISOString(), data: previous })
+      await this.setHistory(history.slice(-HISTORY_LIMIT))
+    }
+    await store.set('content', JSON.stringify(result.content))
+    await store.set(CONTENT_VERSION_KEY, JSON.stringify(result.version))
+    return result
+  },
   async setContent(value) {
     await siteStore().set('content', JSON.stringify(value))
+    const version = await this.getContentVersion()
+    await siteStore().set(CONTENT_VERSION_KEY, JSON.stringify(version + 1))
   },
   async deleteContent() {
     await siteStore().delete('content')
+    const version = await this.getContentVersion()
+    await siteStore().set(CONTENT_VERSION_KEY, JSON.stringify(version + 1))
   },
   async getHistory() {
     const value = await siteStore().get(HISTORY_KEY, { type: 'json' })

@@ -19,9 +19,15 @@ export type MediaRecord = {
 
 export type MediaMetadata = Omit<MediaRecord, 'data'>
 
+export type ContentSaveResult =
+  | { status: 409 }
+  | { status: 200; content: unknown; version: number }
+
 export interface StorageAdapter {
   healthCheck(): Promise<void>
   getContent(): Promise<unknown | null>
+  getContentVersion(): Promise<number>
+  commitContent(value: unknown, expectedVersion: number): Promise<ContentSaveResult>
   setContent(value: unknown): Promise<void>
   deleteContent(): Promise<void>
   getHistory(): Promise<HistoryVersion[]>

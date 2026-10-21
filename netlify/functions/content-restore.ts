@@ -4,6 +4,7 @@ import { isAuthorized, jsonResponse, readJsonBody } from './_admin-auth'
 import { readCurrentContent, readVersions, saveVersion, writeCurrentContent } from './_admin-content'
 import type { StorageAdapter } from '../../server/storage'
 import { netlifyStorage } from './_storage'
+import { mergeContentDocuments } from '../../server/content-document.mjs'
 
 export function createContentRestoreHandler(storage: StorageAdapter) {
   return async function handler(request: Request): Promise<Response> {
@@ -25,8 +26,13 @@ export function createContentRestoreHandler(storage: StorageAdapter) {
 
     const previous = await readCurrentContent(storage)
     if (previous !== null) await saveVersion(previous, storage)
-    await writeCurrentContent(restored, storage)
-    return jsonResponse({ restored: true })
+    const completeRestore = mergeContentDocuments(previous ?? {}, restored)
+    await writeCurrentContent(completeRestore, storage)
+    return jsonResponse({
+      restored: true,
+      content: await readCurrentContent(storage),
+      version: await storage.getContentVersion(),
+    })
   } catch {
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
