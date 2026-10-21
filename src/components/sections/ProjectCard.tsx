@@ -10,7 +10,7 @@ import { ProjectArt } from './ProjectArt'
 
 const MAX_TILT = 8
 
-/** Bento tile: 3D tilt toward the cursor + spotlight. Shares a layoutId with the modal. */
+/** Bento tile: 3D tilt toward the cursor. Shares a layoutId with the modal. */
 export function ProjectCard({ project, onOpen, className }: { project: Project; onOpen: () => void; className?: string }) {
   const { ui } = useContent()
   const hasDemoVideo = project.links.some(
@@ -56,7 +56,7 @@ export function ProjectCard({ project, onOpen, className }: { project: Project; 
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
         aria-haspopup="dialog"
         aria-label={`${ui.openProject}: ${project.title}`}
-        className="glass spotlight group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
+        className="glass group flex h-full w-full flex-col overflow-hidden rounded-[28px] text-left"
       >
         <div className="relative aspect-video w-full shrink-0 overflow-hidden">
           <ProjectArt project={project} large={project.featured} />

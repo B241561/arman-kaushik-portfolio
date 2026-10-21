@@ -25,6 +25,7 @@ const person = {
   socials: {
     github: 'https://github.com/B241561',
     linkedin: 'https://www.linkedin.com/in/arman-kaushik-29b5b6370/',
+    instagram: '[INSTAGRAM_URL]',
   },
 }
 
@@ -185,17 +186,15 @@ export const content = {
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     menuTitle: 'Menu',
-    themeToLight: 'Switch to light mode',
-    themeToDark: 'Switch to dark mode',
   },
 
   hero: {
-    eyebrow: 'Open to AI/ML & data science internships',
-    valueProp: 'Third-year CSE student at SKIT Jaipur, building machine learning and data tools.',
-    primaryCta: 'View Projects',
-    secondaryCta: 'Download Resume',
-    scrollCue: 'Scroll',
-    scrollCueLabel: 'Scroll to About',
+    role: 'Computer Science Student · AI/ML & Data',
+    emailCta: 'Email me',
+    aboutTitle: 'About Me',
+    resumeCta: 'Resume',
+    portfolioCta: 'Portfolio',
+    socialsLabel: 'Social links',
   },
 
   about: {
